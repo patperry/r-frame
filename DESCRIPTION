@@ -1,0 +1,21 @@
+Package: frame
+Version: 0.0.0.9000
+Title: Flexible Data Frames
+Authors@R: c(
+  person(c("Patrick", "O."), "Perry",
+         role = c("aut", "cph", "cre"),
+         email = "pperry@stern.nyu.edu"))
+Depends: R (>= 3.3)
+Imports:
+  utf8 (>= 1.1.2)
+Suggests:
+  knitr,
+  nycflights13,
+  testthat
+Description: Data frames supporting multi-attribute keys, nested data frames and other matrix-like columns.
+License: Apache License (== 2.0) | file LICENSE
+URL: https://github.com/patperry/r-frame
+BugReports: https://github.com/patperry/r-frame/issues
+LazyData: Yes
+Encoding: UTF-8
+VignetteBuilder: knitr
