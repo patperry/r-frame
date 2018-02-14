@@ -36,21 +36,16 @@ record <- function(...)
     }
 
     names(x) <- names
-    do(c.record, x)
+    as.record(x)
 }
 
 
-is.record <- function(x, mode = NULL, n = NULL, names = NULL)
+is.record <- function(x, n = NULL, names = NULL)
 {
-# The underlying storage mode for record `x` can be any list or atomic type.
-# Records with components of all the same type can be stored as atomic
-# vectors, but they can also be stored as lists.
+    n     <- if (is.null(n))     NA   else as.size.scalar(n)
+    names <- if (is.null(names)) NULL else as.character.vector(names, n)
 
-    mode  <- if (is.null(mode))  "any" else as.mode(mode)
-    n     <- if (is.null(n))     NA    else as.size.scalar(n)
-    names <- if (is.null(names)) NULL  else as.character.vector(names, n)
-
-    if (!is.vector(x, mode))
+    if (!is.list(x))
         FALSE
     else if (!inherits(x, "record"))
         FALSE
@@ -62,20 +57,20 @@ is.record <- function(x, mode = NULL, n = NULL, names = NULL)
         TRUE
 }
 
-# We coerce other objects to records by first converting to vector. We
+
+# We coerce other objects to records by first converting to list. We
 # preserve object names for vector inputs.
 
-as.record <- function(x, mode = NULL, n = NULL, names = NULL)
+as.record <- function(x, n = NULL, names = NULL)
     UseMethod("as.record")
 
 
-as.record.default <- function(x, mode = NULL, n = NULL, names = NULL)
+as.record.default <- function(x, n = NULL, names = NULL)
 {
-    mode  <- if (is.null(mode))  "any" else as.mode(mode)
-    n     <- if (is.null(n))     NA    else as.size.scalar(n)
-    names <- if (is.null(names)) NULL  else as.character.vector(names, n)
+    n     <- if (is.null(n))     NA   else as.size.scalar(n)
+    names <- if (is.null(names)) NULL else as.character.vector(names)
 
-    if (is.record(x, mode, n, names))
+    if (is.record(x, n, names))
         return(x)
 
     if (!is.na(n) && length(x) != n)
@@ -87,86 +82,17 @@ as.record.default <- function(x, mode = NULL, n = NULL, names = NULL)
         stop("argument names do not match")
     }
 
-    # work around bug: as.character(list(NA)) == "NA"
-    if (mode == "character") {
-        missing <- anyNA(x)
-        if (missing) {
-            which <- is.na(x)
-        }
-    }
-
-    x <- as.vector(x, mode)
+    x <- as.list(x)
     attributes(x) <- NULL
-
-    if (mode == "character" && missing) {
-        x[which] <- NA
-    }
-
     class(x) <- "record"
     names(x) <- names
     x
 }
 
-as.logical.record <- function(x, n = NULL, names = NULL)
-    as.record(x, "logical", n, names)
-as.raw.record <- function(x, n = NULL, names = NULL)
-    as.record(x, "raw", n, names)
-as.integer.record <- function(x, n = NULL, names = NULL)
-    as.record(x, "integer", n, names)
-as.double.record <- function(x, n = NULL, names = NULL)
-    as.record(x, "double", n, names)
-as.complex.record <- function(x, n = NULL, names = NULL)
-    as.record(x, "complex", n, names)
-as.character.record <- function(x, n = NULL, names = NULL)
-    as.record(x, "character", n, names)
-as.list.record <- function(x, n = NULL, names = NULL)
-    as.record(x, "list", n, names)
-
-as.numeric.record <- as.double.record
-
 as.data.frame.record <- function(x, row.names = NULL, optional = FALSE, ...)
 {
-    x <- as.list.record(x)
     class(x) <- NULL
     as.data.frame(x)
-}
-
-# Records mostly behave like R base vectors, but they treat the empty
-# character string `""` as a missing value, and they have slightly
-# different indexing (`[`) behavior.
-#
-# See below for a description of the indexing behavior.
-
-anyNA.record <- function(x, recursive = FALSE)
-{
-    if (!is.character(x))
-        NextMethod("anyNA")
-
-    for (i in seq_along(x)) {
-        elt <- x[[i]]
-        if (is.na(elt) || elt == "")
-            return(TRUE)
-    }
-    
-    FALSE
-}
-
-
-is.na.record <- function(x)
-{
-    if (!is.character(x))
-        NextMethod("is.na")
-
-    n <- length(x)
-    result <- logical(n)
-
-    for (i in seq_len(n)) {
-        elt <- x[[i]]
-        if (is.na(elt) || elt == "")
-            result[[i]] <- TRUE
-    }
-
-    result
 }
 
 
@@ -176,17 +102,17 @@ is.na.record <- function(x)
 #
 # Note that `names(x)` may contain duplicate values.
 
-names.record <- function(x)
-    attr(x, "names_", TRUE)
-
 `names<-.record` <- function(x, value)
 {
     if (identical(names(x), value))
         return(x)
 
     if (!is.null(value)) {
-        value <- as.character.record(value)
-        value <- as.normal(value)
+        value <- as.character.vector(value)
+        value <- utf8_normalize(value)
+        if (anyNA(value)) {
+            value[is.na(value)] <- ""
+        }
         n <- length(x)
         nvalue <- length(value)
 
@@ -196,7 +122,7 @@ names.record <- function(x)
         }
     }
 
-    attr(x, "names_") <- value
+    attr(x, "names") <- value
     x
 }
 
@@ -204,42 +130,19 @@ names.record <- function(x)
 c.record <- function(...)
 {
     args <- list(...)
-    narg <- length(args)
-    mode <- modes_combine(args)
-    as.record(args, mode)
-}
-
-
-modes_combine <- function(xlist)
-{
-    n <- length(xlist)
-    mode <- "NULL"
-
-    for (i in seq_len(n)) {
-        x <- xlist[[i]]
-        type <- typeof(x)
-        if (mode == "NULL") {
-            mode <- type
-        } else if (type != mode) {
-            return("list")
+    nlist <- vapply(args, length, 0)
+    ntot <- sum(nlist)
+    result <- vector("list", ntot)
+    off <- 0
+    for (i in seq_along(args)) {
+        n <- nlist[[i]]
+        if (n > 0) {
+            result[(off + 1):(off + n)] <- args[[i]]
+            off <- off + n
         }
     }
-
-    if (mode == "NULL")
-        "any"
-    else mode
-}
-
-
-qualify_names <- function(n, names = NULL, prefix = NULL)
-{
-    if (is.null(prefix))
-        names
-    else if (n == 0)
-        character()
-    else if (!is.null(names))
-        paste(prefix, names, sep = ".")
-    else paste(prefix, seq_len(n), sep = ".")
+    names(result) <- flatten_names(nlist, lapply(args, names), names(args))
+    as.record(result)
 }
 
 
@@ -264,4 +167,16 @@ flatten_names <- function(nlist, nameslist = NULL, prefixlist = NULL)
     }
 
     result
+}
+
+
+qualify_names <- function(n, names = NULL, prefix = NULL)
+{
+    if (is.null(prefix) || !nzchar(prefix))
+        names
+    else if (n == 0)
+        character()
+    else if (!is.null(names))
+        paste(prefix, names, sep = ".")
+    else paste(prefix, seq_len(n), sep = ".")
 }

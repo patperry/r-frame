@@ -24,89 +24,89 @@ do <- function(f, x, env = NULL)
 }
 
 
-walk <- function(.x, .f, ...)
-    UseMethod("walk")
+map_ <- function(x, f)
+    UseMethod("map_")
 
-walk.default <- function(.x, .f, ...)
+map_.default <- function(x, f)
 {
-    for (i in seq_along(.x)) {
-        .f(.x[[i]], ...)
+    for (i in seq_along(x)) {
+        f(x[[i]])
     }
     invisible(NULL)
 }
 
 
-map <- function(.x, .f, ...)
+map <- function(x, f)
     UseMethod("map")
 
-map.default <- function(.x, .f, ...)
-    list.map(.x, .f, ...)
+map.default <- function(x, f)
+    list.map(x, f)
 
 
-list.map <- function(.x, .f, ...)
+list.map <- function(x, f)
     UseMethod("list.map")
 
-list.map.default <- function(.x, .f, ...)
+list.map.default <- function(x, f)
 {
-    n <- length(.x)
+    n <- length(x)
     y <- vector("list", n)
     for (i in seq_len(n)) {
-        y[[i]] <- .f(.x[[i]], ...)
+        y[[i]] <- f(x[[i]])
     }
-    names(y) <- names(.x)
-    as.list.record(y)
+    names(y) <- names(x)
+    y
 }
 
 
-NULL.map <- function(.x, .f, ...)
-    UseMethod("logical.map")
+NULL.map <- function(x, f)
+    UseMethod("NULL.map")
 
-NULL.map.default <- function(.x, .f, ...)
+NULL.map.default <- function(x, f)
 {
-    for (i in seq_along(.x)) {
-        val <- .f(.x[[i]], ...)
+    for (i in seq_along(x)) {
+        val <- f(x[[i]])
         if (!is.null(val) && length(val) > 0) {
-            fmt <- "`.f` had non-NULL result for input `.x[[%.0f]]`"
+            fmt <- "`f` had non-NULL result for input `x[[%.0f]]`"
             stop(sprintf(fmt, i))
         }
     }
     NULL
 }
 
-logical.map <- function(.x, .f, ...)
+logical.map <- function(x, f)
     UseMethod("logical.map")
 
-logical.map.default <- function(.x, .f, ...)
-    as.logical.record(map(.x, .f, ...))
+logical.map.default <- function(x, f)
+    as.logical(map(x, f))
 
-raw.map <- function(.x, .f, ...)
+raw.map <- function(x, f)
     UseMethod("raw.map")
 
-raw.map.default <- function(.x, .f, ...)
-    as.raw.record(map(.x, .f, ...))
+raw.map.default <- function(x, f)
+    as.raw(map(x, f))
 
-integer.map <- function(.x, .f, ...)
+integer.map <- function(x, f)
     UseMethod("integer.map")
 
-integer.map.default <- function(.x, .f, ...)
-    as.integer.record(map(.x, .f, ...))
+integer.map.default <- function(x, f)
+    as.integer(map(x, f))
 
-double.map <- function(.x, .f, ...)
+double.map <- function(x, f)
     UseMethod("double.map")
 
-double.map.default <- function(.x, .f, ...)
-    as.double.record(map(.x, .f, ...))
+double.map.default <- function(x, f)
+    as.double(map(x, f))
 
-complex.map <- function(.x, .f, ...)
+complex.map <- function(x, f)
     UseMethod("complex.map")
 
-complex.map.default <- function(.x, .f, ...)
-    as.complex.record(map(.x, .f, ...))
+complex.map.default <- function(x, f)
+    as.complex(map(x, f))
 
-character.map <- function(.x, .f, ...)
+character.map <- function(x, f)
     UseMethod("character.map")
 
-character.map.default <- function(.x, .f, ...)
-    as.character.record(map(.x, .f, ...))
+character.map.default <- function(x, f)
+    as.character(map(x, f))
 
 numeric.map <- double.map

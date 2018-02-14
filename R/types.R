@@ -31,6 +31,14 @@ as.character.scalar <- function(x)
     as.character(x)
 }
 
+as.character.vector <- function(x)
+{
+    if (!is.character(x) || is.object(x))
+        x <- as.character(x)
+
+    x
+}
+
 as.mode <- function(x)
 {
 # A *mode* is a storage mode for a vector: any list or atomic mode.

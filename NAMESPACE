@@ -10,22 +10,9 @@ export(is.record)
 export(as.record)
 
 S3method(as.record, default); export(as.record.default)
-
-S3method(as.logical, record)   ; export(as.logical.record)
-S3method(as.raw, record)       ; export(as.raw.record)
-S3method(as.integer, record)   ; export(as.integer.record)
-S3method(as.double, record)    ; export(as.double.record); 
-S3method(as.complex, record)   ; export(as.complex.record)
-S3method(as.character, record) ; export(as.character.record)
-S3method(as.list, record)      ; export(as.list.record)
-export(as.numeric.record)
-
 S3method(c, record); export(c.record)
 
 S3method(as.data.frame, record)
-S3method(anyNA, record)
-S3method(is.na, record)
-S3method(names, record)
 S3method(`names<-`, record)
 
 
@@ -48,8 +35,8 @@ S3method(as.normal.complex, default)   ; export(as.normal.complex.default)
 
 export(do)
 
-export(walk)
-S3method(walk, default); export(walk.default)
+export(map_)
+S3method(map_, default); export(map_.default)
 
 export(map)
 S3method(map, default)           ; export(map.default)
