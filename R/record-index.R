@@ -30,7 +30,8 @@
 
     if (n > 1)
         entry[[ i[-1] ]]
-    else entry
+    else
+        entry
 }
 
 
@@ -46,9 +47,14 @@
     i1 <- arg_record_index1(n, i)
 
     if (n == 1) {
+        if (!is.null(value)) {
+            value <- list(value)
+        }
         x[i1] <- value
     } else {
-        x[[i1]][[ i[-1] ]] <- value
+        entry <- x[[i1]]
+        entry[[ i[-1] ]] <- value
+        x[[i1]] <- entry
     }
 
     x
@@ -91,25 +97,16 @@
 
 record_delete <- function(x, i)
 {
-    if (is.null(i))
-        return(record_delete_all(x))
-
-    if (is.character(i))
-        i <- match(i, names(x))
-
     class(x) <- NULL
-    x[i] <- NULL
+
+    if (is.null(i)) {
+        x[] <- NULL
+    } else {
+        x[i] <- NULL
+    }
+
     class(x) <- "record"
 
-    x
-}
-
-
-record_delete_all <- function(x)
-{
-    class(x) <- NULL
-    x[] <- NULL
-    class(x) <- "record"
     x
 }
 
