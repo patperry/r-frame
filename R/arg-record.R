@@ -83,9 +83,6 @@ arg_record_subset <- function(x, value, call = sys.call(-1))
                      "numeric index cannot contain both negative and non-negative values",
                      call))
             }
-            if (any(value > length(x))) {
-                stop(simpleError("numeric index exceeds object length", call))
-            }
         }
 
         value
@@ -105,17 +102,23 @@ arg_record_subset <- function(x, value, call = sys.call(-1))
 
         which(value)
     } else {
+        names <- names(value)
         if (!is.character(value) || is.object(value)) {
-            names <- names(value)
             value <- as.character(value)
-            names(value) <- names
         }
+        if (is.null(names)) {
+            names <- value
+        }
+        empty <- !nzchar(names) | is.na(names)
+        names[empty] <- value[empty]
 
         index <- match(value, names(x), 0)
-        names(index) <- names(value)
-        if (any(index == 0)) {
-            fmt <- "index contains unknown name \"%s\""
-            stop(simpleError(sprintf(fmt, value[[which(index == 0)[[1]]]]), call))
+        names(index) <- names
+        new <- which(index == 0)
+        nnew <- length(new)
+        if (nnew > 0) {
+            n <- length(x)
+            index[new] <- (n + 1):(n + nnew)
         }
         index
     }

@@ -62,12 +62,18 @@
         x
     } else {
         y <- .subset(x, i)
-        class(y) <- "record"
-        if (length(i) > 0 && i[[1]] >= 0) {
-            ni <- names(i)
-            if (!is.null(ni))
-                names(y) <- ni
+
+        names <- names(i)
+        if (is.null(names)) {
+            names <- names(y)
         }
+
+        if (anyNA(names)) {
+            names[is.na(names)] <- ""
+        }
+
+        names(y) <- names
+        class(y) <- "record"
         y
     }
 }
@@ -194,6 +200,10 @@ record_replace_index_unsafe <- function(x, i, value, call)
 
     class(x) <- NULL
     x[i] <- value
+    names <- names(i)
+    if (!is.null(names)) {
+        names(x)[i] <- names
+    }
     oldClass(x) <- "record"
 
     x

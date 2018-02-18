@@ -34,7 +34,7 @@ test_that("mixed sign", {
 
 test_that("out-of-bounds", {
     x <- record(1)
-    expect_error(x[2], "numeric index exceeds object length")
+    expect_equal(x[2], as.record(structure(list(NULL), names = "")))
 })
 
 
@@ -47,7 +47,7 @@ test_that("wrong length logical mask", {
 
 test_that("unknown name", {
     x <- record(aa = 1)
-    expect_error(x["a"], "index contains unknown name \"a\"")
+    expect_equal(x["a"], record(a = NULL))
 })
 
 
@@ -55,4 +55,24 @@ test_that("factor index", {
     x <- record(a = 5, b = 4, c = 3)
     i <- factor("b")
     expect_equal(x[i], record(b = 4))
+})
+
+
+test_that("$", {
+    x <- record(a = 1, b = 13, cc = 10)
+    expect_equal(x$b, 13)
+})
+
+
+test_that("$<- existing", {
+    x <- record(a = 1, b = 13, cc = 10)
+    x$b <- "foo"
+    expect_equal(x, record(a = 1, b = "foo", cc = 10))
+})
+
+
+test_that("$<- new", {
+    x <- record(a = 1, b = 13, cc = 10)
+    x$c <- "foo"
+    expect_equal(x, record(a = 1, b = 13, cc = 10, c = "foo"))
 })
