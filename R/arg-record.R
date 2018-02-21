@@ -106,19 +106,24 @@ arg_record_subset <- function(x, value, call = sys.call(-1))
         if (!is.character(value) || is.object(value)) {
             value <- as.character(value)
         }
+
         if (is.null(names)) {
             names <- value
+        } else {
+            empty <- is.na(names) | !nzchar(names)
+            names[empty] <- value[empty]
         }
-        empty <- !nzchar(names) | is.na(names)
-        names[empty] <- value[empty]
 
         index <- match(value, names(x), 0)
         names(index) <- names
+
         new <- which(index == 0)
         nnew <- length(new)
         if (nnew > 0) {
             n <- length(x)
-            index[new] <- (n + 1):(n + nnew)
+            vnew <- value[new]
+            inew <- (n + 1):(n + nnew)
+            index[new] <- inew[match(vnew, vnew)] # handle duplicates in vnew
         }
         index
     }

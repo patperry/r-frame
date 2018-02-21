@@ -70,15 +70,17 @@
         y <- .subset(x, i)
 
         names <- names(i)
-        if (is.null(names)) {
+        if (!is.null(names)) {
+            empty <- is.na(names) | !nzchar(names)
+            names(y)[!empty] <- names[!empty]
+        } else {
             names <- names(y)
+            if (anyNA(names)) {
+                names[is.na(names)] <- ""
+                names(y) <- names
+            }
         }
 
-        if (anyNA(names)) {
-            names[is.na(names)] <- ""
-        }
-
-        names(y) <- names
         class(y) <- "record"
         y
     }
@@ -130,11 +132,13 @@ record_replace <- function(x, i, value, call = sys.call(-1))
 
     class(x) <- NULL
     x[i] <- value
+
     names <- names(i)
     if (!is.null(names)) {
-        names(x)[i] <- names
+        empty <- is.na(names) | !nzchar(names)
+        names(x)[i[!empty]] <- names[!empty]
     }
-    oldClass(x) <- "record"
 
+    oldClass(x) <- "record"
     x
 }

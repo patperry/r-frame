@@ -164,3 +164,47 @@ test_that("replace with 0", {
     x[c(0, 0, 1)] <- c(100, 200, 300)
     expect_equal(x, record(a = 300, b = 2, c = 3, d = 4))
 })
+
+
+test_that("rename replace", {
+    x <- record(a = 1)
+    x[c(b = 1)] <- 2
+    expect_equal(x, record(b = 2))
+})
+
+
+test_that("rename repeat replace", {
+    x <- record(a = 1)
+    x[c(b = 1, c = 1)] <- c(2, 3)
+    expect_equal(x, record(c = 3))
+})
+
+
+test_that("rename implicit replace", {
+    x <- record(a = 1)
+    x[c(b = 1, 1)] <- c(2, 3)
+    expect_equal(x, record(b = 3))
+})
+
+
+test_that("replace empty names", {
+    x <- record(a = 1)
+    i <- c(1, 1)
+    names(i) <- c("", "")
+    x[i] <- c(2, 3)
+    expect_equal(x, record(a = 3))
+})
+
+
+test_that("select, rename one", {
+    x <- record(a = 10, b = 2)
+    y <- x[c("z" = 1, 1)]
+    expect_equal(y, record(z = 10, a = 10))
+})
+
+
+test_that("repeated new name", {
+    x <- record(a = 1)
+    x[c("b", "b")] <- c(10, 20)
+    expect_equal(x, record(a = 1, b = 20))
+})
