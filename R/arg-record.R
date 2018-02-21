@@ -13,8 +13,7 @@
 #  limitations under the License.
 
 
-arg_record_names <- function(n, value, name = argname(substitute(value)),
-                             call = sys.call(-1))
+arg_record_names <- function(n, value, name, call = sys.call(-1))
 {
     if (missing(value) || is.null(value))
         return(NULL)

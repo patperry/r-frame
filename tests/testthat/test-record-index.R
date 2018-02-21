@@ -208,3 +208,11 @@ test_that("repeated new name", {
     x[c("b", "b")] <- c(10, 20)
     expect_equal(x, record(a = 1, b = 20))
 })
+
+
+test_that("invalid name", {
+    x <- record(a = 2)
+    i <- "fa\xE7ile"; Encoding(i) <- "UTF-8"
+    expect_error(x[[i]] <- 2,
+                 "`value` entry 2 has wrong character encoding")
+})

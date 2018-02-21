@@ -81,8 +81,7 @@
             }
         }
 
-        class(y) <- "record"
-        y
+        as.record(y)
     }
 }
 
@@ -106,8 +105,7 @@ record_delete <- function(x, i)
     } else {
         x[i] <- NULL
     }
-    class(x) <- "record"
-    x
+    as.record(x)
 }
 
 
@@ -139,6 +137,5 @@ record_replace <- function(x, i, value, call = sys.call(-1))
         names(x)[i[!empty]] <- names[!empty]
     }
 
-    oldClass(x) <- "record"
-    x
+    as.record(x)
 }

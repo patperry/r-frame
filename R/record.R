@@ -108,18 +108,8 @@ as.data.frame.record <- function(x, row.names = NULL, optional = FALSE, ...)
         return(x)
 
     if (!is.null(value)) {
-        value <- as.character.vector(value)
-        value <- utf8_normalize(value)
-        if (anyNA(value)) {
-            value[is.na(value)] <- ""
-        }
         n <- length(x)
-        nvalue <- length(value)
-
-        if (nvalue != n) {
-            fmt <- "mismatch: `value` length is %.0f, argument length is %.0f"
-            stop(sprintf(fmt, name, nvalue, n))
-        }
+        value <- arg_record_names(n, value, "`value`")
     }
 
     attr(x, "names") <- value
