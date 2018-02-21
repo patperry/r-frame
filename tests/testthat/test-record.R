@@ -6,9 +6,24 @@ test_that("without names", {
                  as.record(list("2" = 2, "xx" = "foo", "-8" = -8)))
 })
 
+
 test_that("with names", {
     expect_equal(record(a = 3, b = "hello"),
                  as.record(list(a = 3, b = "hello")))
+})
+
+
+test_that("set wrong names", {
+    x <- record(a = 1, b = 2)
+    expect_error(names(x) <- "foo",
+                 "mismatch: `value` length is 1, object length is 2")
+})
+
+
+test_that("as.record wrong names", {
+    x <- record(a = 1, b = 2)
+    expect_error(as.record(x, names = c("a", "bb")),
+                 "argument names do not match")
 })
 
 test_that("c", {

@@ -216,3 +216,9 @@ test_that("invalid name", {
     expect_error(x[[i]] <- 2,
                  "`value` entry 2 has wrong character encoding")
 })
+
+test_that("rename by character", {
+    x <- record(a = 1, b = 2, c = 3)
+    expect_equal(x[c("x" = "a", "b", "y" = "b")],
+                 record(x = 1, b = 2, y = 2))
+})

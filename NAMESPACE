@@ -13,7 +13,6 @@ export(as.record)
 S3method(as.record, default); export(as.record.default)
 S3method(c, record); export(c.record)
 
-S3method(as.data.frame, record)
 S3method(`names<-`, record)
 S3method(`$`, record)
 S3method(`$<-`, record)

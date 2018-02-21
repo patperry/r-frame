@@ -43,7 +43,7 @@ record <- function(...)
 is.record <- function(x, n = NULL, names = NULL)
 {
     n     <- if (is.null(n))     NA   else as.size.scalar(n)
-    names <- if (is.null(names)) NULL else as.character.vector(names, n)
+    names <- if (is.null(names)) NULL else as.character.vector(names)
 
     if (!is.list(x))
         FALSE
@@ -51,7 +51,7 @@ is.record <- function(x, n = NULL, names = NULL)
         FALSE
     else if (!is.na(n) && !isTRUE(length(x) == n))
         FALSE
-    else if (!is.null(names) && !isTRUE(all(names(x) == names)))
+    else if (!is.null(names) && !identical(names(x), names))
         FALSE
     else
         TRUE
@@ -78,7 +78,7 @@ as.record.default <- function(x, n = NULL, names = NULL)
 
     if (is.null(names)) {
         names <- names(x)
-    } else if (!isTRUE(all(names == names(x)))) {
+    } else if (!identical(names, names(x))) {
         stop("argument names do not match")
     }
 
@@ -87,12 +87,6 @@ as.record.default <- function(x, n = NULL, names = NULL)
     class(x) <- "record"
     names(x) <- names
     x
-}
-
-as.data.frame.record <- function(x, row.names = NULL, optional = FALSE, ...)
-{
-    class(x) <- NULL
-    as.data.frame(x)
 }
 
 
