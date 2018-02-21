@@ -121,9 +121,9 @@ arg_record_subset <- function(x, value, call = sys.call(-1))
         nnew <- length(new)
         if (nnew > 0) {
             n <- length(x)
-            vnew <- value[new]
             inew <- (n + 1):(n + nnew)
-            index[new] <- inew[match(vnew, vnew)] # handle duplicates in vnew
+            vnew <- value[new]
+            index[new] <- inew[match(vnew, vnew)] # handle duplicates
         }
         index
     }
