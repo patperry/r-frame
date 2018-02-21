@@ -150,3 +150,17 @@ test_that("delete by name", {
     x[c("a", "b")] <- NULL
     expect_equal(x, record(c = "foo"))
 })
+
+
+test_that("replace wrong number", {
+    x <- record(a = 1, b = 2, c = 3, d = 4)
+    expect_error(x[NULL] <- c(100, 101),
+                 "mismatch: selection length is 4, replacement length is 2")
+})
+
+
+test_that("replace with 0", {
+    x <- record(a = 1, b = 2, c = 3, d = 4)
+    x[c(0, 0, 1)] <- c(100, 200, 300)
+    expect_equal(x, record(a = 300, b = 2, c = 3, d = 4))
+})
