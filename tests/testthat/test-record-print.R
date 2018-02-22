@@ -1,5 +1,10 @@
 context("record-print")
 
+test_that("empty", {
+    x <- record()
+    expect_equal(capture_output(print.record(x)), "(empty)")
+})
+
 test_that("with names", {
     ctype <- switch_ctype("C")
     on.exit(Sys.setlocale("LC_CTYPE", ctype), add = TRUE)

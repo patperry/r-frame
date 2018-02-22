@@ -12,7 +12,7 @@ format_record_names <- function(x, nest = 0, indent = 2)
         }
         names(x) <- names
     } else {
-        empty <- is.na(names) || !nzchar(names)
+        empty <- is.na(names) | !nzchar(names)
         if (any(empty)) {
             names[empty] <- paste0("[[", which(empty), "]]")
             names(x) <- names
@@ -80,7 +80,6 @@ format_record_limit <- function(x, limit = NA)
             }
         }
     }
-
 
     list(object = x, trunc = trunc, limit = limit)
 }
@@ -174,9 +173,15 @@ format_record_lines <- function(x, name.width, nest = 0, indent = 2)
 print.record <- function(x, limit = NULL, line = NULL, ...)
 {
     x <- as.record(x)
-    fmt <- format.record(x, limit, line, meta = TRUE)
-    meta <- attr(fmt, "format.meta")
-    lines <- format_record_lines(fmt, meta$name.width)
-    cat(lines, sep = "\n")
+
+    if (length(x) == 0) {
+        cat("(empty)\n")
+    } else {
+        fmt <- format.record(x, limit, line, meta = TRUE)
+        meta <- attr(fmt, "format.meta")
+        lines <- format_record_lines(fmt, meta$name.width)
+        cat(lines, sep = "\n")
+    }
+
     invisible(x)
 }
