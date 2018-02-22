@@ -14,6 +14,12 @@
 
 ## Types
 
+as.option <- function(x)
+{
+    x <- as.scalar(x)
+    as.logical(x)
+}
+
 as.enum <- function(choices, x)
 {
     x <- as.character.scalar(x)
@@ -60,9 +66,9 @@ as.size.scalar <- function(x)
     x <- as.scalar(x)
     x <- as.numeric(x)
 
-    if (is.na(x)) {
+    if (is.na(x) || x < 0) {
         NA_integer_
-    } else if (is.finite(x) && x >= 0) {
+    } else if (is.finite(x)) {
         x <- trunc(x)
         if (x <= .Machine$integer.max) {
             as.integer(x)
@@ -70,6 +76,6 @@ as.size.scalar <- function(x)
             x
         }
     } else {
-        stop(sprintf("argument must be finite and non-negative, not `%f`", x))
+        stop(sprintf("argument must be finite or NA, not `%f`", x))
     }
 }

@@ -1,6 +1,9 @@
 ## Imports
 importFrom(utf8, as_utf8)
+importFrom(utf8, utf8_encode)
+importFrom(utf8, utf8_format)
 importFrom(utf8, utf8_valid)
+importFrom(utf8, utf8_width)
 
 ## Exports
 
@@ -20,6 +23,9 @@ S3method(`[`, record)
 S3method(`[<-`, record)
 S3method(`[[`, record)
 S3method(`[[<-`, record)
+
+S3method(format, record); export(format.record)
+S3method(print, record);  export(print.record)
 
 
 ### normal
