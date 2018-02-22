@@ -145,6 +145,10 @@ arg_record_index1 <- function(n, i, call = sys.call(-1L))
         if (!(is.finite(i1) && i >= 1)) {
             stop(sprintf("invalid index (%s)", i1))
         }
+    } else if (is.logical(i1)) {
+        stop(sprintf("invalid index (%s)", i1))
+    } else {
+        i1 <- as.character(i1)
     }
 
     i1
