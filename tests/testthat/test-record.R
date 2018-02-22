@@ -51,3 +51,10 @@ test_that("c with NULL", {
     expect_equal(c.record(NULL, x, NULL, NULL, x),
                  c.record(x, x))
 })
+
+
+test_that("set length", {
+    x <- record(a = 1, b = "foo")
+    length(x) <- 1
+    expect_equal(x, record(a = 1))
+})

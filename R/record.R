@@ -110,6 +110,12 @@ as.record.default <- function(x, n = NULL, names = NULL)
     x
 }
 
+`length<-.record` <- function(x, value)
+{
+    y <- NextMethod()
+    class(y) <- "record"
+    y
+}
 
 c.record <- function(...)
 {
