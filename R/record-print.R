@@ -175,12 +175,25 @@ print.record <- function(x, limit = NULL, line = NULL, ...)
     x <- as.record(x)
 
     if (length(x) == 0) {
-        cat("(empty)\n")
+        cat("(0 entries)\n")
     } else {
         fmt <- format.record(x, limit, line, meta = TRUE)
         meta <- attr(fmt, "format.meta")
         lines <- format_record_lines(fmt, meta$name.width)
-        cat(lines, sep = "\n")
+        if (length(lines) > 0) {
+            cat(lines, sep = "\n")
+        }
+
+        if (meta$trunc) {
+            total <- record_total(x)
+            if (length(lines) > 0) {
+                prefix <- paste0(utf8_encode("...", width = meta$name.width), "   ")
+            } else {
+                prefix <- ""
+            }
+            suffix <- paste0("(", total, " entries total)")
+            cat(prefix, suffix, "\n", sep = "")
+        }
     }
 
     invisible(x)
