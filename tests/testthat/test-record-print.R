@@ -2,7 +2,7 @@ context("record-print")
 
 test_that("empty", {
     x <- record()
-    expect_equal(capture_output(print.record(x)), "(empty)")
+    expect_equal(capture_output(print.record(x)), "(0 entries)")
 })
 
 test_that("with names", {
