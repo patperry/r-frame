@@ -7,10 +7,8 @@ format_record_names <- function(x, nest = 0, indent = 2)
     if (is.null(names)) {
         if (n > 0) {
             names <- paste0("[[", seq_len(n), "]]")
-        } else {
-            names <- character()
+            names(x) <- names
         }
-        names(x) <- names
     } else {
         empty <- is.na(names) | !nzchar(names)
         if (any(empty)) {
@@ -138,7 +136,7 @@ format.record <- function(x, limit = NA, line = NA, meta = FALSE, ...)
 }
 
 
-format_record_lines <- function(x, name.width, nest = 0, indent = 2)
+format_record_lines <- function(x, name.width, indent = 2)
 {
     names <- names(x)
     tot <- record_total(x)
@@ -150,9 +148,9 @@ format_record_lines <- function(x, name.width, nest = 0, indent = 2)
         if (is.record(xi)) {
             lines[[dst]] <- paste0(utf8_encode(names[[i]], display = TRUE), ":")
             dst <- dst + 1
-            xsubi <- format_record_lines(xi, name.width - indent, nest + 1)
+            xsubi <- format_record_lines(xi, name.width - indent, indent)
             nsub <- length(xsubi)
-            prefix <- formatC("", width = indent * (nest + 1))
+            prefix <- formatC("", width = indent)
             if (nsub > 0) {
                 lines[dst:(dst + nsub - 1)] <- paste0(prefix, xsubi)
                 dst <- dst + nsub
@@ -187,7 +185,7 @@ print.record <- function(x, limit = NULL, line = NULL, ...)
         if (meta$trunc) {
             total <- record_total(x)
             if (length(lines) > 0) {
-                prefix <- paste0(utf8_encode("...", width = meta$name.width), "   ")
+                prefix <- utf8_encode("...", width = meta$name.width + 3)
             } else {
                 prefix <- ""
             }

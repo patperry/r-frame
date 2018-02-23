@@ -2,7 +2,48 @@ context("record-print")
 
 test_that("empty", {
     x <- record()
-    expect_equal(capture_output(print.record(x)), "(0 entries)")
+    expect_equal(capture_output(print(x)), "(0 entries)")
+})
+
+test_that("missing names", {
+    x <- record(a = 1, b = 2, c = "foo")
+    names(x)[[2]] <- ""
+
+    lines <- c(
+"a     : 1",
+"[[2]] : 2",
+"c     : foo")
+
+    expect_equal(strsplit(capture_output(print(x)), "\n")[[1]], lines)
+})
+
+
+test_that("trunc 0", {
+    x <- record(a = 1, b = 2, c = "foo")
+    expect_equal(capture_output(print(x, 0)), "(3 entries total)")
+})
+
+test_that("trunc 1", {
+    x <- record(a = 1, b = 2, c = "foo")
+    expect_equal(capture_output(print(x, 1)), "a : 1\n... (3 entries total)")
+})
+
+test_that("trunc 2", {
+    x <- record(a = 1, b = 2, c = "foo")
+    expect_equal(capture_output(print(x, 2)),
+                 "a : 1\nb : 2\n... (3 entries total)")
+})
+
+test_that("nest 2", {
+    x <- record(a = record(x = record(foo = "a", bar = "baz"), y = 10))
+lines <- c(
+"a:",
+"  x:",
+"    foo : a",
+"    bar : baz",
+"  y     : 10")
+
+    expect_equal(strsplit(capture_output(print(x)), "\n")[[1]], lines)
 })
 
 test_that("with names", {
