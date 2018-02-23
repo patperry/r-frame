@@ -61,7 +61,7 @@ test_that("array entry", {
 
 test_that("function entry", {
     x <- record(foo = sin)
-    expect_equal(capture_output(print(x, 2)), "foo : function")
+    expect_equal(capture_output(print(x, 2)), "foo : <function>")
 })
 
 
