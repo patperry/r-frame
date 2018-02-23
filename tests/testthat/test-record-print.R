@@ -46,6 +46,32 @@ lines <- c(
     expect_equal(strsplit(capture_output(print(x)), "\n")[[1]], lines)
 })
 
+
+test_that("vector entry", {
+    x <- record(a = letters)
+    expect_equal(capture_output(print(x, 2)), "a : character(26)")
+})
+
+
+test_that("array entry", {
+    x <- record(mat = matrix(1:20, 4, 5))
+    expect_equal(capture_output(print(x, 2)), "mat : matrix[4, 5]")
+})
+
+
+test_that("function entry", {
+    x <- record(foo = sin)
+    expect_equal(capture_output(print(x, 2)), "foo : function")
+})
+
+
+test_that("trunc nested", {
+    x <- record(a = record(x = record(foo = "a", bar = "baz"), y = 10))
+    expect_equal(capture_output(print(x, 2)),
+                 "a:\n  x:\n...   (5 entries total)")
+})
+
+
 test_that("with names", {
     ctype <- switch_ctype("C")
     on.exit(Sys.setlocale("LC_CTYPE", ctype), add = TRUE)

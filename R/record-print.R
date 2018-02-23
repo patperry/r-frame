@@ -107,6 +107,8 @@ format_record_value <- function(x, width)
         wellipsis <- 1
         chars <- if (is.na(width)) .Machine$integer.max else (width - wellipsis)
         utf8_format(x, chars = chars)
+    } else if (is.function(x) || is.language(x)) {
+        cl
     } else {
         format(x, line = width)
     }
