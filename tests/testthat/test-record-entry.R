@@ -31,4 +31,13 @@ test_that("invalid index", {
     expect_error(x[[-1]] <- 1, "invalid index \\(-1\\)")
     expect_error(x[[0]] <- 1, "invalid index \\(0\\)")
     expect_error(x[[Inf]] <- 1, "invalid index \\(Inf\\)")
+    expect_error(x[[TRUE]] <- 1, "invalid index \\(TRUE\\)")
+    expect_error(x[[NA]] <- 1, "invalid index \\(NA\\)")
+})
+
+
+test_that("factor index", {
+    x <- record(a = 1, b = 4, c = 19)
+    i <- factor("b")
+    expect_equal(x[[i]], 4)
 })
