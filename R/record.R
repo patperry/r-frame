@@ -58,6 +58,12 @@ is.record <- function(x, n = NULL, names = NULL)
 }
 
 
+as.list.record <- function(x)
+{
+    unclass(x)
+}
+
+
 # We coerce other objects to records by first converting to list. We
 # preserve object names for vector inputs.
 

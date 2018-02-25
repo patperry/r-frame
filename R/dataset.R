@@ -29,6 +29,7 @@ as.dataset <- function(x)
 
 as.dataset.matrix <- function(x)
 {
+    d <- dim(x)
     dn <- dimnames(x)
     rownames <- dn[[1]]
     if (!is.null(rownames)) {
@@ -67,34 +68,17 @@ as.dataset.matrix <- function(x)
 
 as.dataset.default <- function(x)
 {
-    if (is.dataset(x))
-        return(x)
-
     d <- dim(x)
     r <- length(d)
 
-    if (r == 2) {
-        return(as.dataset.matrix(x))
-    } else if (r > 2) {
+    if (r <= 1) {
+        x <- as.record(list(x))
+        as.dataset(x)
+    } else if (r == 2) {
+        as.dataset.matrix(x)
+    } else {
         stop(sprintf("cannot convert rank-%.0f array to dataset", r))
     }
-
-    name <- deparse(substitute(x), width.cutoff = 500L)
-    rownames <- names(x)
-    names(x) <- NULL
-    col <- list(x)
-    names(col) <- name
-
-    x <- as.record(col)
-    x <- as.dataset(x)
-
-    if (!is.null(rownames)) {
-        rownames <- make.unique(rownames)
-        keys <- dataset(name = rownames)
-        keys(x) <- keys
-    }
-
-    x
 }
 
 
@@ -116,11 +100,25 @@ as.dataset.data.frame <- function(x)
 
 as.dataset.record <- function(x)
 {
+    if (is.dataset(x))
+        return(x)
+
     nc <- length(x)
     nr <- rep_len(NA_integer_, nc)
 
     for (i in seq_len(nc)) {
         elt <- x[[i]]
+
+        if (is.record(elt)) {
+            elt <- as.dataset(elt)
+            if (length(elt) == 0) {
+                elt <- NULL
+                x[i] <- list(NULL)
+            } else {
+                x[[i]] <- elt
+            }
+        }
+
         if (is.null(elt))
             next
 
@@ -132,9 +130,8 @@ as.dataset.record <- function(x)
         } else if (r == 2) {
             nr[[i]] <- d[[1]]
         } else {
-            names <- names(x)
-            lab <- if (is.null(names)) "" else sprintf(" (\"%s\")", names[[i]])
-            stop(sprintf("column %.0f%s has more than 2 dimensions", i, lab))
+            stop(sprintf("column %.0f%s has more than 2 dimensions",
+                         i, dataset_name(x, i)))
         }
     }
 
@@ -153,8 +150,10 @@ as.dataset.record <- function(x)
             if (is.na(nr2) || nr2 == nr1)
                 next
 
-            fmt <- "mismatch: column %.0f has %.0f rows, column %.0f has %.0f"
-            stop(sprintf(fmt, i1, nr1, i2, nr2))
+            fmt <- "mismatch: column %.0f%s has %.0f rows, column %.0f%s has %.0f"
+            stop(sprintf(fmt,
+                         i1, dataset_name(x, i1), nr1,
+                         i2, dataset_name(x, i2), nr2))
         }
     }
 
@@ -165,14 +164,15 @@ as.dataset.record <- function(x)
 }
 
 
-col_name_paren <- function(x, i)
+dataset_name <- function(x, i)
 {
     names <- names(x)
-    if (is.null(names)) {
+    if (is.null(names))
+        return("")
+
+    name <- names[[i]]
+    if (is.na(name) || !nzchar(name))
         ""
-    } else if (is.na(names[[i]])) {
-        " (<NA>)"
-    } else {
-        paste0(" (\"", names[[i]], "\")")
-    }
+    else
+        paste0(" (`", name, "`)")
 }

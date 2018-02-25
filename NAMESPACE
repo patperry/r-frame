@@ -25,8 +25,9 @@ S3method(`[<-`, record)
 S3method(`[[`, record)
 S3method(`[[<-`, record)
 
-S3method(format, record); export(format.record)
-S3method(print, record);  export(print.record)
+S3method(as.list, record) ; export(as.list.record)
+S3method(format, record)  ; export(format.record)
+S3method(print, record)   ; export(print.record)
 
 
 ### dataset

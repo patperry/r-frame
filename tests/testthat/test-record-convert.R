@@ -77,7 +77,7 @@ test_that("setting names with wrong encoding", {
 
 test_that("as.list downcasts", {
     x <- record(a = 1, b = 10)
-    expect_equal(as.list(x), x)
+    expect_equal(as.list(x), list(a = 1, b = 10))
 })
 
 
@@ -97,7 +97,7 @@ test_that("as.vector downcasts", {
 
 test_that("changing storage mode", {
     x <- record(a = 1, b = 9, c = 2)
-    expect_equal(as.vector(x), as.list(x))
-    expect_equal(as.vector(x, "list"), as.list(x))
+    expect_equal(as.vector(x), x)
+    expect_equal(as.vector(x, "list"), x)
     expect_equal(as.vector(x, "character"), c("1", "9", "2"))
 })
