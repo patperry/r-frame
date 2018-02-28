@@ -27,23 +27,39 @@ as.dataset <- function(x)
 }
 
 
+make_dataset <- function(nrow, cols)
+{
+    x <- as.record(cols)
+    attr(x, "dataset.nrow") <- nrow
+    class(x) <- c("dataset", class(x))
+    x
+}
+
+
+as.dataset.vector <- function(x)
+{
+    d <- dim(x)
+    if (length(d) > 1)
+        stop("argument is not a vector")
+
+    nrow <- length(x)
+    names(x) <- NULL
+    cols <- list(x)
+
+    make_dataset(nrow, cols)
+}
+
+
 as.dataset.matrix <- function(x)
 {
     d <- dim(x)
-    dn <- dimnames(x)
-    rownames <- dn[[1]]
-    if (!is.null(rownames)) {
-        rownames <- make.unique(rownames)
-    }
-    names <- dn[[2]]
-    n <- d[[2]]
+    if (length(d) != 2)
+        stop("argument is not a matrix")
 
-    if (n == 0) {
-        mat <- matrix(0, d[[1]], 0)
-        x <- as.data.frame(mat, rownames)
-        x <- as.dataset(x)
-        return(x)
-    }
+    dn <- dimnames(x)
+    names <- dn[[2]]
+    nrow <- d[[1]]
+    n <- d[[2]]
 
     cols <- vector("list", n)
     names(cols) <- names
@@ -54,26 +70,21 @@ as.dataset.matrix <- function(x)
         cols[[i]] <- xi
     }
 
-    x <- as.record(cols)
-    x <- as.dataset(x)
-
-     if (!is.null(rownames)) {
-        keys <- dataset(name = rownames)
-        keys(x) <- keys
-    }
-
-    x
+    make_dataset(nrow, cols)
 }
 
 
 as.dataset.default <- function(x)
 {
+    if (is.null(x)) {
+        return(make_dataset(1, NULL))
+    }
+
     d <- dim(x)
     r <- length(d)
 
     if (r <= 1) {
-        x <- as.record(list(x))
-        as.dataset(x)
+        as.dataset.vector(x)
     } else if (r == 2) {
         as.dataset.matrix(x)
     } else {
