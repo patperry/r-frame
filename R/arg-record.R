@@ -41,7 +41,7 @@ arg_record_names <- function(n, value, name, call = sys.call(-1))
 }
 
 
-arg_record_subset <- function(x, value, call = sys.call(-1))
+arg_record_subset <- function(x, value, strict = FALSE, call = sys.call(-1))
 {
     if (missing(value) || is.null(value)) {
         return(NULL)
@@ -82,6 +82,16 @@ arg_record_subset <- function(x, value, call = sys.call(-1))
                      "numeric index cannot contain both negative and non-negative values",
                      call))
             }
+            if (strict) {
+                n <- length(x)
+                bounds <- value > n
+                if (any(bounds)) {
+                    i <- which(bounds)[[1]]
+                    vi <- value[[i]]
+                    fmt <- "bounds error: index is %.0f, maximum is %.0f"
+                    stop(simpleError(sprintf(fmt, vi, n), call))
+                }
+            }
         }
 
         value
@@ -119,10 +129,20 @@ arg_record_subset <- function(x, value, call = sys.call(-1))
         new <- which(index == 0)
         nnew <- length(new)
         if (nnew > 0) {
-            n <- length(x)
-            inew <- (n + 1):(n + nnew)
-            vnew <- value[new]
-            index[new] <- inew[match(vnew, vnew)] # handle duplicates
+            if (strict) {
+                i <- new[[1]]
+                vi <- value[[i]]
+                if (is.na(vi)) {
+                    stop(simpleError("unknown name: <NA>", call))
+                } else {
+                    stop(simpleError(sprintf("unknown name: \"%s\"", vi), call))
+                }
+            } else {
+                n <- length(x)
+                inew <- (n + 1):(n + nnew)
+                vnew <- value[new]
+                index[new] <- inew[match(vnew, vnew)] # handle duplicates
+            }
         }
         index
     }

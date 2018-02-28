@@ -63,7 +63,7 @@
 
 `[.record` <- function(x, i)
 {
-    i <- arg_record_subset(x, i)
+    i <- arg_record_subset(x, i, TRUE)
     if (is.null(i)) {
         x
     } else {
@@ -88,7 +88,7 @@
 
 `[<-.record` <- function(x, i, value)
 {
-    i <- arg_record_subset(x, i)
+    i <- arg_record_subset(x, i, FALSE)
 
     if (is.null(value))
         record_delete(x, i)

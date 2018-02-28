@@ -6,14 +6,15 @@ test_that("numeric index", {
     expect_equal(x[[1]], 1)
     expect_equal(x[[2]], 4)
     expect_equal(x[[3]], 19)
-    expect_equal(x[[4]], NULL)
+    #expect_equal(x[[4]], NULL)
+    expect_error(x[[4]], "bounds error: index is 4, maximum is 3")
 })
 
 
 test_that("NA index", {
     x <- record(a = 1, b = 4, c = 19)
-
-    expect_equal(x[[NA_character_]], NULL)
+    #expect_equal(x[[NA_character_]], NULL)
+    expect_error(x[[NA_character_]], "unknown name: <NA>")
 })
 
 

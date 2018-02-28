@@ -35,7 +35,8 @@ test_that("mixed sign", {
 
 test_that("out-of-bounds", {
     x <- record(1)
-    expect_equal(x[2], as.record(structure(list(NULL), names = "")))
+    #expect_equal(x[2], as.record(structure(list(NULL), names = "")))
+    expect_error(x[2], "bounds error: index is 2, maximum is 1")
 })
 
 
@@ -48,7 +49,8 @@ test_that("wrong length logical mask", {
 
 test_that("unknown name", {
     x <- record(aa = 1)
-    expect_equal(x["a"], record(a = NULL))
+    #expect_equal(x["a"], record(a = NULL))
+    expect_error(x["a"], "unknown name: \"a\"")
 })
 
 
