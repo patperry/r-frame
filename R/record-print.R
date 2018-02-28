@@ -99,7 +99,9 @@ format_record_value <- function(x, width)
     d <- dim(x)
     n <- length(x)
 
-    if (!is.null(d)) {
+    if (is.null(x)) {
+        "NULL"
+    } else if (!is.null(d)) {
         paste0(cl, "[", paste0(d, collapse = ", "), "]")
     } else if (n != 1 || (is.list(x) && !is.object(x))) {
         paste0(cl, "(", n, ")")

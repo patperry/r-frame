@@ -47,6 +47,12 @@ lines <- c(
 })
 
 
+test_that("NULL entry", {
+    x <- record(a = NULL)
+    expect_equal(capture_output(print(x, 2)), "a : NULL")
+})
+
+
 test_that("vector entry", {
     x <- record(a = letters)
     expect_equal(capture_output(print(x, 2)), "a : character(26)")
