@@ -59,7 +59,7 @@ format_record_limit <- function(x, limit = NA)
 
     for (i in seq_len(n)) {
         if (limit == 0) {
-            length(x) <- i - 1
+            length(x) <- max(1, i - 1)
             trunc <- TRUE
             break
         }
@@ -73,7 +73,7 @@ format_record_limit <- function(x, limit = NA)
             trunc <- fmt$trunc
             limit <- fmt$limit
             if (trunc) {
-                length(x) <- i
+                length(x) <- max(1, i)
                 break
             }
         }
@@ -92,7 +92,10 @@ format_record_values <- function(x, width)
 format_record_value <- function(x, width)
 {
     if (is.record(x)) {
-        return(format_record_values(x, width))
+        if (length(x) == 0)
+            return("{}")
+        else
+            return(format_record_values(x, width))
     }
 
     cl <- class(x)[[1]]
@@ -177,7 +180,7 @@ print.record <- function(x, limit = NULL, line = NULL, ...)
     x <- as.record(x)
 
     if (length(x) == 0) {
-        cat("(0 entries)\n")
+        cat("{}\n")
     } else {
         fmt <- format.record(x, limit, line, meta = TRUE)
         meta <- attr(fmt, "format.meta")

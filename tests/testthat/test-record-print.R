@@ -2,7 +2,7 @@ context("record-print")
 
 test_that("empty", {
     x <- record()
-    expect_equal(capture_output(print(x)), "(0 entries)")
+    expect_equal(capture_output(print(x)), "{}")
 })
 
 test_that("missing names", {
@@ -20,7 +20,7 @@ test_that("missing names", {
 
 test_that("trunc 0", {
     x <- record(a = 1, b = 2, c = "foo")
-    expect_equal(capture_output(print(x, 0)), "(3 entries total)")
+    expect_equal(capture_output(print(x, 0)), "a : 1\n... (3 entries total)")
 })
 
 test_that("trunc 1", {
@@ -53,6 +53,16 @@ test_that("NULL entry", {
 })
 
 
+test_that("nested empty", {
+    x <- record(a = 1, b = record(), c = "foo")
+lines <- c(
+"a : 1",
+"b : {}",
+"c : foo")
+    expect_equal(strsplit(capture_output(print(x)), "\n")[[1]], lines)
+})
+
+
 test_that("vector entry", {
     x <- record(a = letters)
     expect_equal(capture_output(print(x, 2)), "a : character(26)")
@@ -74,7 +84,7 @@ test_that("function entry", {
 test_that("trunc nested", {
     x <- record(a = record(x = record(foo = "a", bar = "baz"), y = 10))
     expect_equal(capture_output(print(x, 2)),
-                 "a:\n  x:\n...   (5 entries total)")
+                 "a:\n  x:\n    foo : a\n...       (5 entries total)")
 })
 
 
