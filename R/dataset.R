@@ -109,69 +109,79 @@ as.dataset.data.frame <- function(x)
 }
 
 
+dataset_nrow <- function(x)
+{
+    for (i in seq_along(x)) {
+        elt <- x[[i]]
+        if (is.null(elt))
+            next
+
+        if (is.record(elt) && !is.dataset(elt)) {
+            nr <- dataset_nrow(elt)
+            if (!is.na(nr))
+                return(nr)
+        } else {
+            d <- dim(elt)
+            r <- length(d)
+            if (r <= 1) {
+                return(length(elt))
+            } else {
+                return(d[[1]])
+            }
+        }
+    }
+
+    NA_integer_
+}
+
+
+cast_dataset <- function(x, nrow)
+{
+    for (i in seq_along(x)) {
+        elt <- x[[i]]
+        if (is.null(elt))
+            next
+
+        if (is.record(elt) && !is.dataset(elt)) {
+            x[[i]] <- elt <- cast_dataset(elt, nrow)
+            next
+        }
+
+        d <- dim(elt)
+        r <- length(d)
+
+        if (r <= 1) {
+            nr <- length(elt)
+        } else if (r == 2) {
+            nr <- d[[1]]
+        } else {
+            stop(sprintf("column %.0f%s has more than 2 dimensions",
+                         i, dataset_name(x, i)))
+        }
+
+        if (nr != nrow) {
+            fmt <- "mismatch: column %.0f%s has %.0f rows, should have %.0f"
+            stop(sprintf(fmt, i, dataset_name(x, i), nr, nrow))
+        }
+    }
+
+    attr(x, "dataset.nrow") <- nrow
+    class(x) <- c("dataset", class(x))
+    x
+}
+
+
 as.dataset.record <- function(x)
 {
     if (is.dataset(x))
         return(x)
 
     nc <- length(x)
-    nr <- rep_len(NA_integer_, nc)
+    nrow <- dataset_nrow(x)
+    if (is.na(nrow))
+        nrow <- 1L
 
-    for (i in seq_len(nc)) {
-        elt <- x[[i]]
-
-        if (is.record(elt)) {
-            elt <- as.dataset(elt)
-            if (length(elt) == 0) {
-                elt <- NULL
-                x[i] <- list(NULL)
-            } else {
-                x[[i]] <- elt
-            }
-        }
-
-        if (is.null(elt))
-            next
-
-        d <- dim(elt)
-        r <- length(d)
-
-        if (r <= 1) {
-            nr[[i]] <- length(elt)
-        } else if (r == 2) {
-            nr[[i]] <- d[[1]]
-        } else {
-            stop(sprintf("column %.0f%s has more than 2 dimensions",
-                         i, dataset_name(x, i)))
-        }
-    }
-
-    nr1 <- NA
-    for (i1 in seq_len(nc)) {
-        nr1 <- nr[[i1]]
-        if (!is.na(nr1))
-            break
-    }
-
-    if (is.na(nr1)) {
-        nr1 <- 0L
-    } else if (i1 < nc) {
-        for (i2 in (i1 + 1):nc) {
-            nr2 <- nr[[i2]]
-            if (is.na(nr2) || nr2 == nr1)
-                next
-
-            fmt <- "mismatch: column %.0f%s has %.0f rows, column %.0f%s has %.0f"
-            stop(sprintf(fmt,
-                         i1, dataset_name(x, i1), nr1,
-                         i2, dataset_name(x, i2), nr2))
-        }
-    }
-
-    attr(x, "dataset.nrow") <- nr1
-    class(x) <- c("dataset", class(x))
-
-    x
+    cast_dataset(x, nrow)
 }
 
 

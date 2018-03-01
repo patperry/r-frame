@@ -43,11 +43,11 @@ test_that("'as.dataset.list' allows duplicated names", {
 
 test_that("'dataset' errors for unequal length columns", {
     expect_error(dataset(x = 1:10, y = 1:10, z = c(1, 2, 3)),
-                 "mismatch: column 1 (`x`) has 10 rows, column 3 (`z`) has 3",
+                 "mismatch: column 3 (`z`) has 3 rows, should have 10",
                  fixed = TRUE)
 
     expect_error(dataset(x = 1:10, y = matrix(1:10, 2, 5)),
-                 "mismatch: column 1 (`x`) has 10 rows, column 2 (`y`) has 2",
+                 "mismatch: column 2 (`y`) has 2 rows, should have 10",
                  fixed = TRUE)
 })
 
@@ -61,7 +61,7 @@ test_that("'dataset' errors for rank-3 array columns", {
 
 test_that("'dataset' does not allow scalar columns", {
     expect_error(dataset(x = 1:10, y = 10:1, z = 1),
-                 "mismatch: column 1 (`x`) has 10 rows, column 3 (`z`) has 1",
+                 "mismatch: column 3 (`z`) has 1 rows, should have 10",
                  fixed = TRUE)
 })
 
@@ -134,9 +134,24 @@ test_that("'dataset' can be nested", {
 })
 
 
-test_that("as.dataset(record()) has no rows", {
+test_that("as.dataset(record()) has one row", {
     x <- as.dataset(record())
-    expect_equal(dim(x), c(0, 0))
+    expect_equal(dim(x), c(1, 0))
+})
+
+
+test_that("empty column", {
+    x <- dataset(a = 1:5, b = 1:5, c = record())
+    expect_equal(dim(x), c(5, 3))
+    expect_equal(dim(x$c), c(5, 0))
+})
+
+
+test_that("nested empty column", {
+    x <- dataset(c = record(foo = record()), b = 1:6)
+    expect_equal(dim(x), c(6, 2))
+    expect_equal(dim(x$c), c(6, 1))
+    expect_equal(dim(x$c$foo), c(6, 0))
 })
 
 
