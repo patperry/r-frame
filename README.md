@@ -118,3 +118,67 @@ x <- as.record(letters)
 print(x) # truncates
 print(x, NA) # no limit
 ```
+
+
+## Dataset
+
+A *dataset* is a record of zero or more variables measured on the same set of
+individuals.
+
+We construct a dataset using the `dataset()` function, analogous to the
+`record()` function:
+
+```r
+data <- dataset(x = 1:10, y = letters[1:10])
+```
+
+Alternatively, we can convert another object to a `dataset` using the
+`as.dataset()` function:
+
+```r
+as.dataset(mtcars)
+```
+
+
+## Keys
+
+The individuals in a dataset can optionally be identified by a set of unique
+values, known as *keys*. For any dataset `x`, `keys(x)` gets the associated
+keys, or `NULL` if none exists. The result is a dataset with unique rows, the
+same number as are in `x`.
+
+
+## Simple
+
+R `data.frames` allow only character keys. Frame `dataset` keys can have a
+variety of types. We call these types *simple*. The *simple atomic* types are
+`NULL`, `logical`, `integer`, `numeric`, `character`, `Date`,
+`POSIXct`. A *simple* type is either a simple atomic type or a dataset of zero or
+more simple types.
+
+The `as.simple` function converts a variable to a simple variable. We can
+convert many of the built-in R types, including `factor` and `complex` to
+simple types using this function:
+
+```
+as.simple(factor(c("a", "a", "b", "a", "c", "a")))
+as.simple(c(1+2i, 3 + 4i, -1, 6i))
+```
+
+The `as.simple` function is generic; if you add a new type to R, you can
+define `as.simple` for this type.
+
+
+## Setting Keys
+
+You can set the keys of a dataset using the `keys(x)<-` function:
+
+```
+x <- as.dataset(mtcars)
+keys(x) <- dataset(k1 = rnorm(32),
+                   k2 = rep(c(TRUE, FALSE), 16))
+```
+
+This command converts they keys to simple, ensures that the rows are unique,
+and sets the keys for `x`.
+
