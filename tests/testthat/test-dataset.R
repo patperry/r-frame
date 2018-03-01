@@ -169,3 +169,8 @@ test_that("errors for list array", {
     arr <- array(as.list(1:6), c(1, 2, 3))
     expect_error(as.dataset(arr), "cannot convert rank-3 array to dataset")
 })
+
+
+test_that("from NULL", {
+    expect_equal(dim(as.dataset(NULL)), c(0, 0))
+})

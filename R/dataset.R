@@ -77,7 +77,7 @@ as.dataset.matrix <- function(x)
 as.dataset.default <- function(x)
 {
     if (is.null(x)) {
-        return(make_dataset(1, NULL))
+        return(make_dataset(0L, NULL))
     }
 
     d <- dim(x)
