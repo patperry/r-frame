@@ -191,11 +191,7 @@ print.record <- function(x, limit = NULL, line = NULL, ...)
 
         if (meta$trunc) {
             total <- record_total(x)
-            if (length(lines) > 0) {
-                prefix <- utf8_encode("...", width = meta$name.width + 3)
-            } else {
-                prefix <- ""
-            }
+            prefix <- utf8_encode("...", width = meta$name.width + 3)
             suffix <- paste0("(", total, " entries total)")
             cat(prefix, suffix, "\n", sep = "")
         }

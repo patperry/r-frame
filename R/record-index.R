@@ -73,12 +73,6 @@
         if (!is.null(names)) {
             empty <- is.na(names) | !nzchar(names)
             names(y)[!empty] <- names[!empty]
-        } else {
-            names <- names(y)
-            if (anyNA(names)) {
-                names[is.na(names)] <- ""
-                names(y) <- names
-            }
         }
 
         as.record(y)
