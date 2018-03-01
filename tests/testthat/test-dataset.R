@@ -174,3 +174,15 @@ test_that("errors for list array", {
 test_that("from NULL", {
     expect_equal(dim(as.dataset(NULL)), c(0, 0))
 })
+
+
+test_that("from matrix", {
+    mat <- matrix(1:20, 4, 5)
+    colnames(mat) <- letters[1:5]
+    x <- as.dataset(mat)
+    y <- dataset(a = 1:4, b = 5:8, c = 9:12, d = 13:16, e = 17:20)
+    expect_equal(x, y)
+
+    x2 <- as.dataset.default(mat)
+    expect_equal(x, x2)
+})
