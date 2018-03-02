@@ -1,7 +1,5 @@
 RSCRIPT= Rscript --vanilla
-BUILT_VIGNETTES= \
-	vignettes/dplyr.Rmd \
-	vignettes/index.Rmd
+BUILT_VIGNETTES=
 
 all: README.md $(BUILT_VIGNETTES)
 
