@@ -137,26 +137,26 @@ as.simple.list <- function(x)
 #
 # Date: internally stored as numeric, number of days since 1970-01-01 UTC
 
-get_tzone <- function(x, default = "UTC")
+get_tzone <- function(x, default)
 {
-    tz <- attr(x, "tzone")[[1L]]
-    if (is.null(tz)) {
-        tz <- default[[1L]]
-    }
-    tz
+    tz <- attr(x, "tzone")[[1]]
+    if (is.null(tz))
+        default
+    else
+        tz
 }
 
 as.simple.Date <- function(x)
 {
-    tz <- get_tzone(x)
+    tz <- get_tzone(x, "UTC")
     x <- as.Date(x, tz = tz, origin = "1970-01-01")
     structure(as.numeric(x), class = "Date")
 }
 
-as.simple.POSIXt <- function(x, tz = NULL)
+as.simple.POSIXt <- function(x)
 {
-    tz0 <- get_tzone(x, tz)
+    tz0 <- get_tzone(x, NULL)
     x <- as.POSIXct(x, tz0, origin = "1970-01-01")
-    tzone <- if (is.null(tz)) attr(x, "tzone") else tz
+    tzone <- attr(x, "tzone")
     structure(as.numeric(x), class = c("POSIXct", "POSIXt"), tzone = tzone)
 }
