@@ -27,7 +27,7 @@
     }
 
     NextMethod()
-    class(x) <- c("dataset", class(x))
+    class(x) <- c("dataset", oldClass(x))
 
     x
 }
