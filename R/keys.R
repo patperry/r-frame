@@ -49,7 +49,7 @@ keys.dataset <- function(x)
                          nk, n))
         }
 
-        attr(x, "keys") <- value
+        attr(x, "dataset.keys") <- value
     }
 
     x

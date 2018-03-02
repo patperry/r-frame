@@ -42,14 +42,27 @@ S3method(as.dataset, default)    ; export(as.dataset.default)
 S3method(as.dataset, record)     ; export(as.dataset.record)
 
 S3method(dim, dataset)
+S3method(`[[<-`, dataset)
 
 
-### simple.dataset
+### simple
 
-export(is.simple.dataset)
-export(as.simple.dataset)
-S3method(as.simple.dataset, default) ; export(as.simple.dataset.default)
+export(as.simple)
 
+S3method(as.simple, default)   ; export(as.simple.default)
+S3method(as.simple, dataset)   ; export(as.simple.dataset)
+S3method(as.simple, record)    ; export(as.simple.record)
+
+S3method(as.simple, logical)   ; export(as.simple.logical)
+S3method(as.simple, integer)   ; export(as.simple.integer)
+S3method(as.simple, double)    ; export(as.simple.double)
+S3method(as.simple, character) ; export(as.simple.character)
+S3method(as.simple, Date)      ; export(as.simple.Date)
+S3method(as.simple, POSIXt)    ; export(as.simple.POSIXt)
+
+S3method(as.simple, complex)   ; export(as.simple.complex)
+S3method(as.simple, factor)    ; export(as.simple.factor)
+S3method(as.simple, list)      ; export(as.simple.list)
 
 
 ### keyset
@@ -65,12 +78,12 @@ S3method(as.keyset, default) ; export(as.keyset.default)
 ### keys
 
 export(keys)
-S3method(keys, dataset) ; export(keys.dataset)
-S3method(keys, default) ; export(keys.default)
+S3method(keys, dataset)
+S3method(keys, default)
 
 export(`keys<-`)
-S3method(`keys<-`, dataset) ; export(`keys<-.dataset`)
-S3method(`keys<-`, keyset)  ; export(`keys<-.keyset`)
+S3method(`keys<-`, dataset)
+S3method(`keys<-`, keyset)
 
 
 ### normal
