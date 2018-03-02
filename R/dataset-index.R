@@ -1,4 +1,10 @@
 
+`$<-.dataset` <- function(x, name, value)
+{
+    x[[name]] <- value
+    x
+}
+
 
 `[[<-.dataset` <- function(x, i, value)
 {
