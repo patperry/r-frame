@@ -58,7 +58,7 @@ is.record <- function(x, n = NULL, names = NULL)
 }
 
 
-as.list.record <- function(x)
+as.list.record <- function(x, ...)
 {
     unclass(x)
 }
