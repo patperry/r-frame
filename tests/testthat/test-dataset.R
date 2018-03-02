@@ -30,7 +30,7 @@ test_that("'as.dataset' allows empty names", {
 
 test_that("'as.dataset.list' works for missing names", {
     x <- as.dataset(as.record(list(a = 1, -5, 2.3)))
-    expect_equal(names(x), c("a", "", ""))
+    expect_equal(names(x), c("a", NA, NA))
 })
 
 

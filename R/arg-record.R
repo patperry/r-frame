@@ -19,10 +19,9 @@ arg_record_names <- function(n, value, name, call = sys.call(-1))
         return(NULL)
 
     raw <- as.character(value)
-    if (anyNA(raw))
-        raw[is.na(raw)] <- ""
+    raw[!nzchar(raw)] <- NA
 
-    names <- tryCatch(as_utf8(raw, normalize = TRUE), error = function(cond) NULL)
+    names <- tryCatch(as_utf8(raw), error = function(cond) NULL)
     if (is.null(names)) {
         invalid <- which(!utf8_valid(raw))[[1]]
         fmt <- "%s entry %.0f has wrong character encoding"
