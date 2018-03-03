@@ -80,21 +80,6 @@ S3method(`keys<-`, dataset)
 S3method(`keys<-`, keyset)
 
 
-### normal
-
-export(is.normal)
-export(as.normal)
-
-S3method(as.normal, default)   ; export(as.normal.default)  
-S3method(as.normal, character) ; export(as.normal.character)
-S3method(as.normal, double)    ; export(as.normal.double)
-S3method(as.normal, complex)   ; export(as.normal.complex)
-
-S3method(as.normal.character, default) ; export(as.normal.character.default)
-S3method(as.normal.double, default)    ; export(as.normal.double.default)
-S3method(as.normal.complex, default)   ; export(as.normal.complex.default)
-
-
 ### functor
 
 export(do)
