@@ -83,38 +83,17 @@
 `[<-.record` <- function(x, i, value)
 {
     i <- arg_record_subset(x, i, FALSE)
-
-    if (is.null(value))
-        record_delete(x, i)
-    else
-        record_replace(x, i, value)
-}
-
-
-record_delete <- function(x, i)
-{
-    class(x) <- NULL
-    if (is.null(i)) {
-        x[] <- NULL
-    } else {
-        x[i] <- NULL
-    }
-    class(x) <- "record"
-    x
-}
-
-
-record_replace <- function(x, i, value, call = sys.call(-1))
-{
     if (is.null(i))
         i <- seq_along(x)
-
-    # positive integer indices, all within bounds;
     ni <- length(i)
+
+    if (is.null(value))
+        value <- vector("list", ni)
     nv <- length(value)
+
     if (ni != nv && nv != 1L) {
         fmt <- "mismatch: selection length is %.0f, replacement length is %.0f"
-        stop(simpleError(sprintf(fmt, ni, nv), call))
+        stop(sprintf(fmt, ni, nv))
     }
 
     zero <- (i == 0)

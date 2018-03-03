@@ -101,6 +101,32 @@ x[c(foo = 3, bar = 2, baz = 2)]
 x[c(one = TRUE, two = FALSE, three = TRUE)]
 ```
 
+
+### Assigning `NULL`
+
+Assigning `NULL` to a record value does not delete the field:
+
+```r
+x <- record(a = 1, b = 2, c = "foo")
+x[[2]] <- NULL
+x
+```
+
+Compare this to list behavior:
+```r
+l <- list(a = 1, b = 2, c = "foo")
+l[[2]] <- NULL
+l
+```
+
+If you want to delete a field, just index with a negative value indicating
+which fields to exclude:
+
+```r
+x[-2]
+```
+
+
 ### Printing
 
 Records print more concisely than lists:

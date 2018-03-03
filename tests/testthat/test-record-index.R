@@ -131,10 +131,10 @@ test_that("list assign", {
 })
 
 
-test_that("field delete", {
+test_that("field assign NULL", {
     x <- record(a = 1, b = 2, c = 3)
     x[[2]] <- NULL
-    expect_equal(x, record(a = 1, c = 3))
+    expect_equal(x, record(a = 1, b = NULL, c = 3))
 })
 
 
@@ -151,15 +151,15 @@ test_that("delete all", {
     y <- x
     x[NULL] <- NULL
     y[] <- NULL
-    expect_equal(x, record())
+    expect_equal(x, record(a = NULL, b = NULL, c = NULL))
     expect_equal(y, x)
 })
 
 
-test_that("delete by name", {
+test_that("replace NULL by name", {
     x <- record(a = 1, b = 77, c = "foo")
     x[c("a", "b")] <- NULL
-    expect_equal(x, record(c = "foo"))
+    expect_equal(x, record(a = NULL, b = NULL, c = "foo"))
 })
 
 
