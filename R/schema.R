@@ -37,14 +37,6 @@ schema.default <- function(x)
 
 schema.record <- function(x)
 {
-    n <- length(x)
-    y <- vector("list", n)
-    for (i in seq_len(n)) {
-        elt <- x[[i]]
-        if (is.null(elt))
-            next
-        y[[i]] <- schema(elt)
-    }
-    names(y) <- names(x)
-    as.record(y)
+    x <- lapply(x, schema)
+    as.record(x)
 }
