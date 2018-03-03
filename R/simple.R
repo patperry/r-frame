@@ -73,6 +73,7 @@ as.simple.dataset <- function(x)
 
 as.simple.record <- function(x)
 {
+    x <- as.record(x)
     as.simple.dataset(x)
 }
 
