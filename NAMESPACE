@@ -50,20 +50,13 @@ S3method(`[[<-`, dataset)
 
 export(as.simple)
 
-S3method(as.simple, default)   ; export(as.simple.default)
-S3method(as.simple, dataset)   ; export(as.simple.dataset)
-S3method(as.simple, record)    ; export(as.simple.record)
+S3method(as.simple, default) ; export(as.simple.default)
+S3method(as.simple, dataset) ; export(as.simple.dataset)
+S3method(as.simple, record)  ; export(as.simple.record)
 
-S3method(as.simple, logical)   ; export(as.simple.logical)
-S3method(as.simple, integer)   ; export(as.simple.integer)
-S3method(as.simple, double)    ; export(as.simple.double)
-S3method(as.simple, character) ; export(as.simple.character)
-S3method(as.simple, Date)      ; export(as.simple.Date)
-S3method(as.simple, POSIXt)    ; export(as.simple.POSIXt)
-
-S3method(as.simple, complex)   ; export(as.simple.complex)
-S3method(as.simple, factor)    ; export(as.simple.factor)
-S3method(as.simple, list)      ; export(as.simple.list)
+S3method(as.simple, Date)    ; export(as.simple.Date)
+S3method(as.simple, POSIXt)  ; export(as.simple.POSIXt)
+S3method(as.simple, factor)  ; export(as.simple.factor)
 
 
 ### keyset
@@ -141,11 +134,9 @@ export(numeric.map)
 
 ## old # exports (need fixing)
 # export(`$.dataset`)
-# export(`$<-.dataset`)
 # export(`[.dataset`)
 # export(`[<-.dataset`)
 # export(`[[.dataset`)
-# export(`[[<-.dataset`)
 # export(anyDuplicated.dataset)
 # export(anyDuplicated.keyset)
 # export(as.data.frame.dataset)
@@ -194,7 +185,6 @@ export(numeric.map)
 
 
 ## New S3 methods
-# S3method(as_simple_vector, default)
 # S3method(keylevels, default)
 # S3method(keylevels, keyset)
 # S3method(keyrows, default)
@@ -216,11 +206,9 @@ export(numeric.map)
 
 ### dataset
 # S3method(`$`, dataset)
-# S3method(`$<-`, dataset)
 # S3method(`[`, dataset)
 # S3method(`[<-`, dataset)
 # S3method(`[[`, dataset)
-# S3method(`[[<-`, dataset)
 # S3method(anyDuplicated, dataset)
 # S3method(anyDuplicated, keyset)
 # S3method(as.data.frame, dataset)

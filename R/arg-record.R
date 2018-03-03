@@ -24,8 +24,8 @@ arg_record_names <- function(n, value, name, call = sys.call(-1))
     names <- tryCatch(as_utf8(raw), error = function(cond) NULL)
     if (is.null(names)) {
         invalid <- which(!utf8_valid(raw))[[1]]
-        fmt <- "%s entry %.0f has wrong character encoding"
-        stop(simpleError(sprintf(fmt, name, invalid), call))
+        fmt <- "encoding error: %s entry %.0f (\"%s\")"
+        stop(simpleError(sprintf(fmt, name, invalid, raw[[invalid]]), call))
     }
 
     if (n >= 0) {
@@ -49,6 +49,11 @@ arg_record_subset <- function(x, value, strict = FALSE, call = sys.call(-1))
     if (length(dim(value)) >= 2) {
         fmt <- "cannot index with rank-%.0f array"
         stop(simpleError(sprintf(fmt, length(dim(value))), call))
+    }
+
+    names <- names(value)
+    if (!is.null(names)) {
+        names(value) <- arg_record_names(-1, names, "replacement name", call)
     }
     
     if (is.numeric(value)) {
@@ -114,6 +119,7 @@ arg_record_subset <- function(x, value, strict = FALSE, call = sys.call(-1))
         if (!is.character(value) || is.object(value)) {
             value <- as.character(value)
         }
+        value <- arg_record_names(-1, value, "index", call)
 
         if (is.null(names)) {
             names <- value
@@ -140,7 +146,7 @@ arg_record_subset <- function(x, value, strict = FALSE, call = sys.call(-1))
                 n <- length(x)
                 inew <- (n + 1):(n + nnew)
                 vnew <- value[new]
-                index[new] <- inew[match(vnew, vnew)] # handle duplicates
+                index[new] <- inew[match(vnew, vnew, 0)] # handle duplicates
             }
         }
         index

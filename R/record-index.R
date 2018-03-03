@@ -99,7 +99,8 @@ record_delete <- function(x, i)
     } else {
         x[i] <- NULL
     }
-    as.record(x)
+    class(x) <- "record"
+    x
 }
 
 
@@ -131,5 +132,6 @@ record_replace <- function(x, i, value, call = sys.call(-1))
         names(x)[i[!empty]] <- names[!empty]
     }
 
-    as.record(x)
+    class(x) <- "record"
+    x
 }
