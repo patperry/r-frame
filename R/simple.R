@@ -62,10 +62,7 @@ as.simple.dataset <- function(x)
 {
     x <- as.dataset(x)
     for (i in seq_along(x)) {
-        elt <- x[[i]]
-        if (is.null(elt))
-            next
-        x[[i]] <- elt <- as.simple(elt)
+        x[[i]] <- as.simple(x[[i]])
     }
     x
 }
