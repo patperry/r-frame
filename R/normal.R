@@ -31,7 +31,7 @@ as.normal.default <- function(x)
 
     mode <- storage.mode(x)
     if (mode == "character") {
-        x <- as_utf8(x)
+        x <- as_utf8(x, normalize = TRUE)
         x[!nzchar(x)] <- NA
     } else if (mode == "double") {
         x[is.nan(x)] <- NA
