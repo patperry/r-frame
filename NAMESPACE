@@ -49,14 +49,22 @@ S3method(`[[<-`, dataset)
 ### normal
 
 export(as.normal)
+export(is.normal)
+export(is.normal.dataset)
 
 S3method(as.normal, default) ; export(as.normal.default)
 S3method(as.normal, dataset) ; export(as.normal.dataset)
-S3method(as.normal, record)  ; export(as.normal.record)
 
-S3method(as.normal, Date)    ; export(as.normal.Date)
-S3method(as.normal, POSIXt)  ; export(as.normal.POSIXt)
-S3method(as.normal, factor)  ; export(as.normal.factor)
+S3method(as.normal, Date)
+S3method(as.normal, POSIXct)
+S3method(as.normal, POSIXlt)
+S3method(as.normal, factor)
+S3method(as.normal, normal)
+
+S3method(`[`, normal)
+S3method(`[<-`, normal)
+S3method(`[[`, normal)
+S3method(`[[<-`, normal)
 
 
 ### keyset

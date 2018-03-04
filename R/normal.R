@@ -4,6 +4,20 @@ as.normal <- function(x)
     UseMethod("as.normal")
 }
 
+is.normal <- function(x)
+{
+    inherits(x, "normal") || is.null(x) || is.normal.dataset(x)
+}
+
+is.normal.dataset <- function(x)
+{
+    is.dataset(x) && all(vapply(x, is.normal, FALSE))
+}
+
+as.normal.normal <- function(x)
+{
+    x
+}
 
 as.normal.default <- function(x)
 {
@@ -41,6 +55,7 @@ as.normal.default <- function(x)
         # pass
     } else if (mode == "complex") {
         x <- dataset(re = as.normal(Re(x)), im = as.normal(Im(x)))
+        return(x)
     } else if (mode == "list") {
         lengths <- vapply(x, length, 0)
         if (!all(lengths == 1)) {
@@ -48,18 +63,23 @@ as.normal.default <- function(x)
         }
         x <- do.call(c, x)
         x <- as.normal(x)
+        return(x)
     } else if (mode == "raw") {
         x <- as.integer(x)
     } else {
         stop(sprintf("cannot convert objects of mode \"%s\" to normal", mode))
     }
 
+    class(x) <- c("normal", class(x))
     x
 }
 
 
 as.normal.dataset <- function(x)
 {
+    if (is.normal.dataset(x))
+        return(x)
+
     x <- as.dataset(x)
     for (i in seq_along(x)) {
         x[[i]] <- as.normal(x[[i]])
@@ -68,28 +88,72 @@ as.normal.dataset <- function(x)
 }
 
 
-as.normal.record <- function(x)
+as.normal.Date <- function(x)
 {
-    x <- as.record(x)
-    as.normal.dataset(x)
+    class(x) <- c("normal", "Date")
+    x
+}
+
+
+as.normal.POSIXct <- function(x)
+{
+    class(x) <- c("normal", "POSIXct", "POSIXt")
+    x
+}
+
+
+as.normal.POSIXlt <- function(x)
+{
+    x <- as.POSIXct(x)
+    as.normal(x)
 }
 
 
 as.normal.factor <- function(x)
 {
-    x <- as.factor(x)
     levels <- as.normal(levels(x))
     levels[x]
 }
 
 
-as.normal.Date <- function(x)
+un.normal <- function(x)
 {
-    as.Date(x)
+    cl <- oldClass(x)
+    k  <- match("normal", cl, 0L)
+    if (k > 0L) {
+        m  <- length(cl)
+        class(x) <- cl[(k + 1L):m]
+    }
+    x
 }
 
 
-as.normal.POSIXt <- function(x)
+`[[.normal` <- function(x, i)
 {
-    as.POSIXct(x)
+
+    x <- NextMethod("[[")
+    un.normal(x)
+}
+
+
+`[.normal` <- function(x, i)
+{
+    cl <- oldClass(x)
+    x <- NextMethod("[")
+    class(x) <- cl
+    x
+}
+
+
+`[[<-.normal` <- function(x, i, value)
+{
+    x <- NextMethod("[[<-")
+    un.normal(x)
+}
+
+
+`[<-.normal` <- function(x, i, value)
+{
+    x <- NextMethod("[<-")
+    un.normal(x)
 }

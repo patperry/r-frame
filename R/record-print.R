@@ -98,7 +98,7 @@ format_record_value <- function(x, width)
             return(format_record_values(x, width))
     }
 
-    cl <- class(x)[[1]]
+    cl <- paste(class(x), collapse = ".")
     d <- dim(x)
     n <- length(x)
 
