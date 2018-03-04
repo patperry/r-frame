@@ -1,22 +1,22 @@
 
-as.simple <- function(x)
+as.normal <- function(x)
 {
-    UseMethod("as.simple")
+    UseMethod("as.normal")
 }
 
 
-as.simple.default <- function(x)
+as.normal.default <- function(x)
 {
     if (is.null(x))
-        return(NULL)
+        return(x)
 
     d <- dim(x)
     r <- length(d)
     if (r == 2) {
         x <- as.dataset(x)
-        return(as.simple(x))
+        return(as.normal(x))
     } else if (r > 2) {
-        stop(sprintf("cannot convert rank-%.0f objects to simple", r))
+        stop(sprintf("cannot convert rank-%.0f objects to normal", r))
     }
 
     cl <- oldClass(x)
@@ -26,7 +26,7 @@ as.simple.default <- function(x)
     }
 
     if (!is.null(cl)) {
-        stop(sprintf("cannot convert objects of class \"%s\" to simple", cl[[1]]))
+        stop(sprintf("cannot convert objects of class \"%s\" to normal", cl[[1]]))
     }
 
     mode <- storage.mode(x)
@@ -40,56 +40,56 @@ as.simple.default <- function(x)
     } else if (mode == "logical") {
         # pass
     } else if (mode == "complex") {
-        x <- dataset(re = as.simple(Re(x)), im = as.simple(Im(x)))
+        x <- dataset(re = as.normal(Re(x)), im = as.normal(Im(x)))
     } else if (mode == "list") {
         lengths <- vapply(x, length, 0)
         if (!all(lengths == 1)) {
-            stop(sprintf("cannot convert heterogeneous list to simple"))
+            stop(sprintf("cannot convert heterogeneous list to normal"))
         }
         x <- do.call(c, x)
-        x <- as.simple(x)
+        x <- as.normal(x)
     } else if (mode == "raw") {
         x <- as.integer(x)
     } else {
-        stop(sprintf("cannot convert objects of mode \"%s\" to simple", mode))
+        stop(sprintf("cannot convert objects of mode \"%s\" to normal", mode))
     }
 
     x
 }
 
 
-as.simple.dataset <- function(x)
+as.normal.dataset <- function(x)
 {
     x <- as.dataset(x)
     for (i in seq_along(x)) {
-        x[[i]] <- as.simple(x[[i]])
+        x[[i]] <- as.normal(x[[i]])
     }
     x
 }
 
 
-as.simple.record <- function(x)
+as.normal.record <- function(x)
 {
     x <- as.record(x)
-    as.simple.dataset(x)
+    as.normal.dataset(x)
 }
 
 
-as.simple.factor <- function(x)
+as.normal.factor <- function(x)
 {
     x <- as.factor(x)
-    levels <- as.simple(levels(x))
+    levels <- as.normal(levels(x))
     levels[x]
 }
 
 
-as.simple.Date <- function(x)
+as.normal.Date <- function(x)
 {
     as.Date(x)
 }
 
 
-as.simple.POSIXt <- function(x)
+as.normal.POSIXt <- function(x)
 {
     as.POSIXct(x)
 }

@@ -46,17 +46,17 @@ S3method(`$<-`, dataset)
 S3method(`[[<-`, dataset)
 
 
-### simple
+### normal
 
-export(as.simple)
+export(as.normal)
 
-S3method(as.simple, default) ; export(as.simple.default)
-S3method(as.simple, dataset) ; export(as.simple.dataset)
-S3method(as.simple, record)  ; export(as.simple.record)
+S3method(as.normal, default) ; export(as.normal.default)
+S3method(as.normal, dataset) ; export(as.normal.dataset)
+S3method(as.normal, record)  ; export(as.normal.record)
 
-S3method(as.simple, Date)    ; export(as.simple.Date)
-S3method(as.simple, POSIXt)  ; export(as.simple.POSIXt)
-S3method(as.simple, factor)  ; export(as.simple.factor)
+S3method(as.normal, Date)    ; export(as.normal.Date)
+S3method(as.normal, POSIXt)  ; export(as.normal.POSIXt)
+S3method(as.normal, factor)  ; export(as.normal.factor)
 
 
 ### keyset

@@ -45,7 +45,7 @@ as.keyset.default <- function(x)
 
 as.keyset.dataset <- function(x)
 {
-    x <- as.simple.dataset(x)
+    x <- as.normal.dataset(x)
     keys(x) <- NULL
 
     if ((j <- anyDuplicated(x))) {
