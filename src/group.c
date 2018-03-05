@@ -131,7 +131,7 @@ void table_init(Table *t, R_xlen_t size)
 }
 
 
-void table_grow(Table *t, const Array *a, const uint64_t *hash)
+void table_grow(Table *t, const Array *types, const uint64_t *hash)
 {
     Table t2;
     Probe p;
@@ -139,11 +139,11 @@ void table_grow(Table *t, const Array *a, const uint64_t *hash)
 
     table_init(&t2, 2 * t->size);
 
-    m = a->count;
+    m = types->count;
     for (j = 0; j < m; j++) {
         RFRAME_CHECK_INTERRUPT(j);
 
-        i = a->items[j];
+        i = types->items[j];
 
         table_probe_make(&t2, &p, hash[i]);
         while (table_probe_advance(&p)) {
@@ -160,13 +160,13 @@ void table_grow(Table *t, const Array *a, const uint64_t *hash)
 
 SEXP rframe_groups(SEXP x_, SEXP sort_)
 {
-    SEXP id_, types_, names_, out_;
-    Array a;
+    SEXP id_, typerows_, names_, out_;
+    Array types;
     Table t;
     Probe p;
     R_xlen_t i, j, n;
     uint64_t *hash;
-    double *id, *types;
+    double *id, *typerows;
     int sort, nprot = 0;
    
     n = rframe_nrow_dataset(x_);
@@ -179,7 +179,7 @@ SEXP rframe_groups(SEXP x_, SEXP sort_)
     rframe_hash_init(hash, n);
     rframe_hash_dataset(hash, n, x_);
 
-    array_init(&a);
+    array_init(&types);
     table_init(&t, 0);
 
     for (i = 0; i < n; i++) {
@@ -192,18 +192,18 @@ SEXP rframe_groups(SEXP x_, SEXP sort_)
 
             if (j == TABLE_ITEM_EMPTY) {
 
-                j = a.count;
-                array_push(&a, i);
+                j = types.count;
+                array_push(&types, i);
                 t.items[p.index] = j;
 
-                if (a.count == t.capacity) {
-                    table_grow(&t, &a, hash);
+                if (types.count == t.capacity) {
+                    table_grow(&t, &types, hash);
                 }
 
                 break;
-            } else if (hash[i] != hash[a.items[j]]) {
+            } else if (hash[i] != hash[types.items[j]]) {
                 continue;
-            } else if (rframe_equals_dataset(x_, i, a.items[j])) {
+            } else if (rframe_equals_dataset(x_, i, types.items[j])) {
                 break;
             }
         }
@@ -211,20 +211,20 @@ SEXP rframe_groups(SEXP x_, SEXP sort_)
         id[i] = (double)(j + 1);
     }
 
-    PROTECT(types_ = Rf_allocVector(REALSXP, a.count)); nprot++;
+    PROTECT(typerows_ = Rf_allocVector(REALSXP, types.count)); nprot++;
 
-    types = REAL(types_);
-    for (j = 0; j < a.count; j++) {
-        types[j] = (double)(a.items[j] + 1);
+    typerows = REAL(typerows_);
+    for (j = 0; j < types.count; j++) {
+        typerows[j] = (double)(types.items[j] + 1);
     }
 
     PROTECT(names_ = Rf_allocVector(STRSXP, 2)); nprot++;
     SET_STRING_ELT(names_, 0, Rf_mkChar("group"));
-    SET_STRING_ELT(names_, 1, Rf_mkChar("types"));
+    SET_STRING_ELT(names_, 1, Rf_mkChar("typerows"));
 
     PROTECT(out_ = Rf_allocVector(VECSXP, 2)); nprot++;
     SET_VECTOR_ELT(out_, 0, id_);
-    SET_VECTOR_ELT(out_, 1, types_);
+    SET_VECTOR_ELT(out_, 1, typerows_);
     Rf_setAttrib(out_, R_NamesSymbol, names_);
 
     UNPROTECT(nprot);
