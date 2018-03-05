@@ -1,5 +1,6 @@
 #include "rframe.h"
 #include <assert.h>
+#include <string.h>
 
 
 static void rframe_hash_column(uint64_t *hash, R_xlen_t n, SEXP x_);
