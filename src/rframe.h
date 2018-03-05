@@ -14,6 +14,8 @@
                 } \
         } while (0)
 
+R_xlen_t rframe_nrow_dataset(SEXP x_);
+
 SEXP rframe_groups(SEXP x_, SEXP sort_);
 
 int rframe_equals_dataset(SEXP x_, R_xlen_t i1, R_xlen_t i2);
