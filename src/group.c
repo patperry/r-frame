@@ -20,9 +20,13 @@ typedef struct {
 } Array;
 
 
-void array_init(Array *a)
+void array_init(Array *a, R_xlen_t size)
 {
-    a->size = ARRAY_SIZE_INIT;
+    if (size <= ARRAY_SIZE_INIT) {
+        size = ARRAY_SIZE_INIT;
+    }
+
+    a->size = size;
     a->count = 0;
     a->items = (void *)R_alloc(a->size, sizeof(*a->items));
 }
@@ -179,7 +183,7 @@ SEXP rframe_groups(SEXP x_, SEXP sort_)
     rframe_hash_init(hash, n);
     rframe_hash_dataset(hash, n, x_);
 
-    array_init(&types);
+    array_init(&types, 0);
     table_init(&t, 0);
 
     for (i = 0; i < n; i++) {
