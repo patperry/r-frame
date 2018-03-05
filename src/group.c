@@ -201,6 +201,8 @@ SEXP rframe_groups(SEXP x_, SEXP sort_)
                 }
 
                 break;
+            } else if (hash[i] != hash[a.items[j]]) {
+                continue;
             } else if (rframe_equals_dataset(x_, i, a.items[j])) {
                 break;
             }
