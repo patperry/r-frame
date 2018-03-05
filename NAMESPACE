@@ -1,3 +1,6 @@
+## Compiled
+useDynLib(frame, .registration = TRUE)
+
 ## Imports
 importFrom(utf8, as_utf8)
 importFrom(utf8, utf8_encode)
