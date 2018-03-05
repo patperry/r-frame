@@ -21,5 +21,6 @@ SEXP rframe_groups(SEXP x_, SEXP sort_);
 int rframe_equals_dataset(SEXP x_, R_xlen_t i1, R_xlen_t i2);
 void rframe_hash_init(uint64_t *hash, R_xlen_t n);
 void rframe_hash_dataset(uint64_t *hash, R_xlen_t n, SEXP x_);
+void rframe_hash_final(uint64_t *hash, R_xlen_t n);
 
 #endif /* RFRAME_H */

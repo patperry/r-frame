@@ -164,13 +164,13 @@ void table_grow(Table *t, const Array *types, const uint64_t *hash)
 
 SEXP rframe_groups(SEXP x_, SEXP sort_)
 {
-    SEXP id_, typerows_, names_, out_;
+    SEXP id_, typehash_, typerows_, names_, out_;
     Array types;
     Table t;
     Probe p;
     R_xlen_t i, j, n;
     uint64_t *hash;
-    double *id, *typerows;
+    double *id, *typehash, *typerows;
     int sort, nprot = 0;
    
     n = rframe_nrow_dataset(x_);
@@ -182,6 +182,7 @@ SEXP rframe_groups(SEXP x_, SEXP sort_)
     hash = (void *)R_alloc(n, sizeof(*hash));
     rframe_hash_init(hash, n);
     rframe_hash_dataset(hash, n, x_);
+    rframe_hash_final(hash, n);
 
     array_init(&types, 0);
     table_init(&t, 0);
@@ -216,19 +217,25 @@ SEXP rframe_groups(SEXP x_, SEXP sort_)
     }
 
     PROTECT(typerows_ = Rf_allocVector(REALSXP, types.count)); nprot++;
+    PROTECT(typehash_ = Rf_allocVector(REALSXP, types.count)); nprot++;
 
     typerows = REAL(typerows_);
+    typehash = REAL(typehash_);
+
     for (j = 0; j < types.count; j++) {
         typerows[j] = (double)(types.items[j] + 1);
+        typehash[j] = (double)hash[types.items[j]];
     }
 
-    PROTECT(names_ = Rf_allocVector(STRSXP, 2)); nprot++;
+    PROTECT(names_ = Rf_allocVector(STRSXP, 3)); nprot++;
     SET_STRING_ELT(names_, 0, Rf_mkChar("group"));
     SET_STRING_ELT(names_, 1, Rf_mkChar("typerows"));
+    SET_STRING_ELT(names_, 2, Rf_mkChar("hash"));
 
-    PROTECT(out_ = Rf_allocVector(VECSXP, 2)); nprot++;
+    PROTECT(out_ = Rf_allocVector(VECSXP, 3)); nprot++;
     SET_VECTOR_ELT(out_, 0, id_);
     SET_VECTOR_ELT(out_, 1, typerows_);
+    SET_VECTOR_ELT(out_, 2, typehash_);
     Rf_setAttrib(out_, R_NamesSymbol, names_);
 
     UNPROTECT(nprot);

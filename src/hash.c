@@ -1,6 +1,7 @@
 #include "rframe.h"
 #include <assert.h>
 #include <string.h>
+#include <stdint.h>
 
 
 static void rframe_hash_column(uint64_t *hash, R_xlen_t n, SEXP x_);
@@ -129,12 +130,6 @@ void rframe_hash_character(uint64_t *hash, R_xlen_t n, SEXP x_)
 }
 
 
-void rframe_hash_init(uint64_t *hash, R_xlen_t n)
-{
-    memset(hash, 0, n * sizeof(*hash));
-}
-
-
 // This is the hash combine function used by the Boost library
 // (boost/functional/hash/hash.hpp).  It is a variant of the function employed
 // by Hoad and Zobel. Those authors in turn cite Ramakrishna and Zobel.
@@ -170,4 +165,18 @@ uint64_t rframe_hash_string(const char *str)
 }
 
 
+void rframe_hash_init(uint64_t *hash, R_xlen_t n)
+{
+    memset(hash, 0, n * sizeof(*hash));
+}
 
+
+void rframe_hash_final(uint64_t *hash, R_xlen_t n)
+{
+    uint64_t max = (UINT64_C(1) << 52) - 1;
+    R_xlen_t i;
+
+    for (i = 0; i < n; i++) {
+        hash[i] &= max;
+    }
+}
