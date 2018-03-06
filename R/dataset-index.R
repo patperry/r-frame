@@ -91,13 +91,14 @@ row_subset <- function(x, i, call = sys.call(-1L))
         if (anyDuplicated(rows)) {
             keys <- append_copy_num(keys, nrow(x), rows)
         }
+
+        keys <- as.keyset(keys)
     }
 
-    # NOTE: result is a dataset
     cols <- lapply(x, elt_subset, rows)
-    attr(cols, "row.names") <- .set_row_names(length(rows))
-    attr(cols, "class") <- c("dataset", "data.frame")
-    keys(cols) <- keys
+    attr(cols, "dataset.nrow") <- length(rows)
+    attr(cols, "dataset.keys") <- keys
+    class(cols) <- c("dataset", "record")
 
     cols
 }

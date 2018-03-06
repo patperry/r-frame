@@ -62,3 +62,32 @@ test_that("indexing with wrong number of logical errors", {
     expect_error(x[j],
         "mismatch: logical mask length is 10, object length is 11")
 })
+
+
+test_that("indexing with row number works", {
+    x <- as.dataset(mtcars)
+    i <- c(13, 5, 20, 19)
+    expect_equal(x[i,], as.dataset(mtcars[i,]))
+})
+
+
+test_that("indexing with row number and 'drop' works", {
+    x <- as.dataset(mtcars)
+    i <- c(13, 5, 20, 19)
+    expect_equal(x[i, , drop = FALSE], as.dataset(mtcars[i,]))
+})
+
+
+
+test_that("indexing with column number works", {
+    x <- as.dataset(mtcars)
+    j <- c(5, 3, 7)
+    expect_equal(x[,j], as.dataset(mtcars[,j]))
+})
+
+
+test_that("indexing without keys works", {
+    x <- dataset(a = letters)
+    expect_equal(as.dataset(x[1:5, , drop = FALSE]),
+                 dataset(a = letters[1:5]))
+})
