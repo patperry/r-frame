@@ -232,3 +232,11 @@ test_that("rename by character", {
     expect_equal(x[c("x" = "a", "b", "y" = "b")],
                  record(x = 1, b = 2, y = 2))
 })
+
+
+test_that("extend", {
+    x <- record(a = 1)
+    x[[2]] <- 7
+    y <- as.record(list(a = 1, 7))
+    expect_equal(x, y)
+})

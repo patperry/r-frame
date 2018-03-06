@@ -102,8 +102,16 @@
         value <- value[!zero]
     }
 
+    cl <- oldClass(x)
     class(x) <- NULL
+
+    nx1 <- length(x)
     x[i] <- value
+    nx2 <- length(x)
+
+    if (nx1 < nx2) {
+        names(x)[(nx1 + 1L):nx2] <- NA_character_
+    }
 
     names <- names(i)
     if (!is.null(names)) {
@@ -111,6 +119,6 @@
         names(x)[i[!empty]] <- names[!empty]
     }
 
-    class(x) <- "record"
+    class(x) <- cl
     x
 }
