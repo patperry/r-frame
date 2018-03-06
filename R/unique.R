@@ -40,7 +40,11 @@ anyDuplicated.dataset <- function(x, incomparables = FALSE, ...)
 {
     x <- prototype(x)
     u <- .Call(rframe_unique, x)
-    (length(u$types) < length(u$group))
+
+    if (length(u$types) < length(u$group))
+        anyDuplicated(u$group)
+    else
+        0L
 }
 
 
@@ -60,5 +64,5 @@ duplicated.keyset <- function(x, incomparables = FALSE, ...)
 anyDuplicated.keyset <- function(x, incomparables = FALSE, ...)
 {
     x <- as.keyset(x)
-    FALSE
+    0L
 }
