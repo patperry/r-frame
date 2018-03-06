@@ -109,7 +109,13 @@ as.record.default <- function(x, n = NULL, names = NULL)
 
     if (!is.null(value)) {
         n <- length(x)
-        value <- arg_record_names(n, value, "`value`")
+        nv <- length(value)
+        if (nv != n) {
+            fmt <- "mismatch: `value` length is %.0f, object length is %.0f"
+            stop(sprintf(fmt, nv, n))
+        }
+
+        value <- arg_names(value, "`value`")
     }
 
     attr(x, "names") <- value
