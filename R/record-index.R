@@ -65,18 +65,21 @@
 {
     i <- arg_record_subset(x, i, TRUE)
     if (is.null(i)) {
-        x
+        names <- names(x)
+        attributes(x) <- NULL
+        names(x) <- names
     } else {
-        y <- .subset(x, i)
+        x <- .subset(x, i)
 
         names <- names(i)
         if (!is.null(names)) {
             empty <- is.na(names) | !nzchar(names)
-            names(y)[!empty] <- names[!empty]
+            names(x)[!empty] <- names[!empty]
         }
 
-        as.record(y)
     }
+    class(x) <- "record"
+    x
 }
 
 
@@ -102,7 +105,6 @@
         value <- value[!zero]
     }
 
-    cl <- oldClass(x)
     class(x) <- NULL
 
     nx1 <- length(x)
@@ -119,6 +121,6 @@
         names(x)[i[!empty]] <- names[!empty]
     }
 
-    class(x) <- cl
+    class(x) <- "record"
     x
 }

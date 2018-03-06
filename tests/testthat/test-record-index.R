@@ -59,7 +59,7 @@ test_that("wrong length logical mask", {
 test_that("unknown name", {
     x <- record(aa = 1)
     #expect_equal(x["a"], record(a = NULL))
-    expect_error(x["a"], "unknown name: \"a\"")
+    expect_error(x["a"], "unknown name \"a\"")
 })
 
 

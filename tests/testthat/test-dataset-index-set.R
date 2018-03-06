@@ -1,4 +1,4 @@
-context("dataset-index")
+context("dataset-index-set")
 
 test_that("[[<-", {
     x <- dataset(a = 1:5, b = letters[1:5], c = rep(TRUE, 5))

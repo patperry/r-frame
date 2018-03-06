@@ -138,9 +138,9 @@ arg_record_subset <- function(x, value, strict = FALSE, call = sys.call(-1))
                 i <- new[[1]]
                 vi <- value[[i]]
                 if (is.na(vi)) {
-                    stop(simpleError("unknown name: <NA>", call))
+                    stop(simpleError("unknown name <NA>", call))
                 } else {
-                    stop(simpleError(sprintf("unknown name: \"%s\"", vi), call))
+                    stop(simpleError(sprintf("unknown name \"%s\"", vi), call))
                 }
             } else {
                 n <- length(x)

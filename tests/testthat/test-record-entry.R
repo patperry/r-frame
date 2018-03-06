@@ -14,7 +14,7 @@ test_that("numeric index", {
 test_that("NA index", {
     x <- record(a = 1, b = 4, c = 19)
     #expect_equal(x[[NA_character_]], NULL)
-    expect_error(x[[NA_character_]], "unknown name: <NA>")
+    expect_error(x[[NA_character_]], "unknown name <NA>")
 })
 
 
