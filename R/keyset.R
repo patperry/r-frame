@@ -55,3 +55,9 @@ as.keyset.dataset <- function(x)
     class(x) <- c("keyset", class(x))
     x
 }
+
+
+as.keyset.keyset <- function(x)
+{
+    x
+}

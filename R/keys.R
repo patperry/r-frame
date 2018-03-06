@@ -58,5 +58,7 @@ keys.dataset <- function(x)
 
 `keys<-.keyset` <- function(x, value)
 {
-    stop("setting 'keys' on a keyset object is not allowed")
+    if (!is.null(value))
+        stop("setting 'keys' on a keyset object is not allowed")
+    x
 }

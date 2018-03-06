@@ -84,6 +84,7 @@ export(as.keyset)
 
 S3method(as.keyset, dataset) ; export(as.keyset.dataset)
 S3method(as.keyset, default) ; export(as.keyset.default)
+S3method(as.keyset, keyset)
 
 S3method(unique, keyset)        ; export(unique.keyset)
 S3method(duplicated, keyset)    ; export(duplicated.keyset)

@@ -65,7 +65,6 @@ test_that("matrix entry", {
 
 
 test_that("matrix entry replace", {
-    skip("not implemented")
     x <- dataset(a = matrix(1:6 * 10, 3, 2))
     x[cbind(2, 1)] <- list(c(17, 14))
 
@@ -75,7 +74,6 @@ test_that("matrix entry replace", {
 
 
 test_that("matrix entry replace recycle", {
-    skip("not implemented")
     x <- dataset(a = matrix(1:6 * 10, 3, 2))
     x[cbind(2, 1)] <- 100
 
@@ -85,7 +83,6 @@ test_that("matrix entry replace recycle", {
 
 
 test_that("matrix entry wrong replace number", {
-    skip("not implemented")
     x <- dataset(a = matrix(1:6 * 10, 3, 2))
     expect_error(x[cbind(2, 1)] <- c(17, 24),
                  "number of values \\(2\\) must match number of entries to replace \\(1\\)")

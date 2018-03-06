@@ -20,7 +20,7 @@
 
         nx <- dim(x)[[1]]
         if (nx != nv) {
-            fmt <- "mismatch: replacement has %.0f rows, data has %.0f"
+            fmt <- "mismatch: replacement has %.0f rows, should have %.0f"
             stop(sprintf(fmt, nv, nx))
         }
     }
@@ -50,7 +50,7 @@
 
 replace_pairs <- function(x, pairs, value, call = sys.call(-1L))
 {
-    pairs <- arg_pairs_index(x, pairs, call)
+    pairs <- arg_dataset_pairs_index(x, pairs, call)
 
     i <- pairs[, 1L, drop = TRUE]
     j <- pairs[, 2L, drop = TRUE]
@@ -100,7 +100,7 @@ replace_cols <- function(x, j, value, call = sys.call(-1L))
         nv <- nrow(value)
         nx <- nrow(x)
         if (nx != nv) {
-            fmt <- "mismatch: replacement has %.0f rows, data has %.0f"
+            fmt <- "mismatch: replacement has %.0f rows, should have %.0f"
             stop(simpleError(sprintf(fmt, nv, nx), call))
         }
     }
