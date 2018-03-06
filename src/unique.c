@@ -162,20 +162,18 @@ void table_grow(Table *t, const Array *types, const uint64_t *hash)
 }
 
 
-SEXP rframe_groups(SEXP x_, SEXP sort_)
+SEXP rframe_unique(SEXP x_)
 {
-    SEXP id_, typehash_, typerows_, names_, out_;
+    SEXP id_, table_, typehash_, typerows_, names_, out_;
     Array types;
     Table t;
     Probe p;
     R_xlen_t i, j, n;
     uint64_t *hash;
-    double *id, *typehash, *typerows;
-    int sort, nprot = 0;
+    double *id, *table, *typehash, *typerows;
+    int nprot = 0;
    
     n = rframe_nrow_dataset(x_);
-    sort = LOGICAL(sort_)[0] == TRUE;
-
     PROTECT(id_ = Rf_allocVector(REALSXP, n)); nprot++;
     id = REAL(id_);
 
@@ -216,26 +214,37 @@ SEXP rframe_groups(SEXP x_, SEXP sort_)
         id[i] = (double)(j + 1);
     }
 
+    PROTECT(table_ = Rf_allocVector(REALSXP, t.size)); nprot++;
+    table = REAL(table_);
+    for (i = 0; i < t.size; i++) {
+        j = t.items[i];
+        if (j == TABLE_ITEM_EMPTY) {
+            table[i] = 0;
+        } else {
+            table[i] = (double)(j + 1);
+        }
+    }
+
     PROTECT(typerows_ = Rf_allocVector(REALSXP, types.count)); nprot++;
     PROTECT(typehash_ = Rf_allocVector(REALSXP, types.count)); nprot++;
-
     typerows = REAL(typerows_);
     typehash = REAL(typehash_);
-
     for (j = 0; j < types.count; j++) {
         typerows[j] = (double)(types.items[j] + 1);
         typehash[j] = (double)hash[types.items[j]];
     }
 
-    PROTECT(names_ = Rf_allocVector(STRSXP, 3)); nprot++;
+    PROTECT(names_ = Rf_allocVector(STRSXP, 4)); nprot++;
     SET_STRING_ELT(names_, 0, Rf_mkChar("group"));
-    SET_STRING_ELT(names_, 1, Rf_mkChar("typerows"));
+    SET_STRING_ELT(names_, 1, Rf_mkChar("types"));
     SET_STRING_ELT(names_, 2, Rf_mkChar("hash"));
+    SET_STRING_ELT(names_, 3, Rf_mkChar("table"));
 
-    PROTECT(out_ = Rf_allocVector(VECSXP, 3)); nprot++;
+    PROTECT(out_ = Rf_allocVector(VECSXP, 4)); nprot++;
     SET_VECTOR_ELT(out_, 0, id_);
     SET_VECTOR_ELT(out_, 1, typerows_);
     SET_VECTOR_ELT(out_, 2, typehash_);
+    SET_VECTOR_ELT(out_, 3, table_);
     Rf_setAttrib(out_, R_NamesSymbol, names_);
 
     UNPROTECT(nprot);

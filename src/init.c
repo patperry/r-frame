@@ -6,7 +6,7 @@
 
 
 static const R_CallMethodDef CallEntries[] = {
-    CALLDEF(rframe_groups, 2),
+    CALLDEF(rframe_unique, 1),
     {NULL, NULL, 0}
 };
 
