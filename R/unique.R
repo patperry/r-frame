@@ -42,3 +42,23 @@ anyDuplicated.dataset <- function(x, incomparables = FALSE, ...)
     u <- .Call(rframe_unique, x)
     (length(u$types) < length(u$group))
 }
+
+
+unique.keyset <- function(x, incomparables = FALSE, ...)
+{
+    as.keyset(x)
+}
+
+
+duplicated.keyset <- function(x, incomparables = FALSE, ...)
+{
+    x <- as.keyset(x)
+    logical(nrow(x))
+}
+
+
+anyDuplicated.keyset <- function(x, incomparables = FALSE, ...)
+{
+    x <- as.keyset(x)
+    FALSE
+}
