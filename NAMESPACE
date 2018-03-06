@@ -47,6 +47,7 @@ S3method(as.dataset, record)     ; export(as.dataset.record)
 S3method(dim, dataset)
 S3method(`$<-`, dataset)
 S3method(`[`, dataset)
+S3method(`[<-`, dataset)
 S3method(`[[<-`, dataset)
 
 S3method(unique, dataset)        ; export(unique.dataset)
@@ -195,7 +196,6 @@ export(numeric.map)
 ## Base S3 methods
 
 ### dataset
-# S3method(`[<-`, dataset)
 # S3method(as.data.frame, dataset)
 # S3method(as.matrix, dataset)
 # S3method(cbind, dataset)

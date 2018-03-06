@@ -47,10 +47,27 @@
     i1 <- arg_record_index1(n, i)
 
     if (n == 1) {
-        if (!is.null(value)) {
-            value <- list(value)
+        n1 <- length(x)
+        i1 <- arg_record_subset(x, i1, FALSE)
+
+        class(x) <- NULL
+        if (is.null(value)) {
+            x[i1] <- list(NULL)
+        } else {
+            x[[i1]] <- value
         }
-        x[i1] <- value
+
+        nm <- names(i1)
+        if (!is.null(nm)) {
+            names(x)[[i1]] <- nm
+        } else {
+            n2 <- length(x)
+            if (n1 < n2) {
+                names(x)[(n1 + 1L):n2] <- NA_character_
+            }
+        }
+
+        class(x) <- "record"
     } else {
         entry <- x[[i1]]
         entry[[ i[-1] ]] <- value
