@@ -143,7 +143,7 @@ replace_cells <- function(x, i, j, value, call = sys.call(-1L))
     if (is.null(i)) {
         i <- seq_len(nrow(x))
     } else {
-        i <- arg_row_index(x, i, call)
+        i <- arg_dataset_row_index(x, i, call)
     }
     if (is.null(j)) {
         j <- seq_along(x)
