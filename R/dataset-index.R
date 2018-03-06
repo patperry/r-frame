@@ -72,7 +72,7 @@ column_subset <- function(x, i, call = sys.call(-1L))
     nrow <- attr(x, "dataset.nrow", TRUE)
     keys <- attr(x, "dataset.keys", TRUE)
     class(x) <- "record"
-    x <- x[i]
+    x <- x[i] # TODO: use `[.record` directly?
     attr(x, "dataset.nrow") <- nrow
     attr(x, "dataset.keys") <- keys
     class(x) <- c("dataset", oldClass(x))
