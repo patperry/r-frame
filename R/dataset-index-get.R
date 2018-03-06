@@ -24,6 +24,7 @@
         dim <- dim(x)
         if (!is.null(i) && dim[[1L]] == 1L) {
             x <- lapply(x, drop_row_dim)
+            x <- as.record(x)
         }
         if (!is.null(j) && dim[[2L]] == 1L) {
             x <- x[[1L]]
