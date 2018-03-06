@@ -116,7 +116,7 @@ elt_subset <- function(x, i)
 
 get_pairs <- function(x, pairs, call = sys.call(-1))
 {
-    pairs <- arg_pairs_index(x, pairs, call)
+    pairs <- arg_dataset_pairs_index(x, pairs, call)
 
     i <- pairs[, 1L, drop = TRUE]
     j <- pairs[, 2L, drop = TRUE]
