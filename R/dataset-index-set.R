@@ -148,71 +148,71 @@ replace_cells <- function(x, i, j, value, call = sys.call(-1L))
     if (is.null(j)) {
         j <- seq_along(x)
     } else {
-        j <- arg_col_index(x, j, call)
+        j <- arg_index(j, length(x), names(x), TRUE)
     }
 
     ni <- length(i)
     nj <- length(j)
-    recycle <- arg_dataset_recycle(ni, nj, value, call)$cols
 
-    if (ni == 0 || nj == 0) {
-        return(x)
+    if (is.null(value)) {
+        nv <- 1
+        rv <- 0
+    } else {
+        dv <- dim(value)
+        rv <- length(dv)
+        if (rv <= 1) {
+            nv <- length(value)
+            if (nv == 1) {
+                rv <- 0
+            } else if (nv != ni * nj) {
+                fmt <- "mistmatch: selection size is %.0f, replacement size is %.0f"
+                stop(sprintf(fmt, ni * nj, nv))
+            } else {
+                rv <- 1
+            }
+        } else if (rv == 2) {
+            if (dv[[1]] != ni) {
+                fmt <- "mistmatch: selection has %.0f rows, replacement has %.0f"
+                stop(sprintf(fmt, ni, dv[[1]]))
+            } else if (dv[[2]] != nj) {
+                fmt <- "mistmatch: selection has %.0f columns, replacement has %.0f"
+                stop(sprintf(fmt, nj, dv[[2]]))
+            }
+        } else {
+            fmt <- "replacement must be a vector or matrix, not a rank-%.0f array"
+            stop(sprintf(fmt, rv))
+        }
     }
 
     for (k in seq_along(j)) {
         jk <- j[[k]]
-        vk <- if (recycle) value[[1L]] else value[[k]]
+
+        if (rv == 0) {
+            vk <- value
+        } else if (rv == 1) {
+            vk <- value[(1 + (k - 1) * ni):(k * ni)]
+        } else {
+            vk <- value[, k, drop = TRUE]
+        }
+
+        if (is.null(vk)) {
+            if (is.null(x[[jk]])) {
+                next
+            } else {
+                vk <- vector("list", ni)
+            }
+        }
 
         if (is.null(x[[jk]])) {
-            xjk <- vector("list", dim(x)[[1L]])
-            if (!is.null(vk)) {
-                xjk[[i]] <- vk
-            }
-            x[[jk]] <- xjk
+            x[[jk]] <- vector("list", nrow(x))
+        }
+
+        if (length(dim(x[[jk]])) <= 1) {
+            x[[jk]][i] <- vk
         } else {
-            if (length(dim(x[[jk]])) <= 1L) {
-                x[[jk]][i] <- vk
-            } else {
-                x[[jk]][i,] <- vk
-            }
+            x[[jk]][i, ] <- vk
         }
     }
 
     x
-}
-
-
-arg_dataset_recycle <- function(ni, nj, value, call = sys.call(-1L))
-{
-    dim <- dim(value)
-    if (is.null(dim)) {
-        rows <- length(value)
-        if (rows == ni * nj) {
-            return(list(rows = FALSE, cols = FALSE))
-        }
-        cols <- 1L
-    } else {
-        rows <- dim[[1L]]
-        cols <- dim[[2L]]
-    }
-
-    if (rows == ni) {
-        recycle_rows <- FALSE
-    } else if (rows == 1L) {
-        recycle_rows <- TRUE
-    } else {
-        stop(simpleError(sprintf(
-             "replacement has %.0f rows, need %.0f", rows, ni), call))
-    }
-
-    if (cols == nj) {
-        recycle_cols <- FALSE
-    } else if (cols == 1L) {
-        recycle_cols <- TRUE
-    } else {
-        stop(simpleError(sprintf(
-             "replacement has %.0f columns, need %.0f", cols, nj), call))
-    }
-
-    list(rows = recycle_rows, cols = recycle_cols)
 }

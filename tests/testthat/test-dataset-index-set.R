@@ -248,3 +248,17 @@ test_that("setting invalid errors", {
     expect_error(x[[17]] <- array(1, c(1,1,1)),
                  "replacement is not a vector or matrix")
 })
+
+
+test_that("setting cells", {
+    ds <- mtcars
+    mat <- matrix(1:20, 4, 5)
+    x <- as.dataset(ds)
+    i <- c(3, 9, 2, 1)
+    j <- c(5, 3, 2, 7, 8)
+    x[i, j] <- mat
+    y <- ds
+    y[i, j] <- mat
+    y <- as.dataset(y)
+    expect_equal(x, y)
+})
