@@ -132,7 +132,11 @@ test_that("replace column with scalar", {
 
 test_that("replace column with scalar, double index", {
     x <- as.dataset(mtcars)
-    expect_error(x[, 5] <- 17, "replacement has 1 rows, should have 32")
+    y <- mtcars
+    x[, 5] <- 17
+    y[, 5] <- 17
+    y <- as.dataset(y)
+    expect_equal(x, y)
 })
 
 
@@ -157,16 +161,8 @@ test_that("deleting columns with name", {
 
 test_that("deleting columns with single index and comma", {
     x <- as.dataset(mtcars)
-    y <- as.dataset(mtcars)
-    x[,c(1, 1, 5)] <- NULL
-    y[c(1, 1, 5)] <- NULL
-    expect_equal(x, y)
-})
-
-
-test_that("setting single column scalar", {
-    x <- as.dataset(mtcars)
-    expect_error(x[,3] <- 7, "replacement has 1 rows, should have 32")
+    expect_error(x[,c(1, 1, 5)] <- NULL,
+                 "selection dimensions are 32 x 3, replacement size is 0")
 })
 
 

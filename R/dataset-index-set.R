@@ -33,17 +33,25 @@
 
 `[<-.dataset` <- function(x, i, j, value)
 {
-    args <- arg_dataset_index(nargs() - 2L, i, j)
-    i <- args$i
-    j <- args$j
-    pairs <- args$pairs
-
-    if (!is.null(pairs)) {
-        replace_pairs(x, pairs, value)
-    } else if (is.null(i)) {
-        replace_cols(x, j, value)
-    } else {
-        replace_cells(x, i, j, value)
+    if (nargs() == 3L) { # x[i] <- value
+        if (missing(i)) {
+            replace_cols(x, NULL, value)
+        } else {
+            r <- length(dim(i))
+            if (r <= 1) {
+                replace_cols(x, i, value)
+            } else if (r == 2) {
+                replace_pairs(x, i, value)
+            } else {
+                stop(sprintf("index is a rank-%.0f array", r))
+            }
+        }
+    } else { # x[i,j] <- value
+        if (missing(i))
+            i <- NULL
+        if (missing(j))
+            j <- NULL
+        replace_block(x, i, j, value)
     }
 }
 
@@ -112,81 +120,50 @@ replace_cols <- function(x, j, value, call = sys.call(-1L))
 }
 
 
-as_column <- function(x, n)
+replace_block <- function(x, is, js, value)
 {
-    # promote scalars
-    if (length(x) == 1 && length(dim(x)) <= 1) {
-        x <- rep(x, n)
-    }
-
-    # drop keys
-    if (!is.null(keys(x))) {
-        keys(x) <- NULL
-    }
-
-    # drop names
     d <- dim(x)
-    if (is.null(d)) {
-        names(x) <- NULL
-    } else if (length(d) == 1) {
-        dimnames(x) <- NULL
+    if (is.null(is)) {
+        is <- seq_len(d[[1]])
     } else {
-        rownames(x) <- NULL
+        is <- arg_dataset_row_index(x, is)
     }
 
-    x
-}
-
-
-replace_cells <- function(x, i, j, value, call = sys.call(-1L))
-{
-    if (is.null(i)) {
-        i <- seq_len(nrow(x))
+    if (is.null(js)) {
+        js <- seq_len(d[[2]])
     } else {
-        i <- arg_dataset_row_index(x, i, call)
-    }
-    if (is.null(j)) {
-        j <- seq_along(x)
-    } else {
-        j <- arg_index(j, length(x), names(x), TRUE)
+        js <- arg_index(js, d[[2]], names(x), TRUE)
     }
 
-    ni <- length(i)
-    nj <- length(j)
+    ni <- length(is)
+    nj <- length(js)
+    dv <- dim(value)
+    rv <- length(dv)
+    nv <- length(value)
 
-    if (is.null(value)) {
-        nv <- 1
-        rv <- 0
-    } else {
-        dv <- dim(value)
-        rv <- length(dv)
-        if (rv <= 1) {
-            nv <- length(value)
-            if (nv == 1) {
-                rv <- 0
-            } else if (nv != ni * nj) {
-                fmt <- "mistmatch: selection size is %.0f, replacement size is %.0f"
-                stop(sprintf(fmt, ni * nj, nv))
-            } else {
-                rv <- 1
-            }
-        } else if (rv == 2) {
-            if (dv[[1]] != ni) {
-                fmt <- "mistmatch: selection has %.0f rows, replacement has %.0f"
-                stop(sprintf(fmt, ni, dv[[1]]))
-            } else if (dv[[2]] != nj) {
-                fmt <- "mistmatch: selection has %.0f columns, replacement has %.0f"
-                stop(sprintf(fmt, nj, dv[[2]]))
-            }
+    if (rv <= 1) {
+        if (nv == 1) {
+            rv <- 0
+        } else if (nv == ni * nj) {
+            rv <- 1
         } else {
-            fmt <- "replacement must be a vector or matrix, not a rank-%.0f array"
-            stop(sprintf(fmt, rv))
+            fmt <- "mistmatch: selection dimensions are %.0f x %.0f, replacement size is %.0f"
+            stop(sprintf(fmt, ni, nj, nv))
         }
+    } else if (rv == 2) {
+        if (dv[[1]] != ni) {
+            fmt <- "mistmatch: selection has %.0f rows, replacement has %.0f"
+            stop(sprintf(fmt, ni, dv[[1]]))
+        } else if (dv[[2]] != nj) {
+            fmt <- "mistmatch: selection has %.0f columns, replacement has %.0f"
+            stop(sprintf(fmt, nj, dv[[2]]))
+        }
+    } else {
+        fmt <- "replacement must be a vector or matrix, not a rank-%.0f array"
+        stop(sprintf(fmt, rv))
     }
 
-    for (k in seq_along(j)) {
-        jk <- j[[k]]
-
+    for (k in seq_len(nj)) {
         if (rv == 0) {
             vk <- value
         } else if (rv == 1) {
@@ -194,25 +171,51 @@ replace_cells <- function(x, i, j, value, call = sys.call(-1L))
         } else {
             vk <- value[, k, drop = TRUE]
         }
+        x <- replace_subcol(x, is, js[[k]], vk)
+    }
 
-        if (is.null(vk)) {
-            if (is.null(x[[jk]])) {
-                next
-            } else {
-                vk <- vector("list", ni)
-            }
-        }
+    x
+}
 
-        if (is.null(x[[jk]])) {
-            x[[jk]] <- vector("list", nrow(x))
-        }
 
-        if (length(dim(x[[jk]])) <= 1) {
-            x[[jk]][i] <- vk
+replace_subcol <- function(x, is, j, value)
+{
+    if (is.null(value)) {
+        if (is.null(x[[j]])) {
+            return(x)
         } else {
-            x[[jk]][i, ] <- vk
+            value <- list(NULL)
         }
     }
 
+    xj <- x[[j]]
+    if (is.null(xj)) {
+        xj <- vector("list", nrow(x))
+    }
+
+    dx <- dim(xj)
+    rx <- length(dx)
+    dv <- dim(value)
+    rv <- length(dv)
+    if (rx <= 1) {
+        if (rv <= 1) {
+            xj[is] <- value
+        } else {
+            fmt <- "mismatch: destination column is a vector, replacement is a rank-%.0f array"
+            stop(sprintf(fmt, rv))
+        }
+    } else if (rv == 2) {
+        if (dx[[2]] == dv[[2]]) {
+            xj[is, ] <- value
+        } else {
+            fmt <- "mismatch: destination column has %.0f components, replacement has %.0f"
+            stop(sprintf(fmt, dx[[2]], dv[[2]]))
+        }
+    } else {
+        fmt <- "mismatch: destination column is a matrix, replacement is a rank-%.0f array"
+        stop(sprintf(fmt, rx, rv))
+    }
+
+    x[[j]] <- xj
     x
 }
