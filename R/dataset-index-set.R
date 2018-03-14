@@ -58,7 +58,7 @@
 
 replace_pairs <- function(x, pairs, value, call = sys.call(-1L))
 {
-    pairs <- arg_dataset_pairs_index(x, pairs, call)
+    pairs <- arg_pairs(pairs, dim(x))
 
     i <- pairs[, 1L, drop = TRUE]
     j <- pairs[, 2L, drop = TRUE]
