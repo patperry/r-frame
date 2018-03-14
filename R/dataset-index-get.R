@@ -1,33 +1,43 @@
 
 `[.dataset` <- function(x, i, j, drop = FALSE)
 {
-    args <- arg_dataset_index(nargs() - 1L - !missing(drop), i, j)
+    nargs <- nargs() - !missing(drop)
     drop <- as.option(drop)
 
-    i <- args$i
-    j <- args$j
-    pairs <- args$pairs
-
-    if (!is.null(j)) {
-        x <- column_subset(x, j)
-    }
-
-    if (!is.null(i)) {
-        x <- row_subset(x, i)
-    }
-
-    if (!is.null(pairs)) {
-        return(get_pairs(x, pairs))
-    }
-
-    if (drop) {
-        dim <- dim(x)
-        if (!is.null(i) && dim[[1L]] == 1L) {
-            x <- lapply(x, drop_row_dim)
-            x <- as.record(x)
+    if (nargs == 2L) { # x[i]
+        if (missing(i) || is.null(i)) {
+            x <- column_subset(x, NULL)
+        } else {
+            r <- length(dim(i))
+            if (r <= 1) {
+                x <- column_subset(x, i)
+            } else if (r == 2) {
+                return(get_pairs(x, i))
+            } else {
+                stop(sprintf("index is a rank-%.0f array", r))
+            }
+            if (drop && length(x) == 1)
+                x <- x[[1]]
         }
-        if (!is.null(j) && dim[[2L]] == 1L) {
-            x <- x[[1L]]
+
+    } else { # x[i, j]
+        if (missing(i))
+            i <- NULL
+        if (missing(j))
+            j <- NULL
+
+        x <- column_subset(x, j)
+        x <- row_subset(x, i)
+
+        if (drop) {
+            dim <- dim(x)
+            if (!is.null(i) && dim[[1]] == 1) {
+                x <- lapply(x, drop_row_dim)
+                x <- as.record(x)
+            }
+            if (!is.null(j) && dim[[2]] == 1) {
+                x <- x[[1]]
+            }
         }
     }
 
@@ -50,25 +60,34 @@ column_subset <- function(x, i, call = sys.call(-1L))
 
 row_subset <- function(x, i, call = sys.call(-1L))
 {
-    rows <- arg_dataset_row_index(x, i, call)
-    keys <- keys(x)
+    nrow <- attr(x, "dataset.nrow", TRUE)
+    keys <- attr(x, "dataset.keys", TRUE)
+    
+    if (!is.null(i)) {
+        rows <- arg_dataset_row_index(x, i, call)
 
-    if (!is.null(keys)) {
-        keys <- keys[rows, , drop = FALSE]
+        if (!is.null(keys)) {
+            keys <- keys[rows, , drop = FALSE]
 
-        if (anyDuplicated(rows)) {
-            keys <- append_copy_num(keys, nrow(x), rows)
+            if (anyDuplicated(rows)) {
+                keys <- append_copy_num(keys, nrow, rows)
+            }
+
+            keys <- as.keyset(keys)
         }
-
-        keys <- as.keyset(keys)
+        nrow <- length(rows)
+        x <- lapply(x, elt_subset, rows)
+    } else {
+        names <- names(x)
+        attributes(x) <- NULL
+        names(x) <- names
     }
 
-    cols <- lapply(x, elt_subset, rows)
-    attr(cols, "dataset.nrow") <- length(rows)
-    attr(cols, "dataset.keys") <- keys
-    class(cols) <- c("dataset", "record")
+    attr(x, "dataset.nrow") <- nrow
+    attr(x, "dataset.keys") <- keys
+    class(x) <- c("dataset", "record")
 
-    cols
+    x
 }
 
 

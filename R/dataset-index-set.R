@@ -46,7 +46,7 @@
                 stop(sprintf("index is a rank-%.0f array", r))
             }
         }
-    } else { # x[i,j] <- value
+    } else { # x[i, j] <- value
         if (missing(i))
             i <- NULL
         if (missing(j))
@@ -116,7 +116,7 @@ replace_cols <- function(x, j, value, call = sys.call(-1L))
     nrow <- attr(x, "dataset.nrow", TRUE)
     keys <- attr(x, "dataset.keys", TRUE)
     class(x) <- "record"
-    x[j] <- value
+    x[j] <- value  # TODO: use `[<-.record` directly?
     attr(x, "dataset.keys") <- keys
     attr(x, "dataset.nrow") <- nrow
     class(x) <- c("dataset", oldClass(x))
