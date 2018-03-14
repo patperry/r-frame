@@ -1,4 +1,4 @@
-arg_index <- function(value, n, names, get)
+arg_subset <- function(value, n, names, get)
 {
     if (missing(value) || is.null(value)) {
         return(NULL)
