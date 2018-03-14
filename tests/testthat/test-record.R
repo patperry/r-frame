@@ -20,12 +20,6 @@ test_that("set wrong names", {
 })
 
 
-test_that("as.record wrong names", {
-    x <- record(a = 1, b = 2)
-    expect_error(as.record(x, names = c("a", "bb")),
-                 "argument names do not match")
-})
-
 test_that("c", {
     x <- record(a = 1, b = 2)
     y <- record(c = "foo", d = "bar")
@@ -57,4 +51,11 @@ test_that("set length", {
     x <- record(a = 1, b = "foo")
     length(x) <- 1
     expect_equal(x, record(a = 1))
+})
+
+
+test_that("convert record", {
+    x <- record(a = 1, b = "foo")
+    y <- as.record(x)
+    expect_equal(x, y)
 })

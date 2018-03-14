@@ -67,27 +67,19 @@ as.list.record <- function(x, ...)
 # We coerce other objects to records by first converting to list. We
 # preserve object names for vector inputs.
 
-as.record <- function(x, n = NULL, names = NULL)
+as.record <- function(x)
     UseMethod("as.record")
 
 
-as.record.default <- function(x, n = NULL, names = NULL)
+as.record.record <- function(x)
 {
-    n     <- if (is.null(n))     NA   else as.size.scalar(n)
-    names <- if (is.null(names)) NULL else as.character.vector(names)
+    x
+}
 
-    if (is.record(x, n, names))
-        return(x)
 
-    if (!is.na(n) && length(x) != n)
-        stop("argument lengths do not match")
-
-    if (is.null(names)) {
-        names <- names(x)
-    } else if (!identical(names, names(x))) {
-        stop("argument names do not match")
-    }
-
+as.record.default <- function(x)
+{
+    names <- names(x)
     x <- as.list(x)
     attributes(x) <- NULL
     class(x) <- "record"
