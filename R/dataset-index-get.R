@@ -64,19 +64,20 @@ row_subset <- function(x, i, call = sys.call(-1L))
     keys <- attr(x, "dataset.keys", TRUE)
     
     if (!is.null(i)) {
-        rows <- arg_dataset_row_index(x, i, call)
+        i <- arg_index(i, nrow, NULL, TRUE)
 
         if (!is.null(keys)) {
-            keys <- keys[rows, , drop = FALSE]
+            keys <- keys[i, , drop = FALSE]
 
-            if (anyDuplicated(rows)) {
-                keys <- append_copy_num(keys, nrow, rows)
+            if (anyDuplicated(i)) {
+                keys <- append_copy_num(keys, nrow, i)
             }
 
             keys <- as.keyset(keys)
         }
-        nrow <- length(rows)
-        x <- lapply(x, elt_subset, rows)
+
+        nrow <- length(i)
+        x <- lapply(x, elt_subset, i)
     } else {
         names <- names(x)
         attributes(x) <- NULL
@@ -86,6 +87,28 @@ row_subset <- function(x, i, call = sys.call(-1L))
     attr(x, "dataset.nrow") <- nrow
     attr(x, "dataset.keys") <- keys
     class(x) <- c("dataset", "record")
+
+    x
+}
+
+
+append_copy_num <- function(x, nkey, id)
+{
+    # TODO: implement in C?
+    copy <- integer(nkey)
+    newkey <- integer(length(id))
+    for (i in seq_along(id)) {
+        k <- id[[i]]
+        copy[[k]] <- copy[[k]] + 1L
+        newkey[[i]] <- copy[[k]]
+    }
+    names <- names(x)
+    if (is.null(names)) {
+        names <- character(length(x))
+    }
+
+    x[[length(x) + 1L]] <- newkey
+    names(x) <- c(names, "#")
 
     x
 }
