@@ -51,19 +51,17 @@
         i1 <- arg_index(i1, n1, names(x), FALSE)
 
         class(x) <- NULL
-        if (is.null(value)) {
-            x[i1] <- list(NULL)
-        } else {
-            x[[i1]] <- value
-        }
+        x[[i1]] <- value
 
-        nm <- names(i1)
-        if (!is.null(nm)) {
-            names(x)[[i1]] <- nm
-        } else {
-            n2 <- length(x)
-            if (n1 < n2) {
-                names(x)[(n1 + 1L):n2] <- NA_character_
+        if (!is.null(value)) {
+            nm <- names(i1)
+            if (!is.null(nm)) {
+                names(x)[[i1]] <- nm
+            } else {
+                n2 <- length(x)
+                if (n1 < n2) {
+                    names(x)[(n1 + 1L):n2] <- NA_character_
+                }
             }
         }
 
@@ -105,10 +103,14 @@
     i <- arg_index(i, length(x), names(x), FALSE)
     if (is.null(i))
         i <- seq_along(x)
-    ni <- length(i)
 
-    if (is.null(value))
-        value <- vector("list", ni)
+    if (is.null(value)) {
+        x <- .subset(x, -i)
+        class(x) <- "record"
+        return(x)
+    }
+
+    ni <- length(i)
     nv <- length(value)
 
     if (ni != nv && nv != 1L) {

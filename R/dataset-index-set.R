@@ -113,8 +113,12 @@ replace_cols <- function(x, j, value, call = sys.call(-1L))
         }
     }
 
+    nrow <- attr(x, "dataset.nrow", TRUE)
+    keys <- attr(x, "dataset.keys", TRUE)
     class(x) <- "record"
     x[j] <- value
+    attr(x, "dataset.keys") <- keys
+    attr(x, "dataset.nrow") <- nrow
     class(x) <- c("dataset", oldClass(x))
     x
 }
