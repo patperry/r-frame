@@ -19,16 +19,13 @@
     if (!identical(exact, TRUE))
         warning("'exact' argument is ignored")
 
-    if (missing(i))
-        stop("missing index")
+    if (missing(i) || ((ni <- length(i)) == 0))
+        stop("empty index")
 
-    n <- length(i)
-    i1 <- arg_record_index1(n, i)
+    i1 <- arg_index(i[[1]], length(x), names(x), TRUE)
+    entry <- .subset2(x, i1)
 
-    x1 <- x[i1]
-    entry <- .subset2(x1, 1)
-
-    if (n > 1)
+    if (ni > 1)
         entry[[ i[-1] ]]
     else
         entry
@@ -40,15 +37,13 @@
 {
     # TODO: implement in C
 
-    if (missing(i))
-        stop("missing index")
+    if (missing(i) || ((ni <- length(i)) == 0))
+        stop("empty index")
 
-    n <- length(i)
-    i1 <- arg_record_index1(n, i)
-
-    if (n == 1) {
-        n1 <- length(x)
-        i1 <- arg_subscript(i1, n1, names(x), FALSE)
+    if (ni == 1) {
+        n <- length(x)
+        names <- names(x)
+        i1 <- arg_index(i[[1]], n, names, FALSE)
 
         class(x) <- NULL
         x[[i1]] <- value
@@ -56,18 +51,20 @@
         if (!is.null(value)) {
             nm <- names(i1)
             if (!is.null(nm)) {
-                names(x)[[i1]] <- nm
-            } else {
-                n2 <- length(x)
-                if (n1 < n2) {
-                    names(x)[(n1 + 1L):n2] <- NA_character_
+                if (is.null(names)) {
+                    names <- rep_len(NA, n)
                 }
+                names[[i1]] <- nm
+                names(x) <- names
+            } else if (i1 > n && !is.null(names)) {
+                names(x) <- c(names, rep_len(NA, i1 - n))
             }
         }
 
         class(x) <- "record"
     } else {
-        entry <- x[[i1]]
+        i1 <- i[[1]]
+        entry <- x[[ i1 ]]
         entry[[ i[-1] ]] <- value
         x[[i1]] <- entry
     }
