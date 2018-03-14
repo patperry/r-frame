@@ -12,8 +12,7 @@ arg_dataset_index <- function(nargs, i, j, call = sys.call(-1L))
         } else if (r == 2L) {
             return(list(pairs = i))
         } else {
-            stop(simpleError(sprintf("cannot index with a rank-%.0f array",
-                                     r), call))
+            stop(simpleError(sprintf("index is a rank-%.0f array", r), call))
         }
     } else if (nargs == 2L) {
         if (missing(i)) {

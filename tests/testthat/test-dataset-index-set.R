@@ -258,3 +258,11 @@ test_that("setting cells", {
     y <- as.dataset(y)
     expect_equal(x, y)
 })
+
+
+test_that("rank-3 index", {
+    ds <- as.dataset(mtcars)
+    i <- array(1, c(1, 1, 1))
+    expect_error(ds[i], "index is a rank-3 array")
+    expect_error(ds[i] <- NULL, "index is a rank-3 array")
+})
