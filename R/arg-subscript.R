@@ -1,4 +1,4 @@
-arg_subset <- function(value, n, names, get)
+arg_subscript <- function(value, n, names, get)
 {
     if (missing(value) || is.null(value)) {
         return(NULL)
@@ -6,7 +6,7 @@ arg_subset <- function(value, n, names, get)
     
     r <- length(dim(value))
     if (r >= 2) {
-        stop(sprintf("cannot index with rank-%.0f array", r))
+        stop(sprintf("subscript is a rank-%.0f array", r))
     }
 
     if (get) {
@@ -31,19 +31,19 @@ arg_subset <- function(value, n, names, get)
 
     if (is.numeric(value)) {
         if (anyNA(value)) {
-            stop("numeric index cannot contain NA values")
+            stop("numeric subscript cannot contain NA values")
         }
 
         if (length(value) == 0) {
             # pass
         } else if (isTRUE(value[[1]] < 0)) {
             if (!all(value < 0)) {
-                stop("numeric index cannot contain both negative and non-negative values")
+                stop("numeric subscript cannot contain both negative and non-negative values")
             }
             value <- seq_len(n)[value]
         } else {
             if (!all(value >= 0)) {
-                stop("numeric index cannot contain both negative and non-negative values")
+                stop("numeric subscript cannot contain both negative and non-negative values")
             }
 
             if (get) {
@@ -59,7 +59,7 @@ arg_subset <- function(value, n, names, get)
     } else if (is.logical(value)) {
         nvalue <- length(value)
         if (nvalue != n) {
-            fmt <- "mismatch: logical mask length is %.0f, object length is %.0f"
+            fmt <- "mismatch: logical subscript length is %.0f, should be %.0f"
             stop(simpleError(sprintf(fmt, nvalue, n), call))
         }
 

@@ -136,7 +136,7 @@ replace_block <- function(x, is, js, value)
     if (is.null(js)) {
         js <- seq_len(d[[2]])
     } else {
-        js <- arg_subset(js, d[[2]], names(x), TRUE)
+        js <- arg_subscript(js, d[[2]], names(x), TRUE)
     }
 
     ni <- length(is)

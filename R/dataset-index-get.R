@@ -64,7 +64,7 @@ row_subset <- function(x, i, call = sys.call(-1L))
     keys <- attr(x, "dataset.keys", TRUE)
     
     if (!is.null(i)) {
-        i <- arg_subset(i, nrow, NULL, TRUE)
+        i <- arg_subscript(i, nrow, NULL, TRUE)
 
         if (!is.null(keys)) {
             keys <- keys[i, , drop = FALSE]

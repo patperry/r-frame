@@ -48,7 +48,7 @@
 
     if (n == 1) {
         n1 <- length(x)
-        i1 <- arg_subset(i1, n1, names(x), FALSE)
+        i1 <- arg_subscript(i1, n1, names(x), FALSE)
 
         class(x) <- NULL
         x[[i1]] <- value
@@ -78,7 +78,7 @@
 
 `[.record` <- function(x, i)
 {
-    i <- arg_subset(i, length(x), names(x), TRUE)
+    i <- arg_subscript(i, length(x), names(x), TRUE)
     if (is.null(i)) {
         names <- names(x)
         attributes(x) <- NULL
@@ -100,7 +100,7 @@
 
 `[<-.record` <- function(x, i, value)
 {
-    i <- arg_subset(i, length(x), names(x), FALSE)
+    i <- arg_subscript(i, length(x), names(x), FALSE)
     if (is.null(i))
         i <- seq_along(x)
 

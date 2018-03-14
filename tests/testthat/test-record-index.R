@@ -17,7 +17,7 @@ test_that("rename invalid", {
 test_that("rank-3 array", {
     x <- record(a = 7, b = 12, c = "hello")
     expect_error(x[array(1, c(1, 1, 1))],
-                 "cannot index with rank-3 array")
+                 "subscript is a rank-3 array")
 })
 
 test_that("numeric object", {
@@ -29,16 +29,16 @@ test_that("numeric object", {
 
 test_that("numeric NA", {
     x <- record(1)
-    expect_error(x[NA_real_], "numeric index cannot contain NA values")
+    expect_error(x[NA_real_], "numeric subscript cannot contain NA values")
 })
 
 
 test_that("mixed sign", {
     x <- record(1)
     expect_error(x[c(0, -1)],
-                 "numeric index cannot contain both negative and non-negative values")
+                 "numeric subscript cannot contain both negative and non-negative values")
     expect_error(x[c(-1, 0)],
-                 "numeric index cannot contain both negative and non-negative values")
+                 "numeric subscript cannot contain both negative and non-negative values")
 })
 
 
@@ -52,7 +52,7 @@ test_that("out-of-bounds", {
 test_that("wrong length logical mask", {
     x <- record(1, 2, 3, 4)
     i <- c(TRUE, FALSE)
-    expect_error(x[i], "mismatch: logical mask length is 2, object length is 4")
+    expect_error(x[i], "mismatch: logical subscript length is 2, should be 4")
 })
 
 
