@@ -240,3 +240,9 @@ test_that("extend", {
     y <- as.record(list(a = 1, 7))
     expect_equal(x, y)
 })
+
+
+test_that("unknown NA", {
+    x <- record(a = 1)
+    expect_error(x[NA_character_], "unknown name <NA>")
+})
