@@ -34,13 +34,27 @@ as.enum <- function(choices, x)
 as.character.scalar <- function(x)
 {
     x <- as.scalar(x)
-    as.character(x)
+    as.character.vector(x)
 }
 
 as.character.vector <- function(x)
 {
     if (!is.character(x) || is.object(x))
         x <- as.character(x)
+
+    x
+}
+
+as.integer.scalar <- function(x)
+{
+    x <- as.scalar(x)
+    as.integer.vector(x)
+}
+
+as.integer.vector <- function(x)
+{
+    if (!is.integer(x) || is.object(x))
+        x <- as.integer(x)
 
     x
 }
