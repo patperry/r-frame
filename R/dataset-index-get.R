@@ -45,7 +45,7 @@
 }
 
 
-column_subset <- function(x, i, call = sys.call(-1L))
+column_subset <- function(x, i)
 {
     nrow <- attr(x, "dataset.nrow", TRUE)
     keys <- attr(x, "dataset.keys", TRUE)
@@ -58,7 +58,7 @@ column_subset <- function(x, i, call = sys.call(-1L))
 }
 
 
-row_subset <- function(x, i, call = sys.call(-1L))
+row_subset <- function(x, i)
 {
     nrow <- attr(x, "dataset.nrow", TRUE)
     keys <- attr(x, "dataset.keys", TRUE)
@@ -124,7 +124,7 @@ elt_subset <- function(x, i)
 }
 
 
-get_pairs <- function(x, pairs, call = sys.call(-1))
+get_pairs <- function(x, pairs)
 {
     pairs <- arg_pairs(pairs, dim(x))
 

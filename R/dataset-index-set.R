@@ -56,7 +56,7 @@
 }
 
 
-replace_pairs <- function(x, pairs, value, call = sys.call(-1L))
+replace_pairs <- function(x, pairs, value)
 {
     pairs <- arg_pairs(pairs, dim(x))
 
@@ -64,8 +64,7 @@ replace_pairs <- function(x, pairs, value, call = sys.call(-1L))
     j <- pairs[, 2L, drop = TRUE]
 
     if (anyNA(i) || anyNA(j)) {
-        stop(simpleError("NAs are not allowed in subscripted assignments",
-                         call))
+        stop("NAs are not allowed in subscripted assignments")
     }
 
     n <- length(i)
@@ -100,7 +99,7 @@ replace_pairs <- function(x, pairs, value, call = sys.call(-1L))
 }
 
 
-replace_cols <- function(x, j, value, call = sys.call(-1L))
+replace_cols <- function(x, j, value)
 {
     if (!is.null(value)) {
         value <- as.dataset(value)
@@ -109,7 +108,7 @@ replace_cols <- function(x, j, value, call = sys.call(-1L))
         nx <- nrow(x)
         if (nx != nv) {
             fmt <- "mismatch: replacement has %.0f rows, should have %.0f"
-            stop(simpleError(sprintf(fmt, nv, nx), call))
+            stop(sprintf(fmt, nv, nx))
         }
     }
 

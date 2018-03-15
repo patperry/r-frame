@@ -87,3 +87,18 @@ test_that("matrix entry wrong replace number", {
     expect_error(x[cbind(2, 1)] <- c(17, 24),
                  "number of values \\(2\\) must match number of entries to replace \\(1\\)")
 })
+
+
+test_that("pair selection errors", {
+    x <- dataset(a = 1:5, b = letters[1:5])
+    expect_error(x[rbind(TRUE, TRUE)], "subscript length is 2, should be 10")
+    expect_error(x[matrix(FALSE, 2, 3)], "subscript dimensions are 2 x 3, should be 5 x 2")
+    expect_error(x[cbind(1, 1, 1)], "invalid matrix subscript \\(3 columns\\)")
+})
+
+
+test_that("indexing with scalar logical works", {
+    x <- dataset(a = 1:5, b = letters[1:5])
+    expect_equal(x[cbind(TRUE)], c(as.list(1:5), as.list(letters[1:5])))
+    expect_equal(x[cbind(FALSE)], list())
+})

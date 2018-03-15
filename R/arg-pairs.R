@@ -17,14 +17,14 @@ arg_pairs <- function(i, dim)
                 if (length(i) == 1L) {
                     i <- rep(i, nel)
                 } else {
-                    stop(sprintf("selection mask length (%.0f) must equal number of elements (%.0f)",
+                    stop(sprintf("mismatch: subscript length is %.0f, should be %.0f",
                                  length(i), nel))
                 }
             }
         } else if (d1 == nr && d2 == nc) {
             i <- as.logical(i)
         } else {
-            stop(sprintf("selection mask dimensions (%.0f, %.0f) must match data dimensions (%.0f, %.0f)",
+            stop(sprintf("mismatch: subscript dimensions are %.0f x %.0f, should be %.0f x %.0f",
                          d1, d2, nr, nc))
         }
 
@@ -54,7 +54,7 @@ arg_pairs <- function(i, dim)
         col[is.na(row)] <- NA
         vec <- FALSE
     } else {
-        stop(sprintf("cannot index with %.0f-column matrix", d2))
+        stop(sprintf("invalid matrix subscript (%.0f columns)", d2))
     }
 
     if (vec) {
