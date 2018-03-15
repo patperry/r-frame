@@ -63,10 +63,6 @@ replace_pairs <- function(x, pairs, value)
     i <- pairs[, 1L, drop = TRUE]
     j <- pairs[, 2L, drop = TRUE]
 
-    if (anyNA(i) || anyNA(j)) {
-        stop("NAs are not allowed in subscripted assignments")
-    }
-
     n <- length(i)
     nv <- length(value)
 

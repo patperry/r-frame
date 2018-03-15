@@ -198,47 +198,6 @@ test_that("index setting with matrix pairs recycles", {
 })
 
 
-test_that("index setting with matrix and NA index errors", {
-    i <- c(47, 5, 132, NA, 10, 142, 143, 123)
-    j <- c(1, 3, 3, 1, 2, 2, NA, 3)
-    val <- runif(length(i))
-
-    x <- as.dataset(iris)
-    expect_error(x[cbind(i, j)] <- val,
-                 "NAs are not allowed in subscripted assignments")
-})
-
-
-test_that("matrix entry", {
-    x <- dataset(x = 1:3,
-                 foo = data.frame(bar = 1:3, baz = c("a", "b", "c"),
-                                  stringsAsFactors = FALSE))
-    x[rbind(c(2, 1),
-            c(3, 2))] <- list(100, list(99, 88))
-
-    y <- dataset(x = c(1, 100, 3),
-                 foo = data.frame(bar = c(1, 2, 99),
-                                  baz = c("a", "b", "88"),
-                                  stringsAsFactors = FALSE))
-    expect_equal(x, y)
-})
-
-
-test_that("errors for invalid single", {
-    x <- dataset(x = 1:3, y = 4:6)
-    expect_error(x[rbind(1, 4, 7, 3)], "index 3 \\(7\\) is out of bounds")
-})
-
-
-test_that("errors for invalid pair", {
-    x <- dataset(x = 1:3,
-                 foo = data.frame(bar = 1:3, baz = c("a", "b", "c"),
-                                  stringsAsFactors = FALSE))
-    expect_error(x[cbind(c(1, 2), c(2, 3))] <- list(100, list(99, 88)),
-                 "index 2 \\(2, 3\\) is out of bounds")
-})
-
-
 test_that("setting invalid errors", {
     x <- as.dataset(mtcars)
     expect_error(x[[17]] <- array(1, c(1,1,1)),

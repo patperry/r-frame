@@ -132,17 +132,13 @@ get_pairs <- function(x, pairs)
     j <- pairs[, 2L, drop = TRUE]
 
     vals <- lapply(seq_along(i), function(k) {
+        ik <- i[[k]]
         jk <- j[[k]]
-        if (is.na(jk)) {
-            NA
+        xk <- x[[jk]]
+        if (length(dim(xk)) <= 1L) {
+            xk[[ik]]
         } else {
-            ik <- i[[k]]
-            xk <- x[[jk]]
-            if (length(dim(xk)) <= 1L) {
-                xk[[ik]]
-            } else {
-                drop_row_dim(xk[ik, , drop = FALSE])
-            }
+            drop_row_dim(xk[ik, , drop = FALSE])
         }
     })
 
