@@ -111,8 +111,8 @@
     nv <- length(value)
 
     if (ni != nv && nv != 1L) {
-        fmt <- "mismatch: selection length is %.0f, replacement length is %.0f"
-        stop(sprintf(fmt, ni, nv))
+        fmt <- "mismatch: replacement has %.0f entries, should have %.0f"
+        stop(sprintf(fmt, nv, ni))
     }
 
     zero <- (i == 0)

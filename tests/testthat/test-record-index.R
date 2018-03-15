@@ -166,7 +166,7 @@ test_that("set NULL by name", {
 test_that("replace wrong number", {
     x <- record(a = 1, b = 2, c = 3, d = 4)
     expect_error(x[NULL] <- c(100, 101),
-                 "mismatch: selection length is 4, replacement length is 2")
+                 "mismatch: replacement has 2 entries, should have 4")
 })
 
 

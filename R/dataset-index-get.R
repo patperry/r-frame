@@ -14,7 +14,7 @@
             } else if (r == 2) {
                 return(get_pairs(x, i))
             } else {
-                stop(sprintf("index is a rank-%.0f array", r))
+                stop(sprintf("subscript is a rank-%.0f array", r))
             }
             if (drop && length(x) == 1)
                 x <- x[[1]]

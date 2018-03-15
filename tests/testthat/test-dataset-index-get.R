@@ -91,3 +91,10 @@ test_that("indexing without keys works", {
     expect_equal(as.dataset(x[1:5, , drop = FALSE]),
                  dataset(a = letters[1:5]))
 })
+
+
+test_that("getting all columns", {
+    x <- dataset(a = letters)
+    expect_equal(x, x[])
+    expect_equal(x[], x[NULL])
+})

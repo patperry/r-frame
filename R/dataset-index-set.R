@@ -43,7 +43,7 @@
             } else if (r == 2) {
                 replace_pairs(x, i, value)
             } else {
-                stop(sprintf("index is a rank-%.0f array", r))
+                stop(sprintf("subscript is a rank-%.0f array", r))
             }
         }
     } else { # x[i, j] <- value
@@ -141,30 +141,26 @@ replace_block <- function(x, is, js, value)
 
     ni <- length(is)
     nj <- length(js)
-    dv <- dim(value)
-    rv <- length(dv)
-    nv <- length(value)
 
-    if (rv <= 1) {
+    if (is.null(value)) {
+        rv <- 0
+    } else {
+        value <- as.dataset(value)
+        dv <- dim(value)
+        nv <- dv[[1]] * dv[[2]]
+
         if (nv == 1) {
             rv <- 0
-        } else if (nv == ni * nj) {
+            value <- value[[1]][[1]]
+        } else if (dv[[2]] == 1 && nv == ni * nj) {
             rv <- 1
+            value <- value[[1]]
+        } else if (dv[[1]] == ni && dv[[2]] == nj) {
+            rv <- 2
         } else {
-            fmt <- "mistmatch: selection dimensions are %.0f x %.0f, replacement size is %.0f"
-            stop(sprintf(fmt, ni, nj, nv))
+            fmt <- "mistmatch: replace dimensions are %.0f x %.0f, should be %.0f x %.0f"
+            stop(sprintf(fmt, dv[[1]], dv[[2]], ni, nj))
         }
-    } else if (rv == 2) {
-        if (dv[[1]] != ni) {
-            fmt <- "mistmatch: selection has %.0f rows, replacement has %.0f"
-            stop(sprintf(fmt, ni, dv[[1]]))
-        } else if (dv[[2]] != nj) {
-            fmt <- "mistmatch: selection has %.0f columns, replacement has %.0f"
-            stop(sprintf(fmt, nj, dv[[2]]))
-        }
-    } else {
-        fmt <- "replacement must be a vector or matrix, not a rank-%.0f array"
-        stop(sprintf(fmt, rv))
     }
 
     for (k in seq_len(nj)) {
@@ -173,7 +169,7 @@ replace_block <- function(x, is, js, value)
         } else if (rv == 1) {
             vk <- value[(1 + (k - 1) * ni):(k * ni)]
         } else {
-            vk <- value[, k, drop = TRUE]
+            vk <- value[[k]]
         }
         x <- replace_subcol(x, is, js[[k]], vk)
     }
@@ -184,40 +180,22 @@ replace_block <- function(x, is, js, value)
 
 replace_subcol <- function(x, is, j, value)
 {
-    if (is.null(value)) {
-        if (is.null(x[[j]])) {
-            return(x)
-        } else {
-            value <- list(NULL)
-        }
-    }
-
     xj <- x[[j]]
     if (is.null(xj)) {
-        xj <- vector("list", nrow(x))
+        if (is.null(value)) {
+            return(x)
+        } else {
+            xj <- vector("list", nrow(x))
+        }
     }
 
     dx <- dim(xj)
     rx <- length(dx)
-    dv <- dim(value)
-    rv <- length(dv)
+
     if (rx <= 1) {
-        if (rv <= 1) {
-            xj[is] <- value
-        } else {
-            fmt <- "mismatch: destination column is a vector, replacement is a rank-%.0f array"
-            stop(sprintf(fmt, rv))
-        }
-    } else if (rv == 2) {
-        if (dx[[2]] == dv[[2]]) {
-            xj[is, ] <- value
-        } else {
-            fmt <- "mismatch: destination column has %.0f components, replacement has %.0f"
-            stop(sprintf(fmt, dx[[2]], dv[[2]]))
-        }
+        xj[is] <- value
     } else {
-        fmt <- "mismatch: destination column is a matrix, replacement is a rank-%.0f array"
-        stop(sprintf(fmt, rx, rv))
+        xj[is, ] <- value
     }
 
     x[[j]] <- xj

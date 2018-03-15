@@ -162,7 +162,7 @@ test_that("deleting columns with name", {
 test_that("deleting columns with single index and comma", {
     x <- as.dataset(mtcars)
     expect_error(x[,c(1, 1, 5)] <- NULL,
-                 "selection dimensions are 32 x 3, replacement size is 0")
+                 "replacement has length zero")
 })
 
 
@@ -263,6 +263,61 @@ test_that("setting cells", {
 test_that("rank-3 index", {
     ds <- as.dataset(mtcars)
     i <- array(1, c(1, 1, 1))
-    expect_error(ds[i], "index is a rank-3 array")
-    expect_error(ds[i] <- NULL, "index is a rank-3 array")
+    expect_error(ds[i], "subscript is a rank-3 array")
+    expect_error(ds[i] <- NULL, "subscript is a rank-3 array")
+})
+
+
+test_that("replacing column", {
+    x <- dataset(a = letters, b = 1:26)
+    x[1] <- LETTERS
+    y <- dataset(a = LETTERS, b = 1:26)
+    expect_equal(x, y)
+})
+
+
+test_that("replacing two columns", {
+    x <- dataset(a = letters, b = 1:26, c = rep(FALSE, 26))
+    x[c("c", "a")] <- cbind(0, -1 * (1:26))
+    y <- dataset(a = -1 * (1:26), b = 1:26, c = rep(0, 26))
+    expect_equal(x, y)
+})
+
+
+test_that("replacing all columns", {
+    x <- x2 <- dataset(a = letters, b = 1:26, c = rep(FALSE, 26))
+    x[] <- rep(TRUE, 26)
+    x2[NULL] <- rep(TRUE, 26)
+    y <- dataset(a = rep(TRUE, 26), b = rep(TRUE, 26), c = rep(TRUE, 26))
+    expect_equal(x, y)
+    expect_equal(x2, y)
+})
+
+
+test_that("replace column, wrong number of rows", {
+    x <- dataset(a = letters)
+    expect_error(x[1] <- letters[1:13],
+                 "mismatch: replacement has 13 rows, should have 26")
+})
+
+
+test_that("replace column, wrong number of columns", {
+    x <- dataset(a = letters)
+    expect_error(x[1] <- cbind(LETTERS, letters),
+                 "mismatch: replacement has 2 entries, should have 1")
+})
+
+
+test_that("replacing row", {
+    x <- dataset(a = letters[1:5], b = 1:5)
+    y <- dataset(a = c("A", letters[2:5]), b = c(10, 2:5))
+    x[1, ] <- record("A", 10)
+    expect_equal(x, y)
+})
+
+test_that("replacing rows", {
+    x <- dataset(a = letters[1:5], b = 1:5)
+    y <- dataset(a = c("A", "B", letters[3:5]), b = c(10, 11, 3:5))
+    x[1:2, ] <- dataset(c("A", "B"), c(10, 11))
+    expect_equal(x, y)
 })
