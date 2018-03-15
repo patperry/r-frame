@@ -321,3 +321,48 @@ test_that("replacing rows", {
     x[1:2, ] <- dataset(c("A", "B"), c(10, 11))
     expect_equal(x, y)
 })
+
+
+test_that("replace matrix block", {
+    x <- dataset(a = matrix(1:6, 3, 2),
+                 y = matrix(1:9, 3, 3))
+    x[1:2, 1] <- dataset(matrix(99:102, 2, 2))
+
+    a <- matrix(1:6, 3, 2)
+    a[1:2,] <- matrix(99:102, 2, 2)
+    y <- dataset(a = a, y = matrix(1:9, 3, 3))
+
+    expect_equal(x, y)
+})
+
+
+test_that("replace block with vector", {
+    x <- dataset(a = letters[1:5], b = LETTERS[1:5])
+    y <- dataset(a = c("W", "X", letters[3:5]),
+                 b = c("Y", "Z", LETTERS[3:5]))
+    x[1:2,] <- c("W", "X", "Y", "Z")
+    expect_equal(x, y)
+})
+
+
+test_that("replace wrong dim", {
+    x <- dataset(a = letters[1:5], b = LETTERS[1:5])
+    value <- dataset(c("A", "B", "C"), c("X", "Y", "Z"))
+    expect_error(x[1,] <- value,
+                 "mismatch: replacement dimensions are 3 x 2, should be 1 x 2")
+})
+
+
+test_that("replace NULL column with NULL", {
+    x <- y <- dataset(a = 1:5, b = NULL)
+    x[1:3, 2] <- NULL
+    expect_equal(x, y)
+})
+
+
+test_that("replace NULL column with non-NULL", {
+    x <- dataset(a = 1:5, b = NULL)
+    x[1:3, 2] <- "X"
+    y <- dataset(a = 1:5, b = list("X", "X", "X", NULL, NULL))
+    expect_equal(x, y)
+})

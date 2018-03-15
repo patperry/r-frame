@@ -149,16 +149,16 @@ replace_block <- function(x, is, js, value)
         dv <- dim(value)
         nv <- dv[[1]] * dv[[2]]
 
-        if (nv == 1) {
+        if (dv[[1]] == ni && dv[[2]] == nj) {
+            rv <- 2
+        } else if (nv == 1) {
             rv <- 0
             value <- value[[1]][[1]]
         } else if (dv[[2]] == 1 && nv == ni * nj) {
             rv <- 1
             value <- value[[1]]
-        } else if (dv[[1]] == ni && dv[[2]] == nj) {
-            rv <- 2
         } else {
-            fmt <- "mistmatch: replace dimensions are %.0f x %.0f, should be %.0f x %.0f"
+            fmt <- "mismatch: replacement dimensions are %.0f x %.0f, should be %.0f x %.0f"
             stop(sprintf(fmt, dv[[1]], dv[[2]], ni, nj))
         }
     }
