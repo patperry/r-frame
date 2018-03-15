@@ -130,7 +130,7 @@ replace_block <- function(x, is, js, value)
     if (is.null(is)) {
         is <- seq_len(d[[1]])
     } else {
-        is <- arg_dataset_row_index(x, is)
+        is <- arg_subscript(is, d[[1]], NULL, TRUE)
     }
 
     if (is.null(js)) {
