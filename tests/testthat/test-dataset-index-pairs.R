@@ -102,3 +102,10 @@ test_that("indexing with scalar logical works", {
     expect_equal(x[cbind(TRUE)], c(as.list(1:5), as.list(letters[1:5])))
     expect_equal(x[cbind(FALSE)], list())
 })
+
+
+test_that("index empty dataset", {
+    x <- dataset(a = integer())
+    expect_equal(x[matrix(0, 0, 1)], list())
+    expect_equal(x[matrix(0, 0, 2)], list())
+})

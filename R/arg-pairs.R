@@ -1,25 +1,24 @@
 
 arg_pairs <- function(value, dim)
 {
-    nr <- dim[[1]]
-    nc <- dim[[2]]
-    nel <- nr * nc
-
     value <- as.matrix(value)
     d <- dim(value)
     d1 <- d[[1]]
     d2 <- d[[2]]
 
+    nr <- dim[[1]]
+    nc <- dim[[2]]
+    nel <- nr * nc
+
     if (is.logical(value)) {
-        if (d2 == 1L) {
-            value <- value[, 1L, drop = TRUE]
-            nvalue <- length(value)
-            if (nvalue != nel) {
-                if (nvalue == 1) {
+        if (d2 == 1) {
+            value <- value[, 1, drop = TRUE]
+            if (d1 != nel) {
+                if (d1 == 1) {
                     value <- rep_len(value, nel)
                 } else {
                     stop(sprintf("mismatch: subscript length is %.0f, should be %.0f",
-                                 nvalue, nel))
+                                 d1, nel))
                 }
             }
         } else if (d1 == nr && d2 == nc) {
@@ -29,7 +28,7 @@ arg_pairs <- function(value, dim)
                          d1, d2, nr, nc))
         }
 
-        i <- seq_len(nel)[as.logical(value)]
+        i <- which(value)
         vec <- TRUE
     } else if (d2 == 1L) {
         i <- trunc(as.numeric(value))
