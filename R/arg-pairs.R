@@ -1,37 +1,38 @@
 
-arg_pairs <- function(i, dim)
+arg_pairs <- function(value, dim)
 {
     nr <- dim[[1]]
     nc <- dim[[2]]
     nel <- nr * nc
 
-    i <- as.matrix(i)
-    d <- dim(i)
+    value <- as.matrix(value)
+    d <- dim(value)
     d1 <- d[[1]]
     d2 <- d[[2]]
 
-    if (is.logical(i)) {
+    if (is.logical(value)) {
         if (d2 == 1L) {
-            i <- i[, 1L, drop = TRUE]
-            if (length(i) != nel) {
-                if (length(i) == 1L) {
-                    i <- rep(i, nel)
+            value <- value[, 1L, drop = TRUE]
+            nvalue <- length(value)
+            if (nvalue != nel) {
+                if (nvalue == 1) {
+                    value <- rep_len(value, nel)
                 } else {
                     stop(sprintf("mismatch: subscript length is %.0f, should be %.0f",
-                                 length(i), nel))
+                                 nvalue, nel))
                 }
             }
         } else if (d1 == nr && d2 == nc) {
-            i <- as.logical(i)
+            value <- as.logical(value)
         } else {
             stop(sprintf("mismatch: subscript dimensions are %.0f x %.0f, should be %.0f x %.0f",
                          d1, d2, nr, nc))
         }
 
-        i <- seq_len(nel)[as.logical(i)]
+        i <- seq_len(nel)[as.logical(value)]
         vec <- TRUE
     } else if (d2 == 1L) {
-        i <- trunc(as.numeric(i))
+        i <- trunc(as.numeric(value))
         bounds <- which(!(is.na(i) | (1L <= i & i <= nel)))
         if (length(bounds) > 0L) {
             b <- bounds[[1L]]
@@ -39,8 +40,8 @@ arg_pairs <- function(i, dim)
         }
         vec <- TRUE
     } else if (d2 == 2L) {
-        row <- trunc(as.numeric(i[, 1L, drop = TRUE]))
-        col <- trunc(as.numeric(i[, 2L, drop = TRUE]))
+        row <- trunc(as.numeric(value[, 1L, drop = TRUE]))
+        col <- trunc(as.numeric(value[, 2L, drop = TRUE]))
 
         bounds <- which(!((is.na(row) | (1L <= row & row <= nr))
                           & (is.na(col) | (1L <= col & col <= nc))))
