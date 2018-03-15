@@ -98,3 +98,27 @@ test_that("getting all columns", {
     expect_equal(x, x[])
     expect_equal(x[], x[NULL])
 })
+
+
+test_that("indexing with keys, duplicate row", {
+    x <- dataset(a = letters[1:5])
+    keys(x) <- dataset(k = 2 * (1:5))
+    i <- c(1, 1, 2, 1)
+
+    y <- dataset(a = letters[i])
+    keys(y) <- dataset(k = (2 * (1:5))[i], `#` = c(1L, 2L, 1L, 3L))
+
+    expect_equal(x[i, ], y)
+})
+
+
+test_that("indexing with keys, duplicate row, no names", {
+    x <- dataset(a = letters[1:5])
+    keys(x) <- as.record(list(2 * (1:5)))
+    i <- c(1, 1, 2, 1)
+
+    y <- dataset(a = letters[i])
+    keys(y) <- as.record(list((2 * (1:5))[i], `#` = c(1L, 2L, 1L, 3L)))
+
+    expect_equal(x[i, ], y)
+})
