@@ -1,5 +1,5 @@
 
-format_record_names <- function(x, nest = 0, indent = 2)
+format_record_names <- function(x, indent, nest = 0)
 {
     n     <- length(x)
     names <- names(x)
@@ -25,7 +25,7 @@ format_record_names <- function(x, nest = 0, indent = 2)
     for (i in seq_len(n)) {
         xi <- x[[i]]
         if (is.record(xi)) {
-            fmt <- format_record_names(xi, nest + 1, indent)
+            fmt <- format_record_names(xi, indent, nest + 1)
             width <- max(width, fmt$width)
             x[[i]] <- fmt$object
         }
@@ -83,19 +83,19 @@ format_record_limit <- function(x, limit = NA)
 }
 
 
-format_record_values <- function(x, width)
+format_record_values <- function(x, style)
 {
-    as.record(lapply(x, format_record_value, width = width))
+    as.record(lapply(x, format_record_value, style = style))
 }
 
 
-format_record_value <- function(x, width)
+format_record_value <- function(x, style)
 {
     if (is.record(x)) {
         if (length(x) == 0)
             return("{}")
         else
-            return(format_record_values(x, width))
+            return(format_record_values(x, style))
     }
 
     cl <- paste(class(x), collapse = ".")
@@ -110,30 +110,32 @@ format_record_value <- function(x, width)
         paste0(cl, "(", n, ")")
     } else if (is.character(x) && !is.object(x)) {
         wellipsis <- 1
+        width <- style$line
         chars <- if (is.na(width)) .Machine$integer.max else (width - wellipsis)
         utf8_format(x, chars = chars)
     } else if (is.function(x) || is.language(x)) {
         paste0("<", cl, ">")
     } else {
-        format(x, line = width)
+        format(x, style = style)
     }
 }
 
 
-format.record <- function(x, limit = NA, line = NA, meta = FALSE, ...)
+format.record <- function(x, limit = NA, style = NULL, meta = FALSE, ...)
 {
     x     <- as.record(x)
-    limit <- if (is.null(limit)) option.frame.limit() else as.size.scalar(limit)
-    line  <- if (is.null(line))  option.frame.line()  else as.size.scalar(line)
+    limit <- as.limit(limit)
+    style <- as.style(style)
     meta  <- as.option(meta)
 
     lfmt   <- format_record_limit(x, limit)
     trunc  <- lfmt$trunc
-    nfmt   <- format_record_names(lfmt$object)
+    nfmt   <- format_record_names(lfmt$object, style$indent)
     nwidth <- nfmt$width
 
-    width <- if (is.na(line)) NA else max(1, line - nwidth - 3)
-    y <- format_record_values(nfmt$object, width)
+    line  <- style$line
+    style$line <- if (is.na(line)) NA else max(1, line - nwidth - 3)
+    y <- format_record_values(nfmt$object, style)
 
     if (meta) {
         attr(y, "format.meta") <- list(name.width = nwidth, trunc = trunc)
@@ -143,8 +145,10 @@ format.record <- function(x, limit = NA, line = NA, meta = FALSE, ...)
 }
 
 
-format_record_lines <- function(x, name.width, indent = 2)
+format_record_lines <- function(x, name.width, style)
 {
+    indent <- style$indent
+    faint <- style$faint
     names <- names(x)
     tot <- record_total(x)
     lines <- character(tot)
@@ -153,9 +157,11 @@ format_record_lines <- function(x, name.width, indent = 2)
     for (i in seq_along(x)) {
         xi <- x[[i]]
         if (is.record(xi)) {
-            lines[[dst]] <- paste0(utf8_encode(names[[i]], display = TRUE), ":")
+            lines[[dst]] <- paste0(utf8_encode(names[[i]],
+                                               escapes = faint,
+                                               display = TRUE), ":")
             dst <- dst + 1
-            xsubi <- format_record_lines(xi, name.width - indent, indent)
+            xsubi <- format_record_lines(xi, name.width - indent, style)
             nsub <- length(xsubi)
             prefix <- formatC("", width = indent)
             if (nsub > 0) {
@@ -164,8 +170,8 @@ format_record_lines <- function(x, name.width, indent = 2)
             }
         } else {
             prefix <- utf8_encode(names[[i]], width = name.width,
-                                  display = TRUE)
-            suffix <- utf8_encode(xi, display = TRUE)
+                                  escapes = faint, display = TRUE)
+            suffix <- utf8_encode(xi, escapes = faint, display = TRUE)
             lines[[dst]] <- paste0(prefix, " : ", suffix)
             dst <- dst + 1
         }
@@ -175,16 +181,18 @@ format_record_lines <- function(x, name.width, indent = 2)
 }
 
 
-print.record <- function(x, limit = NULL, line = NULL, ...)
+print.record <- function(x, limit = NULL, style = NULL, ...)
 {
-    x <- as.record(x)
+    x     <- as.record(x)
+    limit <- as.limit(limit)
+    style <- as.style(style)
 
     if (length(x) == 0) {
         cat("{}\n")
     } else {
-        fmt <- format.record(x, limit, line, meta = TRUE)
+        fmt <- format.record(x, limit, style, meta = TRUE)
         meta <- attr(fmt, "format.meta")
-        lines <- format_record_lines(fmt, meta$name.width)
+        lines <- format_record_lines(fmt, meta$name.width, style)
         if (length(lines) > 0) {
             cat(lines, sep = "\n")
         }
