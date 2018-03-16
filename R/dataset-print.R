@@ -12,10 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-utf8_fallback <- function(x, default)
-{
-    if (is.na(iconv(x, "UTF-8", ""))) default else x
-}
 
 new_format_control <- function(chars = NULL, digits = NULL,
                                na.encode = TRUE, quote = FALSE,
