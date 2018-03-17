@@ -350,10 +350,10 @@ test_that("printing with NA col name works", {
     x <- dataset(x = 4:6)
     names(x) <- NA
     lines <- c(
-'   ',
-'1 4',
-'2 5',
-'3 6')
+'  [,1]',
+'1    4',
+'2    5',
+'3    6')
     expect_equal(strsplit(capture_output(print(x)), "\n")[[1]], lines)
 })
 

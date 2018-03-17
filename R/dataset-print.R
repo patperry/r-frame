@@ -232,7 +232,10 @@ format_matrix <- function(name, x, ..., control, section, indent)
     if (is.null(names)) {
         names <- paste0("[,", as.character(seq_len(nc)), "]")
     } else {
-        names[is.na(names)] <- ""
+        isna <- which(is.na(names) | !nzchar(names))
+        if (length(isna) > 0) {
+            names[isna] <- paste0("[,", as.character(isna), "]")
+        }
     }
     y <- as.record(vector("list", nc))
     trunc <- FALSE
