@@ -223,7 +223,7 @@ format_matrix <- function(name, x, ..., control, section, indent)
 {
     nc <- dim(x)[[2L]]
     if (nc == 0L) {
-        x <- as.list.dataset(list(x), flat = TRUE)[[1L]]
+        x <- flatten_dataset(list(x), flat = TRUE)[[1L]]
         return(format_vector(name, x, ..., control = control,
                              section = section, indent = indent))
     }
@@ -234,7 +234,7 @@ format_matrix <- function(name, x, ..., control, section, indent)
     } else {
         names[is.na(names)] <- ""
     }
-    y <- vector("list", nc)
+    y <- as.record(vector("list", nc))
     trunc <- FALSE
 
     gap <- control$print.gap
@@ -339,9 +339,7 @@ ncol_recursive <- function(x, offset = 0)
 }
 
 
-format.dataset_old <- function(x, rows = -1L, wrap = -1L, ..., chars = NULL,
-                           na.encode = TRUE, quote = FALSE, na.print = NULL,
-                           print.gap = NULL, justify = "none", width = NULL,
+format.dataset <- function(x, rows = -1L, wrap = -1L, ...,
                            indent = NULL, line = NULL, meta = FALSE)
 {
     if (is.null(x)) {
@@ -362,13 +360,14 @@ format.dataset_old <- function(x, rows = -1L, wrap = -1L, ..., chars = NULL,
     x <- as.dataset(x)
     rows <- as.integer.scalar(rows)
     wrap <- as.integer.scalar(wrap)
-    chars <- if (is.null(chars)) NULL else as.integer.scalar(chars)
-    na.encode <- as.option(na.encode)
-    quote <- as.option(quote)
-    na.print <- if (is.null(na.print)) NULL else as.character.scalar(na.print)
-    print.gap <- if (is.null(print.gap)) NULL else as.integer.scalar(print.gap)
-    justify <- as.enum(c("left", "right", "centre", "none"), justify)
-    width <- if (is.null(width)) NULL else as.integer.scalar(width)
+
+    chars <- NULL
+    na.encode <- TRUE
+    quote <- FALSE
+    na.print <- NULL
+    print.gap <- NULL
+    justify <- "none"
+    width <- NULL
     indent <- if (is.null(indent)) NULL else as.integer.scalar(indent)
     line <- if (is.null(line)) NULL else as.integer.scalar(line)
     meta <- as.option(meta)
@@ -390,7 +389,7 @@ format.dataset_old <- function(x, rows = -1L, wrap = -1L, ..., chars = NULL,
         x <- x[seq_len(rows), , drop = FALSE]
     }
 
-    fmt <- format_column("", x, ..., control = control,
+    fmt <- format_column("", x, control = control,
                          section = 1L, indent = indent)
     y <- fmt$value
     keys(y) <- keys(x)
@@ -597,7 +596,7 @@ format_rows <- function(control, style, nrow, number, keys)
 }
 
 
-print.dataset_old <- function(x, rows = NULL, wrap = NULL, ..., number = NULL,
+print.dataset <- function(x, rows = NULL, wrap = NULL, ..., number = NULL,
                           chars = NULL, digits = NULL, quote = FALSE,
                           na.print = NULL, print.gap = NULL, display = TRUE)
 {
@@ -668,7 +667,7 @@ print.dataset_old <- function(x, rows = NULL, wrap = NULL, ..., number = NULL,
     width <- unlist(attr(fmt, "width"))
     justify <- unlist(attr(fmt, "justify"))
 
-    cols <- as.list.dataset(fmt, flat = TRUE, path = TRUE)
+    cols <- flatten_dataset(fmt, flat = TRUE, path = TRUE)
     path <- attr(cols, "path")
     index <- attr(cols, "index")
     names <- vapply(path, tail, "", n = 1)

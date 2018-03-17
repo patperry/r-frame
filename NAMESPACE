@@ -54,8 +54,8 @@ S3method(`[`, dataset)
 S3method(`[<-`, dataset)
 S3method(`[[<-`, dataset)
 
-#S3method(format, dataset) ; export(format.dataset)
-#S3method(print, dataset)  ; export(print.dataset)
+S3method(format, dataset) ; export(format.dataset)
+S3method(print, dataset)  ; export(print.dataset)
 
 S3method(unique, dataset)        ; export(unique.dataset)
 S3method(duplicated, dataset)    ; export(duplicated.dataset)
