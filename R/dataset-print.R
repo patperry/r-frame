@@ -223,7 +223,7 @@ format_matrix <- function(name, x, ..., control, section, indent)
 {
     nc <- dim(x)[[2L]]
     if (nc == 0L) {
-        x <- flatten_dataset(list(x), flat = TRUE)[[1L]]
+        x <- flatten_dataset(record(x), flat = TRUE)[[1L]]
         return(format_vector(name, x, ..., control = control,
                              section = section, indent = indent))
     }
