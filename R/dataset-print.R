@@ -328,7 +328,7 @@ ncol_recursive <- function(x, offset = 0)
 {
     if (length(dim(x)) <= 1) {
         offset + 1
-    } else if (is.data.frame(x)) {
+    } else if (is.dataset(x)) {
         for (j in seq_len(ncol(x))) {
             offset <- ncol_recursive(x[[j]], offset)
         }
