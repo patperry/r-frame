@@ -596,20 +596,14 @@ format_rows <- function(control, style, nrow, number, keys)
 }
 
 
-print.dataset <- function(x, rows = NULL, wrap = NULL, ..., number = NULL,
-                          chars = NULL, digits = NULL, quote = FALSE,
-                          na.print = NULL, print.gap = NULL, display = TRUE)
+print.dataset <- function(x, rows = NULL, wrap = NULL, ...)
 {
     if (is.null(x)) {
         return(invisible(NULL))
     }
 
     x <- as.dataset(x)
-    if (is.null(number)) {
-        number <- is.null(keys(x))
-    } else {
-        number <- as.option(number)
-    }
+    number <- is.null(keys(x))
 
     if (is.null(rows)) {
         rows <- option_rows(rows)
@@ -624,14 +618,12 @@ print.dataset <- function(x, rows = NULL, wrap = NULL, ..., number = NULL,
 
     rows <- as.integer.scalar(rows)
     wrap <- as.integer.scalar(wrap)
-    number <- as.option(number)
-    chars  <- if (is.null(chars))  NULL else as.integer.scalar(chars)
-    digits <- if (is.null(digits)) NULL else as.integer.scalar(digits)
-    quote <- as.option(quote)
-    na.print  <- if (is.null(na.print)) NULL  else as.character.scalar(na.print)
-    print.gap <- if (is.null(print.gap)) NULL else as.integer.scalar(print.gap)
-    display <- as.option(display)
-    
+    chars  <- NULL
+    digits <- NULL
+    quote <- FALSE
+    na.print  <- NULL
+    print.gap <- NULL
+    display <- TRUE
     control <- new_format_control(chars = chars, digits = digits,
                                   quote = quote, na.print = na.print,
                                   print.gap = print.gap, display = display,
