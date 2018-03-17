@@ -17,7 +17,7 @@ new_format_control <- function(chars = NULL, digits = NULL,
                                na.encode = TRUE, quote = FALSE,
                                na.print = NULL, print.gap = NULL,
                                justify = "none", width = NULL,
-                               display = TRUE, line = NULL, wrap = NULL)
+                               display = TRUE, line = NULL, pages = NULL)
 {
     control <- list()
     control$chars <- chars
@@ -30,7 +30,7 @@ new_format_control <- function(chars = NULL, digits = NULL,
     control$width <- width
     control$display <- display
     control$line <- line
-    control$wrap <- wrap
+    control$pages <- pages
     control$ansi <- output_ansi()
     control$utf8 <- output_utf8()
 
@@ -185,7 +185,7 @@ format_vector <- function(name, x, ..., control, section, indent)
     }
 
     # compute width, determine whether to truncate
-    if (section - 1L == control$wrap) {
+    if (!is.na(control$pages) && section - 1L == control$pages) {
         limit <- control$line - indent
         width <- col_width(name, y, control, limit + 1)
         trunc <- (width > limit)
@@ -206,8 +206,8 @@ format_vector <- function(name, x, ..., control, section, indent)
     start <- (indent == 0L)
     next_indent <- indent + width + gap
     if (next_indent > control$line + gap && !start
-            && section - 1L < control$wrap) {
-        # wrap, re-format with new indent
+            && !is.na(control$pages) && section - 1L < control$pages) {
+        # new page, re-format with new indent
         format_vector(name, x, ..., control = control,
                       section = section + 1L, indent = 0L)
     } else {
@@ -243,7 +243,7 @@ format_matrix <- function(name, x, ..., control, section, indent)
     gap <- control$print.gap
     ellipsis <- utf8_width(control$ellipsis)
     line <- control$line
-    wrap <- control$wrap
+    pages <- control$pages
 
     section_start <- section
     indent_start <- indent
@@ -255,7 +255,7 @@ format_matrix <- function(name, x, ..., control, section, indent)
     justify <- vector("list", nc)
 
     for (j in seq_len(nc)) {
-        if (next_section - 1L == wrap && j < nc) {
+        if (!is.na(pages) && next_section - 1L == pages && j < nc) {
             control$line <- line - gap - ellipsis
         } else {
             control$line <- line
@@ -342,21 +342,12 @@ ncol_recursive <- function(x, offset = 0)
 }
 
 
-format.dataset <- function(x, limit = NA, wrap = -1L, ...,
+format.dataset <- function(x, limit = NA, pages = NA, ...,
                            indent = NULL, line = NULL, meta = FALSE)
 {
     x     <- as.dataset(x)
     limit <- as.limit(limit)
-
-    if (is.null(wrap)) {
-        wrap <- option_wrap(wrap)
-    }
-    if (wrap < 0) {
-        wrap <- .Machine$integer.max
-    }
-   
-    x <- as.dataset(x)
-    wrap <- as.integer.scalar(wrap)
+    pages <- as.limit(pages)
 
     chars <- NULL
     na.encode <- TRUE
@@ -372,7 +363,7 @@ format.dataset <- function(x, limit = NA, wrap = -1L, ...,
     control <- new_format_control(chars = chars, na.encode = na.encode,
                                   quote = quote, na.print = na.print,
                                   print.gap = print.gap, justify = justify,
-                                  width = width, line = line, wrap = wrap)
+                                  width = width, line = line, pages = pages)
     n <- dim(x)[[1L]]
 
     if (is.null(indent)) {
@@ -593,20 +584,13 @@ format_rows <- function(control, style, nrow, number, keys)
 }
 
 
-print.dataset <- function(x, limit = NULL, wrap = NULL, ...)
+print.dataset <- function(x, limit = NULL, pages = NULL, ...)
 {
     x     <- as.dataset(x)
     limit <- as.limit(limit)
+    pages <- as.limit(pages)
     number <- is.null(keys(x))
 
-    if (is.null(wrap)) {
-        wrap <- option_wrap(wrap)
-    }
-    if (wrap < 0) {
-        wrap <- .Machine$integer.max
-    }
-
-    wrap <- as.integer.scalar(wrap)
     chars  <- NULL
     digits <- NULL
     quote <- FALSE
@@ -616,7 +600,7 @@ print.dataset <- function(x, limit = NULL, wrap = NULL, ...)
     control <- new_format_control(chars = chars, digits = digits,
                                   quote = quote, na.print = na.print,
                                   print.gap = print.gap, display = display,
-                                  wrap = wrap)
+                                  pages = pages)
 
     n <- dim(x)[[1L]]
     style <- new_format_style(control)
@@ -639,7 +623,8 @@ print.dataset <- function(x, limit = NULL, wrap = NULL, ...)
     row_body <- rfmt$body
 
     line <- max(1L, control$line - row_width)
-    fmt <- format.dataset(x, limit = limit, wrap = wrap, chars = control$chars,
+    fmt <- format.dataset(x, limit = limit, pages = pages,
+                          chars = control$chars,
                           na.encode = FALSE, na.print = control$na.print,
                           quote = control$quote, print.gap = control$print.gap,
                           digits = control$digits, line = line, meta = TRUE)

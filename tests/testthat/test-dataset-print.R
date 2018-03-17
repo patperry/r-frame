@@ -73,7 +73,7 @@ test_that("'print.dataset' can wrap 4 columns", {
 '  author           language text                                                ',
 '1 Founding Fathers English  The Declaration of Independence of The United Sta...')
 
-    expect_equal(strsplit(capture_output(print.dataset(x, wrap = 1),
+    expect_equal(strsplit(capture_output(print.dataset(x, pages = 1),
                                          width = 80),
                           "\n")[[1]],
                  lines)
@@ -118,7 +118,7 @@ test_that("'print' can handle matrix columns", {
 '2 b d f h j l n p r t  v  x  z  B D F H J L N P R T  V  X  Z  b d f h j l ...',
 '                                                           (39 columns total)')
 
-    expect_equal(strsplit(capture_output(print(x, wrap = 0), width = 77),
+    expect_equal(strsplit(capture_output(print(x, pages = 0), width = 77),
                           "\n")[[1]], lines)
 })
 
@@ -142,7 +142,7 @@ test_that("'print' can handle matrix columns with tail", {
 '2 b d f h j l n p r t  v  x  z  B D F H J L N P R T  V  X  Z  b d f h ... ...',
 '                                                           (40 columns total)')
 
-    expect_equal(strsplit(capture_output(print(x, wrap = 0), width = 77),
+    expect_equal(strsplit(capture_output(print(x, pages = 0), width = 77),
                           "\n")[[1]], lines)
 })
 
@@ -196,7 +196,7 @@ test_that("'print' handles single matrix with many columns", {
 '  mpg cyl disp  hp drat ...',
 '1  21   6  160 110  3.9 ...',
 '         (11 columns total)')
-    expect_equal(strsplit(capture_output(print(x, wrap = 0), width = 27),
+    expect_equal(strsplit(capture_output(print(x, pages = 0), width = 27),
                           "\n")[[1]],
                  lines)
 })
