@@ -48,6 +48,7 @@ S3method(as.dataset, default)    ; export(as.dataset.default)
 S3method(as.dataset, record)     ; export(as.dataset.record)
 
 S3method(dim, dataset)
+S3method(dimnames, dataset)
 S3method(`$<-`, dataset)
 S3method(`[`, dataset)
 S3method(`[<-`, dataset)

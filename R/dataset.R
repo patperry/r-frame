@@ -21,6 +21,16 @@ dim.dataset <- function(x)
 }
 
 
+dimnames.dataset <- function(x)
+{
+    names <- names(x)
+    if (is.null(names))
+        NULL
+    else
+        list(NULL, names)
+}
+
+
 as.dataset <- function(x)
 {
     UseMethod("as.dataset")
