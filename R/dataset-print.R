@@ -339,16 +339,11 @@ ncol_recursive <- function(x, offset = 0)
 }
 
 
-format.dataset <- function(x, rows = -1L, wrap = -1L, ...,
+format.dataset <- function(x, limit = NA, wrap = -1L, ...,
                            indent = NULL, line = NULL, meta = FALSE)
 {
-    if (is.null(x)) {
-        return(invisible(NULL))
-    }
-
-    if (is.null(rows)) {
-        rows <- option_rows(rows)
-    }
+    x     <- as.dataset(x)
+    limit <- as.limit(limit)
 
     if (is.null(wrap)) {
         wrap <- option_wrap(wrap)
@@ -358,7 +353,6 @@ format.dataset <- function(x, rows = -1L, wrap = -1L, ...,
     }
    
     x <- as.dataset(x)
-    rows <- as.integer.scalar(rows)
     wrap <- as.integer.scalar(wrap)
 
     chars <- NULL
@@ -381,12 +375,12 @@ format.dataset <- function(x, rows = -1L, wrap = -1L, ...,
     if (is.null(indent)) {
         indent <- 0L
     }
-    if (rows < 0) {
-        rows <- n
+    if (is.na(limit) || limit < 0) {
+        limit <- n
     }
 
-    if ((rtrunc <- (n > rows))) {
-        x <- x[seq_len(rows), , drop = FALSE]
+    if ((rtrunc <- (n > limit))) {
+        x <- x[seq_len(limit), , drop = FALSE]
     }
 
     fmt <- format_column("", x, control = control,
@@ -596,18 +590,11 @@ format_rows <- function(control, style, nrow, number, keys)
 }
 
 
-print.dataset <- function(x, rows = NULL, wrap = NULL, ...)
+print.dataset <- function(x, limit = NULL, wrap = NULL, ...)
 {
-    if (is.null(x)) {
-        return(invisible(NULL))
-    }
-
-    x <- as.dataset(x)
+    x     <- as.dataset(x)
+    limit <- as.limit(limit)
     number <- is.null(keys(x))
-
-    if (is.null(rows)) {
-        rows <- option_rows(rows)
-    }
 
     if (is.null(wrap)) {
         wrap <- option_wrap(wrap)
@@ -616,7 +603,6 @@ print.dataset <- function(x, rows = NULL, wrap = NULL, ...)
         wrap <- .Machine$integer.max
     }
 
-    rows <- as.integer.scalar(rows)
     wrap <- as.integer.scalar(wrap)
     chars  <- NULL
     digits <- NULL
@@ -638,8 +624,8 @@ print.dataset <- function(x, rows = NULL, wrap = NULL, ...)
         return(invisible(x))
     }
 
-    if (!is.null(rows) && rows >= 0) {
-        n <- min(n, rows)
+    if (!is.na(limit) && limit >= 0) {
+        n <- min(n, limit)
     }
 
     keys <- keys(x)[seq_len(n), , drop = FALSE]
@@ -650,7 +636,7 @@ print.dataset <- function(x, rows = NULL, wrap = NULL, ...)
     row_body <- rfmt$body
 
     line <- max(1L, control$line - row_width)
-    fmt <- format.dataset(x, rows = rows, wrap = wrap, chars = control$chars,
+    fmt <- format.dataset(x, limit = limit, wrap = wrap, chars = control$chars,
                           na.encode = FALSE, na.print = control$na.print,
                           quote = control$quote, print.gap = control$print.gap,
                           digits = control$digits, line = line, meta = TRUE)
