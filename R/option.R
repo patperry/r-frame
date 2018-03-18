@@ -3,7 +3,7 @@
 as.limit <- function(x)
 {
     if (is.null(x))
-        x <- getOption("frame.limit")
+        x <- getOption("format.limit")
     if (is.null(x)) {
         20L
     } else {
@@ -19,7 +19,7 @@ as.limit <- function(x)
 as.pages <- function(x)
 {
     if (is.null(x))
-        x <- getOption("frame.pages")
+        x <- getOption("format.pages")
     if (is.null(x)) {
         1L
     } else {
@@ -45,7 +45,7 @@ as.line <- function(x)
 as.tab <- function(x)
 {
     if (is.null(x))
-        x <- getOption("frame.tab")
+        x <- getOption("format.tab")
     if (is.null(x)) {
         2L
     } else {
@@ -58,10 +58,10 @@ as.tab <- function(x)
 }
 
 
-as.style <- function(x)
+as.format.control <- function(x)
 {
     if (is.null(x))
-        x <- getOption("frame.style")
+        x <- getOption("format.control")
 
     if (is.null(x)) {
         # RStudio has only partial ANSI support
