@@ -4,10 +4,15 @@ as.limit <- function(x)
 {
     if (is.null(x))
         x <- getOption("frame.limit")
-    if (is.null(x))
+    if (is.null(x)) {
         20L
-    else
-        as.size.scalar(x)
+    } else {
+        x <- as.size.scalar(x)
+        if (!is.na(x) && x <= 0) {
+            x <- NA_integer_
+        }
+        x
+    }
 }
 
 
@@ -15,10 +20,15 @@ as.pages <- function(x)
 {
     if (is.null(x))
         x <- getOption("frame.pages")
-    if (is.null(x))
+    if (is.null(x)) {
         1L
-    else
-        as.size.scalar(x)
+    } else {
+        x <- as.size.scalar(x)
+        if (!is.na(x) && x <= 0) {
+            x <- NA_integer_
+        }
+        x
+    }
 }
 
 
@@ -61,13 +71,15 @@ as.style <- function(x)
         record(faint = "38;5;246", #666666
                bold  = "38;5;203", #FF3333
                line  = getOption("width"),
-               tab   = 2L)
+               tab   = 2L,
+               pages = as.pages(NULL))
     } else {
-        x <- as.list(x)[c("faint", "bold", "line", "tab")]
-        x["faint"] <- as.ansi(x$faint)
-        x["bold"]  <- as.ansi(x$bold)
-        x["line"]  <- as.line(x$line)
-        x["tab"]   <- as.tab(x$indent)
+        x <- as.list(x)[c("faint", "bold", "line", "tab", "pages")]
+        x$faint <- as.ansi(x$faint)
+        x$bold  <- as.ansi(x$bold)
+        x$line  <- as.line(x$line)
+        x$tab   <- as.tab(x$tab)
+        x$pages <- as.pages(x$pages)
         as.record(x)
     }
 }

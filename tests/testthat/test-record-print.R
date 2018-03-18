@@ -20,7 +20,8 @@ test_that("missing names", {
 
 test_that("trunc 0", {
     x <- record(a = 1, b = 2, c = "foo")
-    expect_equal(capture_output(print(x, 0)), "a : 1\n... (3 entries total)")
+    expect_equal(capture_output(print(x, 0)),
+                 capture_output(print(x, NA)))
 })
 
 test_that("trunc 1", {

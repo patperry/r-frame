@@ -185,7 +185,7 @@ format_vector <- function(name, x, ..., control, section, indent)
     }
 
     # compute width, determine whether to truncate
-    if (!is.na(control$pages) && section - 1L == control$pages) {
+    if (!is.na(control$pages) && section == control$pages) {
         limit <- control$line - indent
         width <- col_width(name, y, control, limit + 1)
         trunc <- (width > limit)
@@ -206,7 +206,7 @@ format_vector <- function(name, x, ..., control, section, indent)
     start <- (indent == 0L)
     next_indent <- indent + width + gap
     if (next_indent > control$line + gap && !start
-            && !is.na(control$pages) && section - 1L < control$pages) {
+            && !is.na(control$pages) && section < control$pages) {
         # new page, re-format with new indent
         format_vector(name, x, ..., control = control,
                       section = section + 1L, indent = 0L)
@@ -255,7 +255,7 @@ format_matrix <- function(name, x, ..., control, section, indent)
     justify <- vector("list", nc)
 
     for (j in seq_len(nc)) {
-        if (!is.na(pages) && next_section - 1L == pages && j < nc) {
+        if (!is.na(pages) && next_section == pages && j < nc) {
             control$line <- line - gap - ellipsis
         } else {
             control$line <- line
