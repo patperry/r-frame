@@ -44,12 +44,14 @@ as.line <- function(x)
 
 as.tab <- function(x)
 {
+    if (is.null(x))
+        x <- getOption("frame.tab")
     if (is.null(x)) {
         2L
     } else {
         x <- as.size.scalar(x)
         if (is.na(x))
-            2L
+            0L
         else
             x
     }
@@ -70,8 +72,8 @@ as.style <- function(x)
         #
         record(faint = "38;5;246", #666666
                bold  = "38;5;203", #FF3333
-               line  = getOption("width"),
-               tab   = 2L,
+               line  = as.line(NULL),
+               tab   = as.tab(NULL),
                pages = as.pages(NULL))
     } else {
         x <- as.list(x)[c("faint", "bold", "line", "tab", "pages")]
