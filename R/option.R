@@ -21,7 +21,7 @@ as.line <- function(x)
 }
 
 
-as.indent <- function(x)
+as.tab <- function(x)
 {
     if (is.null(x)) {
         2L
@@ -52,11 +52,11 @@ as.style <- function(x)
                line   = getOption("width"),
                indent = 2L)
     } else {
-        x <- as.list(x)[c("faint", "bold", "line", "indent")]
-        x["faint"]  <- as.ansi(x$faint)
-        x["bold"]   <- as.ansi(x$bold)
-        x["line"]   <- as.line(x$line)
-        x["indent"] <- as.indent(x$indent)
+        x <- as.list(x)[c("faint", "bold", "line", "tab")]
+        x["faint"] <- as.ansi(x$faint)
+        x["bold"]  <- as.ansi(x$bold)
+        x["line"]  <- as.line(x$line)
+        x["tab"]   <- as.tab(x$indent)
         as.record(x)
     }
 }

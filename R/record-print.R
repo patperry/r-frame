@@ -1,5 +1,5 @@
 
-format_record_names <- function(x, indent, nest = 0)
+format_record_names <- function(x, tab, nest = 0)
 {
     n     <- length(x)
     names <- names(x)
@@ -19,13 +19,13 @@ format_record_names <- function(x, indent, nest = 0)
 
     width <- max(0, utf8_width(names))
     if (n > 0) {
-        width <- nest * indent + width
+        width <- nest * tab + width
     }
 
     for (i in seq_len(n)) {
         xi <- x[[i]]
         if (is.record(xi)) {
-            fmt <- format_record_names(xi, indent, nest + 1)
+            fmt <- format_record_names(xi, tab, nest + 1)
             width <- max(width, fmt$width)
             x[[i]] <- fmt$object
         }
@@ -132,7 +132,7 @@ format.record <- function(x, limit = NA, style = NULL, indent = 0,
 
     lfmt   <- format_record_limit(x, limit)
     trunc  <- lfmt$trunc
-    nfmt   <- format_record_names(lfmt$object, style$indent)
+    nfmt   <- format_record_names(lfmt$object, style$tab)
     nwidth <- nfmt$width
 
     indent <- indent + nwidth + 3
