@@ -11,6 +11,17 @@ as.limit <- function(x)
 }
 
 
+as.pages <- function(x)
+{
+    if (is.null(x))
+        x <- getOption("frame.pages")
+    if (is.null(x))
+        1L
+    else
+        as.size.scalar(x)
+}
+
+
 as.line <- function(x)
 {
     if (is.null(x)) {

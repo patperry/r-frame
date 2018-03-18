@@ -347,7 +347,7 @@ format.dataset <- function(x, limit = NA, pages = NA, ...,
 {
     x     <- as.dataset(x)
     limit <- as.limit(limit)
-    pages <- as.limit(pages)
+    pages <- as.pages(pages)
 
     chars <- NULL
     na.encode <- TRUE
@@ -588,7 +588,7 @@ print.dataset <- function(x, limit = NULL, pages = NULL, ...)
 {
     x     <- as.dataset(x)
     limit <- as.limit(limit)
-    pages <- as.limit(pages)
+    pages <- as.pages(pages)
     number <- is.null(keys(x))
 
     chars  <- NULL
