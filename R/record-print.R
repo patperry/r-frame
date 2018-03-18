@@ -83,19 +83,19 @@ format_record_limit <- function(x, limit = NA)
 }
 
 
-format_record_values <- function(x, style)
+format_record_values <- function(x, style, indent)
 {
-    as.record(lapply(x, format_record_value, style = style))
+    as.record(lapply(x, format_record_value, style = style, indent = indent))
 }
 
 
-format_record_value <- function(x, style)
+format_record_value <- function(x, style, indent)
 {
     if (is.record(x)) {
         if (length(x) == 0)
             return("{}")
         else
-            return(format_record_values(x, style))
+            return(format_record_values(x, style, indent))
     }
 
     cl <- paste(class(x), collapse = ".")
@@ -110,32 +110,33 @@ format_record_value <- function(x, style)
         paste0(cl, "(", n, ")")
     } else if (is.character(x) && !is.object(x)) {
         wellipsis <- 1
-        width <- style$line
+        width <- max(1, style$line - indent)
         chars <- if (is.na(width)) .Machine$integer.max else (width - wellipsis)
         utf8_format(x, chars = chars)
     } else if (is.function(x) || is.language(x)) {
         paste0("<", cl, ">")
     } else {
-        format(x, style = style)
+        format(x, style = style, indent = indent)
     }
 }
 
 
-format.record <- function(x, limit = NA, style = NULL, meta = FALSE, ...)
+format.record <- function(x, limit = NA, style = NULL, indent = 0,
+                          meta = FALSE, ...)
 {
-    x     <- as.record(x)
-    limit <- as.limit(limit)
-    style <- as.style(style)
-    meta  <- as.option(meta)
+    x      <- as.record(x)
+    limit  <- as.limit(limit)
+    style  <- as.style(style)
+    indent <- as.size.scalar(indent)
+    meta   <- as.option(meta)
 
     lfmt   <- format_record_limit(x, limit)
     trunc  <- lfmt$trunc
     nfmt   <- format_record_names(lfmt$object, style$indent)
     nwidth <- nfmt$width
 
-    line  <- style$line
-    style$line <- if (is.na(line)) NA else max(1, line - nwidth - 3)
-    y <- format_record_values(nfmt$object, style)
+    indent <- indent + nwidth + 3
+    y <- format_record_values(nfmt$object, style, indent)
 
     if (meta) {
         attr(y, "format.meta") <- list(name.width = nwidth, trunc = trunc)
