@@ -58,10 +58,10 @@ as.style <- function(x)
         #  + no ANSI faint; use gray instead
         #  + no ANSI bold; use color instead
         #
-        record(faint  = "38;5;246", #666666
-               bold   = "38;5;203", #FF3333
-               line   = getOption("width"),
-               indent = 2L)
+        record(faint = "38;5;246", #666666
+               bold  = "38;5;203", #FF3333
+               line  = getOption("width"),
+               tab   = 2L)
     } else {
         x <- as.list(x)[c("faint", "bold", "line", "tab")]
         x["faint"] <- as.ansi(x$faint)

@@ -148,7 +148,7 @@ format.record <- function(x, limit = NA, style = NULL, indent = 0,
 
 format_record_lines <- function(x, name.width, style)
 {
-    indent <- style$indent
+    tab <- style$tab
     faint <- style$faint
     names <- names(x)
     tot <- record_total(x)
@@ -162,9 +162,9 @@ format_record_lines <- function(x, name.width, style)
                                                escapes = faint,
                                                display = TRUE), ":")
             dst <- dst + 1
-            xsubi <- format_record_lines(xi, name.width - indent, style)
+            xsubi <- format_record_lines(xi, name.width - tab, style)
             nsub <- length(xsubi)
-            prefix <- formatC("", width = indent)
+            prefix <- formatC("", width = tab)
             if (nsub > 0) {
                 lines[dst:(dst + nsub - 1)] <- paste0(prefix, xsubi)
                 dst <- dst + nsub
