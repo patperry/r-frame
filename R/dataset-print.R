@@ -17,7 +17,7 @@ new_format_control <- function(chars = NULL, digits = NULL,
                                na.encode = TRUE,
                                na.print = NULL,
                                justify = "none", width = NULL,
-                               display = TRUE, line = NULL, pages = NULL)
+                               line = NULL, pages = NULL)
 {
     control <- list()
     control$chars <- chars
@@ -26,7 +26,6 @@ new_format_control <- function(chars = NULL, digits = NULL,
     control$na.print <- na.print
     control$justify <- justify
     control$width <- width
-    control$display <- display
     control$line <- line
     control$pages <- pages
 
@@ -50,25 +49,24 @@ new_format_style <- function(control)
     if (output_ansi()) {
         escapes <- style_faint
         bold  <- function(x) paste0("\x1b[", style_bold, "m",
-                                    utf8_encode(x, display = control$display,
+                                    utf8_encode(x, display = TRUE,
                                                 utf8 = utf8),
                                     "\x1b[0m")
         faint <- function(x) paste0("\x1b[", style_faint, "m",
-                                    utf8_encode(x, display = control$display,
+                                    utf8_encode(x, display = TRUE,
                                                 utf8 = utf8),
                                     "\x1b[0m")
     } else {
         escapes <- NULL
         bold <- faint <- function(x)
-            utf8_encode(x, display = control$display, utf8 = utf8)
+            utf8_encode(x, display = TRUE, utf8 = utf8)
     }
 
     normal <- function(x, width) {
         x <- utf8_encode(x, escapes = escapes,
-                         display = control$display, utf8 = utf8)
+                         display = TRUE, utf8 = utf8)
         x[is.na(x)] <- utf8_encode(control$na.print, width = width,
-                                   display = control$display,
-                                   utf8 = utf8)
+                                   display = TRUE, utf8 = utf8)
         x
     }
 
@@ -578,10 +576,8 @@ print.dataset <- function(x, limit = NULL, pages = NULL, ...)
     chars  <- NULL
     digits <- NULL
     na.print  <- NULL
-    display <- TRUE
     control <- new_format_control(chars = chars, digits = digits,
-                                  na.print = na.print,
-                                  display = display, pages = pages)
+                                  na.print = na.print, pages = pages)
 
     n <- dim(x)[[1L]]
     style <- new_format_style(control)
