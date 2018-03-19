@@ -54,7 +54,6 @@ col_width <- function(name, x, control, style, limit = NULL)
 {
     limit <- if (is.null(limit)) Inf else limit
     n <- utf8_width(name)
-    ellipsis <- utf8_width(style$ellipsis)
 
     if (length(dim(x)) <= 1) {
         w <- max(0, utf8_width(x), na.rm = TRUE)
@@ -72,7 +71,7 @@ col_width <- function(name, x, control, style, limit = NULL)
                 w <- w + 1
             }
 
-            xj <- if (is.data.frame(x)) x[[j]] else x[, j, drop = TRUE]
+            xj <- x[, j, drop = TRUE]
             wj <- col_width(names[[j]], xj, control, style, limit - w)
 
             w <- w + wj
