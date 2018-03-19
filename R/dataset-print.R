@@ -13,11 +13,9 @@
 #  limitations under the License.
 
 
-new_format_control <- function(chars = NULL, width = NULL,
-                               line = NULL, pages = NULL)
+new_format_control <- function(width = NULL, line = NULL, pages = NULL)
 {
     control <- list()
-    control$chars <- chars
     control$width <- width
     control$line <- line
     control$pages <- pages
@@ -128,11 +126,8 @@ format_list <- function(x, width, control, style)
 
 format_vector <- function(name, x, ..., control, style, section, indent)
 {
-    chars <- control$chars
     ellipsis <- utf8_width(style$ellipsis)
-    if ((stretch <- is.null(chars))) {
-        chars <- max(24, control$line - indent - ellipsis)
-    }
+    chars <- max(24, control$line - indent - ellipsis)
 
     # determine column justification
     justify <- if (is.numeric(x) || is.complex(x)) "right" else "left"
@@ -155,8 +150,7 @@ format_vector <- function(name, x, ..., control, style, section, indent)
     } else if (is.list(x) && identical(cl, "list")) {
         y <- format_list(x, min_width, control, style)
     } else {
-        y <- format(x, ..., chars = chars,
-                    justify = "none", width = min_width)
+        y <- format(x, ..., chars = chars, justify = "none", width = min_width)
     }
 
     # compute width, determine whether to truncate
@@ -324,14 +318,12 @@ format.dataset <- function(x, limit = NA, pages = NA, ...,
     limit <- as.limit(limit)
     pages <- as.pages(pages)
 
-    chars <- NULL
     width <- NULL
     indent <- if (is.null(indent)) NULL else as.integer.scalar(indent)
     line <- if (is.null(line)) NULL else as.integer.scalar(line)
     meta <- as.option(meta)
 
-    control <- new_format_control(chars = chars,
-                                  width = width, line = line, pages = pages)
+    control <- new_format_control(width = width, line = line, pages = pages)
     n <- dim(x)[[1L]]
     style <- new_format_style(control)
 
@@ -500,7 +492,7 @@ format_rows <- function(control, style, nrow, number, keys)
         if (is.null(names)) {
             names(keys) <- character(length(keys))
         }
-        cols <- format.dataset(keys, chars = .Machine$integer.max,
+        cols <- format.dataset(keys,
                                line = .Machine$integer.max - 1,
                                meta = TRUE)
         width <- unlist(attr(cols, "width"))
@@ -552,8 +544,7 @@ print.dataset <- function(x, limit = NULL, pages = NULL, ...)
     pages <- as.pages(pages)
     number <- is.null(keys(x))
 
-    chars  <- NULL
-    control <- new_format_control(chars = chars, pages = pages)
+    control <- new_format_control(pages = pages)
 
     n <- dim(x)[[1L]]
     style <- new_format_style(control)
@@ -576,7 +567,6 @@ print.dataset <- function(x, limit = NULL, pages = NULL, ...)
 
     line <- max(1L, control$line - row_width)
     fmt <- format.dataset(x, limit = limit, pages = pages,
-                          chars = control$chars,
                           line = line, meta = TRUE)
     section <- unlist(attr(fmt, "section"))
     indent <- unlist(attr(fmt, "indent"))
