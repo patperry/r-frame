@@ -13,20 +13,6 @@
 #  limitations under the License.
 
 
-new_format_control <- function(line = NULL, pages = NULL)
-{
-    control <- list()
-    control$line <- line
-    control$pages <- pages
-
-    if (is.null(control$line)) {
-        control$line <- getOption("width")
-    }
-
-    control
-}
-
-
 new_format_style <- function(control)
 {
     utf8 <- output_utf8()
@@ -319,7 +305,7 @@ format.dataset <- function(x, limit = NA, pages = NA, ...,
     line <- if (is.null(line)) NULL else as.integer.scalar(line)
     meta <- as.option(meta)
 
-    control <- new_format_control(line = line, pages = pages)
+    control <- as.format.control(list(line = line, pages = pages))
     n <- dim(x)[[1L]]
     style <- new_format_style(control)
 
@@ -540,7 +526,7 @@ print.dataset <- function(x, limit = NULL, pages = NULL, ...)
     pages <- as.pages(pages)
     number <- is.null(keys(x))
 
-    control <- new_format_control(pages = pages)
+    control <- as.format.control(list(pages = pages))
 
     n <- dim(x)[[1L]]
     style <- new_format_style(control)
