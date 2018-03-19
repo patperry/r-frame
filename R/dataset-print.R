@@ -31,8 +31,6 @@ new_format_control <- function(chars = NULL, digits = NULL,
     control$display <- display
     control$line <- line
     control$pages <- pages
-    control$ansi <- output_ansi()
-    control$utf8 <- output_utf8()
 
     if (is.null(control$na.print)) {
         control$na.print <- if (control$quote) "NA" else "<NA>"
@@ -59,28 +57,29 @@ new_format_control <- function(chars = NULL, digits = NULL,
 
 new_format_style <- function(control)
 {
-    if (control$ansi) {
+    utf8 <- output_utf8()
+    if (output_ansi()) {
         escapes <- style_faint
         bold  <- function(x) paste0("\x1b[", style_bold, "m",
                                     utf8_encode(x, display = control$display,
-                                                utf8 = control$utf8),
+                                                utf8 = utf8),
                                     "\x1b[0m")
         faint <- function(x) paste0("\x1b[", style_faint, "m",
                                     utf8_encode(x, display = control$display,
-                                                utf8 = control$utf8),
+                                                utf8 = utf8),
                                     "\x1b[0m")
     } else {
         escapes <- NULL
         bold <- faint <- function(x)
-            utf8_encode(x, display = control$display, utf8 = control$utf8)
+            utf8_encode(x, display = control$display, utf8 = utf8)
     }
 
     normal <- function(x, width) {
         x <- utf8_encode(x, quote = control$quote, escapes = escapes,
-                         display = control$display, utf8 = control$utf8)
+                         display = control$display, utf8 = utf8)
         x[is.na(x)] <- utf8_encode(control$na.print, width = width,
                                    display = control$display,
-                                   utf8 = control$utf8)
+                                   utf8 = utf8)
         x
     }
 
