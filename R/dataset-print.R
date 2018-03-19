@@ -14,7 +14,7 @@
 
 
 new_format_control <- function(chars = NULL, digits = NULL,
-                               na.encode = TRUE, quote = FALSE,
+                               na.encode = TRUE,
                                na.print = NULL,
                                justify = "none", width = NULL,
                                display = TRUE, line = NULL, pages = NULL)
@@ -23,7 +23,6 @@ new_format_control <- function(chars = NULL, digits = NULL,
     control$chars <- chars
     control$digits <- digits
     control$na.encode <- na.encode
-    control$quote <- quote
     control$na.print <- na.print
     control$justify <- justify
     control$width <- width
@@ -32,7 +31,7 @@ new_format_control <- function(chars = NULL, digits = NULL,
     control$pages <- pages
 
     if (is.null(control$na.print)) {
-        control$na.print <- if (control$quote) "NA" else "<NA>"
+        control$na.print <- "<NA>"
     }
     if (is.null(control$width)) {
         control$width <- 0L
@@ -65,7 +64,7 @@ new_format_style <- function(control)
     }
 
     normal <- function(x, width) {
-        x <- utf8_encode(x, quote = control$quote, escapes = escapes,
+        x <- utf8_encode(x, escapes = escapes,
                          display = control$display, utf8 = utf8)
         x[is.na(x)] <- utf8_encode(control$na.print, width = width,
                                    display = control$display,
@@ -90,7 +89,7 @@ col_width <- function(name, x, control, style, limit = NULL)
     ellipsis <- utf8_width(style$ellipsis)
 
     if (length(dim(x)) <= 1) {
-        w <- max(0, utf8_width(x, quote = control$quote), na.rm = TRUE)
+        w <- max(0, utf8_width(x), na.rm = TRUE)
         if (anyNA(x)) {
             naw <- utf8_width(control$na.print)
             w <- max(w, naw)
@@ -136,8 +135,7 @@ format_list <- function(x, width, control, style)
         }
     })
     y <- paste0(y, suffix)
-    utf8_format(y, justify = control$justify, width = width,
-                quote = control$quote)
+    utf8_format(y, justify = control$justify, width = width)
 }
 
 format_vector <- function(name, x, ..., control, style, section, indent)
@@ -145,8 +143,7 @@ format_vector <- function(name, x, ..., control, style, section, indent)
     chars <- control$chars
     ellipsis <- utf8_width(style$ellipsis)
     if ((stretch <- is.null(chars))) {
-        quotes <- if (control$quote) 2 else 0
-        chars <- max(24, control$line - indent - ellipsis - quotes)
+        chars <- max(24, control$line - indent - ellipsis)
     }
 
     # determine column justification
@@ -167,12 +164,12 @@ format_vector <- function(name, x, ..., control, style, section, indent)
                             || identical(cl, "AsIs"))) {
         y <- utf8_format(x, chars = chars, justify = control$justify,
                          width = min_width, na.encode = control$na.encode,
-                         quote = control$quote, na.print = control$na.print)
+                         na.print = control$na.print)
     } else if (is.list(x) && identical(cl, "list")) {
         y <- format_list(x, min_width, control, style)
     } else {
         y <- format(x, ..., chars = chars, na.encode = control$na.encode,
-                    quote = control$quote, na.print = control$na.print,
+                    na.print = control$na.print,
                     justify = control$justify, width = min_width)
     }
 
@@ -343,7 +340,6 @@ format.dataset <- function(x, limit = NA, pages = NA, ...,
 
     chars <- NULL
     na.encode <- TRUE
-    quote <- FALSE
     na.print <- NULL
     justify <- "none"
     width <- NULL
@@ -352,7 +348,7 @@ format.dataset <- function(x, limit = NA, pages = NA, ...,
     meta <- as.option(meta)
 
     control <- new_format_control(chars = chars, na.encode = na.encode,
-                                  quote = quote, na.print = na.print,
+                                  na.print = na.print,
                                   justify = justify,
                                   width = width, line = line, pages = pages)
     n <- dim(x)[[1L]]
@@ -525,7 +521,6 @@ format_rows <- function(control, style, nrow, number, keys)
         }
         cols <- format.dataset(keys, chars = .Machine$integer.max,
                                na.encode = FALSE, na.print = control$na.print,
-                               quote = control$quote,
                                digits = control$digits,
                                line = .Machine$integer.max - 1,
                                meta = TRUE)
@@ -582,11 +577,10 @@ print.dataset <- function(x, limit = NULL, pages = NULL, ...)
 
     chars  <- NULL
     digits <- NULL
-    quote <- FALSE
     na.print  <- NULL
     display <- TRUE
     control <- new_format_control(chars = chars, digits = digits,
-                                  quote = quote, na.print = na.print,
+                                  na.print = na.print,
                                   display = display, pages = pages)
 
     n <- dim(x)[[1L]]
@@ -612,7 +606,6 @@ print.dataset <- function(x, limit = NULL, pages = NULL, ...)
     fmt <- format.dataset(x, limit = limit, pages = pages,
                           chars = control$chars,
                           na.encode = FALSE, na.print = control$na.print,
-                          quote = control$quote,
                           digits = control$digits, line = line, meta = TRUE)
     section <- unlist(attr(fmt, "section"))
     indent <- unlist(attr(fmt, "indent"))
@@ -629,7 +622,7 @@ print.dataset <- function(x, limit = NULL, pages = NULL, ...)
                        utf8_format(as.character(col), width = w,
                                    chars = .Machine$integer.max,
                                    na.encode = FALSE, na.print = na.print,
-                                   quote = quote, justify = j),
+                                   justify = j),
                    cols, width, justify, SIMPLIFY = FALSE, USE.NAMES = FALSE)
     names <- mapply(function(name, w, j)
                         utf8_format(name, width = w,
