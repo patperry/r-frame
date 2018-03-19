@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 
-new_format_control <- function(chars = NULL, digits = NULL,
+new_format_control <- function(chars = NULL,
                                na.encode = TRUE,
                                na.print = NULL,
                                width = NULL,
@@ -21,7 +21,6 @@ new_format_control <- function(chars = NULL, digits = NULL,
 {
     control <- list()
     control$chars <- chars
-    control$digits <- digits
     control$na.encode <- na.encode
     control$na.print <- na.print
     control$width <- width
@@ -516,7 +515,6 @@ format_rows <- function(control, style, nrow, number, keys)
         }
         cols <- format.dataset(keys, chars = .Machine$integer.max,
                                na.encode = FALSE, na.print = control$na.print,
-                               digits = control$digits,
                                line = .Machine$integer.max - 1,
                                meta = TRUE)
         width <- unlist(attr(cols, "width"))
@@ -571,9 +569,8 @@ print.dataset <- function(x, limit = NULL, pages = NULL, ...)
     number <- is.null(keys(x))
 
     chars  <- NULL
-    digits <- NULL
     na.print  <- NULL
-    control <- new_format_control(chars = chars, digits = digits,
+    control <- new_format_control(chars = chars,
                                   na.print = na.print, pages = pages)
 
     n <- dim(x)[[1L]]
@@ -599,7 +596,7 @@ print.dataset <- function(x, limit = NULL, pages = NULL, ...)
     fmt <- format.dataset(x, limit = limit, pages = pages,
                           chars = control$chars,
                           na.encode = FALSE, na.print = control$na.print,
-                          digits = control$digits, line = line, meta = TRUE)
+                          line = line, meta = TRUE)
     section <- unlist(attr(fmt, "section"))
     indent <- unlist(attr(fmt, "indent"))
     width <- unlist(attr(fmt, "width"))
