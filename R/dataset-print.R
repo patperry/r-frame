@@ -16,7 +16,7 @@
 new_format_control <- function(chars = NULL, digits = NULL,
                                na.encode = TRUE,
                                na.print = NULL,
-                               justify = "none", width = NULL,
+                               width = NULL,
                                line = NULL, pages = NULL)
 {
     control <- list()
@@ -24,7 +24,6 @@ new_format_control <- function(chars = NULL, digits = NULL,
     control$digits <- digits
     control$na.encode <- na.encode
     control$na.print <- na.print
-    control$justify <- justify
     control$width <- width
     control$line <- line
     control$pages <- pages
@@ -133,7 +132,7 @@ format_list <- function(x, width, control, style)
         }
     })
     y <- paste0(y, suffix)
-    utf8_format(y, justify = control$justify, width = width)
+    utf8_format(y, justify = "none", width = width)
 }
 
 format_vector <- function(name, x, ..., control, style, section, indent)
@@ -160,7 +159,7 @@ format_vector <- function(name, x, ..., control, style, section, indent)
     # format character and list specially, otherwise use S3
     if (is.character(x) && (identical(cl, "character")
                             || identical(cl, "AsIs"))) {
-        y <- utf8_format(x, chars = chars, justify = control$justify,
+        y <- utf8_format(x, chars = chars, justify = "none",
                          width = min_width, na.encode = control$na.encode,
                          na.print = control$na.print)
     } else if (is.list(x) && identical(cl, "list")) {
@@ -168,7 +167,7 @@ format_vector <- function(name, x, ..., control, style, section, indent)
     } else {
         y <- format(x, ..., chars = chars, na.encode = control$na.encode,
                     na.print = control$na.print,
-                    justify = control$justify, width = min_width)
+                    justify = "none", width = min_width)
     }
 
     # compute width, determine whether to truncate
@@ -339,7 +338,6 @@ format.dataset <- function(x, limit = NA, pages = NA, ...,
     chars <- NULL
     na.encode <- TRUE
     na.print <- NULL
-    justify <- "none"
     width <- NULL
     indent <- if (is.null(indent)) NULL else as.integer.scalar(indent)
     line <- if (is.null(line)) NULL else as.integer.scalar(line)
@@ -347,7 +345,6 @@ format.dataset <- function(x, limit = NA, pages = NA, ...,
 
     control <- new_format_control(chars = chars, na.encode = na.encode,
                                   na.print = na.print,
-                                  justify = justify,
                                   width = width, line = line, pages = pages)
     n <- dim(x)[[1L]]
     style <- new_format_style(control)
