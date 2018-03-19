@@ -15,7 +15,7 @@
 
 new_format_control <- function(chars = NULL, digits = NULL,
                                na.encode = TRUE, quote = FALSE,
-                               na.print = NULL, print.gap = NULL,
+                               na.print = NULL,
                                justify = "none", width = NULL,
                                display = TRUE, line = NULL, pages = NULL)
 {
@@ -25,7 +25,6 @@ new_format_control <- function(chars = NULL, digits = NULL,
     control$na.encode <- na.encode
     control$quote <- quote
     control$na.print <- na.print
-    control$print.gap <- print.gap
     control$justify <- justify
     control$width <- width
     control$display <- display
@@ -34,9 +33,6 @@ new_format_control <- function(chars = NULL, digits = NULL,
 
     if (is.null(control$na.print)) {
         control$na.print <- if (control$quote) "NA" else "<NA>"
-    }
-    if (is.null(control$print.gap)) {
-        control$print.gap <- 1L
     }
     if (is.null(control$width)) {
         control$width <- 0L
@@ -92,7 +88,6 @@ col_width <- function(name, x, control, style, limit = NULL)
     limit <- if (is.null(limit)) Inf else limit
     n <- utf8_width(name)
     ellipsis <- utf8_width(style$ellipsis)
-    gap <- control$print.gap
 
     if (length(dim(x)) <= 1) {
         w <- max(0, utf8_width(x, quote = control$quote), na.rm = TRUE)
@@ -107,7 +102,7 @@ col_width <- function(name, x, control, style, limit = NULL)
 
         for (j in seq_len(nc)) {
             if (j > 1) {
-                w <- w + gap
+                w <- w + 1
             }
 
             xj <- if (is.data.frame(x)) x[[j]] else x[, j, drop = TRUE]
@@ -148,7 +143,6 @@ format_list <- function(x, width, control, style)
 format_vector <- function(name, x, ..., control, style, section, indent)
 {
     chars <- control$chars
-    gap <- control$print.gap
     ellipsis <- utf8_width(style$ellipsis)
     if ((stretch <- is.null(chars))) {
         quotes <- if (control$quote) 2 else 0
@@ -179,8 +173,7 @@ format_vector <- function(name, x, ..., control, style, section, indent)
     } else {
         y <- format(x, ..., chars = chars, na.encode = control$na.encode,
                     quote = control$quote, na.print = control$na.print,
-                    print.gap = control$print.gap, justify = control$justify,
-                    width = min_width)
+                    justify = control$justify, width = min_width)
     }
 
     # compute width, determine whether to truncate
@@ -203,8 +196,8 @@ format_vector <- function(name, x, ..., control, style, section, indent)
 
     # compute new indent
     start <- (indent == 0L)
-    next_indent <- indent + width + gap
-    if (next_indent > control$line + gap && !start
+    next_indent <- indent + width + 1
+    if (next_indent > control$line + 1 && !start
             && !is.na(control$pages) && section < control$pages) {
         # new page, re-format with new indent
         format_vector(name, x, ..., control = control, style = style,
@@ -239,7 +232,6 @@ format_matrix <- function(name, x, ..., control, style, section, indent)
     y <- as.record(vector("list", nc))
     trunc <- FALSE
 
-    gap <- control$print.gap
     ellipsis <- utf8_width(style$ellipsis)
     line <- control$line
     pages <- control$pages
@@ -255,7 +247,7 @@ format_matrix <- function(name, x, ..., control, style, section, indent)
 
     for (j in seq_len(nc)) {
         if (!is.na(pages) && next_section == pages && j < nc) {
-            control$line <- line - gap - ellipsis
+            control$line <- line - 1 - ellipsis
         } else {
             control$line <- line
         }
@@ -281,7 +273,7 @@ format_matrix <- function(name, x, ..., control, style, section, indent)
                 indent_start <- 0L
             }
             next_indent <- max(next_indent,
-                               indent_start + utf8_width(name) + gap)
+                               indent_start + utf8_width(name) + 1)
         }
 
         if (fmt$trunc) {
@@ -293,7 +285,7 @@ format_matrix <- function(name, x, ..., control, style, section, indent)
                 indent[[j]] <- next_indent
                 width[[j]] <- ellipsis
                 justify[[j]] <- "left"
-                next_indent <- next_indent + ellipsis + gap
+                next_indent <- next_indent + ellipsis + 1
             }
             y <- y[1:j]
             names <- names[1:j]
@@ -353,7 +345,6 @@ format.dataset <- function(x, limit = NA, pages = NA, ...,
     na.encode <- TRUE
     quote <- FALSE
     na.print <- NULL
-    print.gap <- NULL
     justify <- "none"
     width <- NULL
     indent <- if (is.null(indent)) NULL else as.integer.scalar(indent)
@@ -362,7 +353,7 @@ format.dataset <- function(x, limit = NA, pages = NA, ...,
 
     control <- new_format_control(chars = chars, na.encode = na.encode,
                                   quote = quote, na.print = na.print,
-                                  print.gap = print.gap, justify = justify,
+                                  justify = justify,
                                   width = width, line = line, pages = pages)
     n <- dim(x)[[1L]]
     style <- new_format_style(control)
@@ -515,8 +506,6 @@ print_body <- function(control, cols, indent, width, row_body)
 
 format_rows <- function(control, style, nrow, number, keys)
 {
-    gap <- utf8_format("", width = control$print.gap)
-
     if (number) {
         row_body <- utf8_format(as.character(seq_len(nrow)),
                                 chars = .Machine$integer.max,
@@ -537,9 +526,8 @@ format_rows <- function(control, style, nrow, number, keys)
         cols <- format.dataset(keys, chars = .Machine$integer.max,
                                na.encode = FALSE, na.print = control$na.print,
                                quote = control$quote,
-                               print.gap = control$print.gap,
                                digits = control$digits,
-                               line = .Machine$integer.max - control$print.gap,
+                               line = .Machine$integer.max - 1,
                                meta = TRUE)
         width <- unlist(attr(cols, "width"))
         justify <- unlist(attr(cols, "justify"))
@@ -556,11 +544,11 @@ format_rows <- function(control, style, nrow, number, keys)
                                     na.print = control$na.print),
                      names(cols), width, justify, USE.NAMES = FALSE)
 
-        kb <- do.call(paste, c(kb, sep = gap))
-        kh <- paste(kh, collapse = gap)
+        kb <- do.call(paste, kb)
+        kh <- paste(kh, collapse = " ")
         if (nzchar(row_head)) {
-            row_head <- paste(row_head, kh, sep = gap)
-            row_body <- paste(row_body, kb, sep = gap)
+            row_head <- paste(row_head, kh)
+            row_body <- paste(row_body, kb)
         } else {
             row_head <- kh
             row_body <- kb
@@ -572,13 +560,13 @@ format_rows <- function(control, style, nrow, number, keys)
     row_body <- style$faint(row_body)
 
     if (!is.null(keys)) {
-        row_head <- paste0(row_head, gap, style$faint(style$vline), gap)
-        row_width <- row_width + 1 + 2 * utf8_width(gap)
-        row_body <- paste0(row_body, gap, style$faint(style$vline), gap)
+        row_head <- paste0(row_head, " ", style$faint(style$vline), " ")
+        row_width <- row_width + 3
+        row_body <- paste0(row_body, " ", style$faint(style$vline), " ")
     } else if (row_width > 0) {
-        row_head <- paste0(row_head, gap)
-        row_body <- paste0(row_body, gap)
-        row_width <- row_width + utf8_width(gap)
+        row_head <- paste0(row_head, " ")
+        row_body <- paste0(row_body, " ")
+        row_width <- row_width + 1
     }
 
     list(width = row_width, head = row_head, body = row_body)
@@ -596,16 +584,13 @@ print.dataset <- function(x, limit = NULL, pages = NULL, ...)
     digits <- NULL
     quote <- FALSE
     na.print  <- NULL
-    print.gap <- NULL
     display <- TRUE
     control <- new_format_control(chars = chars, digits = digits,
                                   quote = quote, na.print = na.print,
-                                  print.gap = print.gap, display = display,
-                                  pages = pages)
+                                  display = display, pages = pages)
 
     n <- dim(x)[[1L]]
     style <- new_format_style(control)
-    gap <- utf8_format("", width = control$print.gap)
 
     if (length(x) == 0) {
         cat(sprintf("(%.0f rows, 0 columns)\n", n))
@@ -627,7 +612,7 @@ print.dataset <- function(x, limit = NULL, pages = NULL, ...)
     fmt <- format.dataset(x, limit = limit, pages = pages,
                           chars = control$chars,
                           na.encode = FALSE, na.print = control$na.print,
-                          quote = control$quote, print.gap = control$print.gap,
+                          quote = control$quote,
                           digits = control$digits, line = line, meta = TRUE)
     section <- unlist(attr(fmt, "section"))
     indent <- unlist(attr(fmt, "indent"))
