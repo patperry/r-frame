@@ -13,21 +13,15 @@
 #  limitations under the License.
 
 
-new_format_control <- function(chars = NULL,
-                               na.print = NULL,
-                               width = NULL,
+new_format_control <- function(chars = NULL, width = NULL,
                                line = NULL, pages = NULL)
 {
     control <- list()
     control$chars <- chars
-    control$na.print <- na.print
     control$width <- width
     control$line <- line
     control$pages <- pages
 
-    if (is.null(control$na.print)) {
-        control$na.print <- "<NA>"
-    }
     if (is.null(control$width)) {
         control$width <- 0L
     }
@@ -61,7 +55,7 @@ new_format_style <- function(control)
     normal <- function(x, width) {
         x <- utf8_encode(x, escapes = escapes,
                          display = TRUE, utf8 = utf8)
-        x[is.na(x)] <- utf8_encode(control$na.print, width = width,
+        x[is.na(x)] <- utf8_encode("<NA>", width = width,
                                    display = TRUE, utf8 = utf8)
         x
     }
@@ -85,7 +79,7 @@ col_width <- function(name, x, control, style, limit = NULL)
     if (length(dim(x)) <= 1) {
         w <- max(0, utf8_width(x), na.rm = TRUE)
         if (anyNA(x)) {
-            naw <- utf8_width(control$na.print)
+            naw <- utf8_width("<NA>")
             w <- max(w, naw)
         }
     } else {
@@ -157,13 +151,11 @@ format_vector <- function(name, x, ..., control, style, section, indent)
     if (is.character(x) && (identical(cl, "character")
                             || identical(cl, "AsIs"))) {
         y <- utf8_format(x, chars = chars, justify = "none",
-                         width = min_width,
-                         na.print = control$na.print)
+                         width = min_width)
     } else if (is.list(x) && identical(cl, "list")) {
         y <- format_list(x, min_width, control, style)
     } else {
         y <- format(x, ..., chars = chars,
-                    na.print = control$na.print,
                     justify = "none", width = min_width)
     }
 
@@ -333,14 +325,12 @@ format.dataset <- function(x, limit = NA, pages = NA, ...,
     pages <- as.pages(pages)
 
     chars <- NULL
-    na.print <- NULL
     width <- NULL
     indent <- if (is.null(indent)) NULL else as.integer.scalar(indent)
     line <- if (is.null(line)) NULL else as.integer.scalar(line)
     meta <- as.option(meta)
 
     control <- new_format_control(chars = chars,
-                                  na.print = na.print,
                                   width = width, line = line, pages = pages)
     n <- dim(x)[[1L]]
     style <- new_format_style(control)
@@ -511,7 +501,6 @@ format_rows <- function(control, style, nrow, number, keys)
             names(keys) <- character(length(keys))
         }
         cols <- format.dataset(keys, chars = .Machine$integer.max,
-                               na.print = control$na.print,
                                line = .Machine$integer.max - 1,
                                meta = TRUE)
         width <- unlist(attr(cols, "width"))
@@ -519,14 +508,12 @@ format_rows <- function(control, style, nrow, number, keys)
 
         kb <- mapply(function(k, w, j)
                          utf8_format(k, chars = .Machine$integer.max,
-                                     justify = j, width = w,
-                                     na.print = control$na.print),
+                                     justify = j, width = w),
                      cols, width, justify,
                      SIMPLIFY = FALSE, USE.NAMES = FALSE)
         kh <- mapply(function(n, w, j)
                         utf8_format(n, chars = .Machine$integer.max,
-                                    justify = j, width = w,
-                                    na.print = control$na.print),
+                                    justify = j, width = w),
                      names(cols), width, justify, USE.NAMES = FALSE)
 
         kb <- do.call(paste, kb)
@@ -566,9 +553,7 @@ print.dataset <- function(x, limit = NULL, pages = NULL, ...)
     number <- is.null(keys(x))
 
     chars  <- NULL
-    na.print  <- NULL
-    control <- new_format_control(chars = chars,
-                                  na.print = na.print, pages = pages)
+    control <- new_format_control(chars = chars, pages = pages)
 
     n <- dim(x)[[1L]]
     style <- new_format_style(control)
@@ -592,7 +577,6 @@ print.dataset <- function(x, limit = NULL, pages = NULL, ...)
     line <- max(1L, control$line - row_width)
     fmt <- format.dataset(x, limit = limit, pages = pages,
                           chars = control$chars,
-                          na.print = control$na.print,
                           line = line, meta = TRUE)
     section <- unlist(attr(fmt, "section"))
     indent <- unlist(attr(fmt, "indent"))
@@ -608,7 +592,6 @@ print.dataset <- function(x, limit = NULL, pages = NULL, ...)
     cols <- mapply(function(col, w, j)
                        utf8_format(as.character(col), width = w,
                                    chars = .Machine$integer.max,
-                                   na.print = na.print,
                                    justify = j),
                    cols, width, justify, SIMPLIFY = FALSE, USE.NAMES = FALSE)
     names <- mapply(function(name, w, j)
