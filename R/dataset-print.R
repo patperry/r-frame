@@ -13,16 +13,12 @@
 #  limitations under the License.
 
 
-new_format_control <- function(width = NULL, line = NULL, pages = NULL)
+new_format_control <- function(line = NULL, pages = NULL)
 {
     control <- list()
-    control$width <- width
     control$line <- line
     control$pages <- pages
 
-    if (is.null(control$width)) {
-        control$width <- 0L
-    }
     if (is.null(control$line)) {
         control$line <- getOption("width")
     }
@@ -133,7 +129,7 @@ format_vector <- function(name, x, ..., control, style, section, indent)
     justify <- if (is.numeric(x) || is.complex(x)) "right" else "left"
 
     # determine the minimum element width
-    min_width <- max(control$width, utf8_width(name))
+    min_width <- utf8_width(name)
 
     # convert factor to character
     cl <- class(x)
@@ -323,7 +319,7 @@ format.dataset <- function(x, limit = NA, pages = NA, ...,
     line <- if (is.null(line)) NULL else as.integer.scalar(line)
     meta <- as.option(meta)
 
-    control <- new_format_control(width = width, line = line, pages = pages)
+    control <- new_format_control(line = line, pages = pages)
     n <- dim(x)[[1L]]
     style <- new_format_style(control)
 
