@@ -293,19 +293,15 @@ ncol_recursive <- function(x, offset = 0)
 }
 
 
-format.dataset <- function(x, limit = NA, pages = NA, ...,
-                           indent = NULL, line = NULL, meta = FALSE)
+format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
+                           meta = FALSE, ...)
 {
     x     <- as.dataset(x)
     limit <- as.limit(limit)
-    pages <- as.pages(pages)
-
-    width <- NULL
-    indent <- if (is.null(indent)) NULL else as.integer.scalar(indent)
-    line <- if (is.null(line)) NULL else as.integer.scalar(line)
+    control <- as.format.control(control)
+    indent <- as.integer.scalar(indent)
     meta <- as.option(meta)
 
-    control <- as.format.control(list(line = line, pages = pages))
     n <- dim(x)[[1L]]
     style <- new_format_style(control)
 
@@ -474,9 +470,9 @@ format_rows <- function(control, style, nrow, number, keys)
         if (is.null(names)) {
             names(keys) <- character(length(keys))
         }
-        cols <- format.dataset(keys,
-                               line = .Machine$integer.max - 1,
-                               meta = TRUE)
+        kcontrol <- control
+        kcontrol$line <- .Machine$integer.max - 1
+        cols <- format.dataset(keys, control = kcontrol, meta = TRUE)
         width <- unlist(attr(cols, "width"))
         justify <- unlist(attr(cols, "justify"))
 
@@ -519,15 +515,13 @@ format_rows <- function(control, style, nrow, number, keys)
 }
 
 
-print.dataset <- function(x, limit = NULL, pages = NULL, ...)
+print.dataset <- function(x, limit = NULL, control = NULL, ...)
 {
-    x     <- as.dataset(x)
-    limit <- as.limit(limit)
-    pages <- as.pages(pages)
+    x       <- as.dataset(x)
+    limit   <- as.limit(limit)
+    control <- as.format.control(control)
+
     number <- is.null(keys(x))
-
-    control <- as.format.control(list(pages = pages))
-
     n <- dim(x)[[1L]]
     style <- new_format_style(control)
 
@@ -547,9 +541,8 @@ print.dataset <- function(x, limit = NULL, pages = NULL, ...)
     row_head <- rfmt$head
     row_body <- rfmt$body
 
-    line <- max(1L, control$line - row_width)
-    fmt <- format.dataset(x, limit = limit, pages = pages,
-                          line = line, meta = TRUE)
+    control$line <- max(1L, control$line - row_width)
+    fmt <- format.dataset(x, limit = limit, control = control, meta = TRUE)
     section <- unlist(attr(fmt, "section"))
     indent <- unlist(attr(fmt, "indent"))
     width <- unlist(attr(fmt, "width"))

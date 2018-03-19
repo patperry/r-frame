@@ -73,7 +73,8 @@ test_that("'print.dataset' can wrap 4 columns", {
 '  author           language text                                                ',
 '1 Founding Fathers English  The Declaration of Independence of The United Sta...')
 
-    expect_equal(strsplit(capture_output(print.dataset(x, pages = 2),
+    control <- list(pages = 2)
+    expect_equal(strsplit(capture_output(print.dataset(x, control = control),
                                          width = 80),
                           "\n")[[1]],
                  lines)
