@@ -335,9 +335,10 @@ format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
             caption <- NULL
         }
 
-        attr(y, "format.meta") <- list(trunc_rows = rtrunc)
-        attr(y, "trunc_cols") <- ctrunc
-        attr(y, "section") <- fmt$section
+        attr(y, "format.meta") <-
+            list(trunc_rows = rtrunc,
+                 trunc_cols = ctrunc,
+                 section    = fmt$section)
         attr(y, "indent") <- fmt$indent
         attr(y, "width") <- fmt$width
         attr(y, "justify") <- fmt$justify
@@ -543,7 +544,7 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
     control$line <- max(1L, control$line - row_width)
     fmt <- format.dataset(x, limit = limit, control = control, meta = TRUE)
     meta <- attr(fmt, "format.meta")
-    section <- unlist(attr(fmt, "section"))
+    section <- unlist(meta$section)
     indent <- unlist(attr(fmt, "indent"))
     width <- unlist(attr(fmt, "width"))
     justify <- unlist(attr(fmt, "justify"))
