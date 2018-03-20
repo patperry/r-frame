@@ -50,9 +50,8 @@ new_format_style <- function(control)
 }
 
 
-col_width <- function(name, x, control, style, limit = NULL)
+col_width <- function(name, x, limit = NA)
 {
-    limit <- if (is.null(limit)) Inf else limit
     n <- utf8_width(name)
 
     if (length(dim(x)) <= 1) {
@@ -72,18 +71,22 @@ col_width <- function(name, x, control, style, limit = NULL)
             }
 
             xj <- x[, j, drop = TRUE]
-            wj <- col_width(names[[j]], xj, control, style, limit - w)
+            wj <- col_width(names[[j]], xj, limit - w)
 
             w <- w + wj
-            if (w >= limit) {
+            if (isTRUE(w >= limit)) {
                 return(limit)
             }
         }
     }
 
     w <- max(n, w)
-    min(limit, w)
+    if (isTRUE(w >= limit))
+        limit
+    else
+        w
 }
+
 
 format_list <- function(x, width, control, style)
 {
@@ -104,6 +107,7 @@ format_list <- function(x, width, control, style)
     y <- paste0(y, suffix)
     utf8_format(y, justify = "none", width = width)
 }
+
 
 format_vector <- function(name, x, ..., control, style, section, indent)
 {
@@ -137,10 +141,10 @@ format_vector <- function(name, x, ..., control, style, section, indent)
     # compute width, determine whether to truncate
     if (!is.na(control$pages) && section == control$pages) {
         limit <- control$line - indent
-        width <- col_width(name, y, control, style, limit + 1)
+        width <- col_width(name, y, limit + 1)
         trunc <- (width > limit)
     } else {
-        width <- col_width(name, y, control, style)
+        width <- col_width(name, y)
         trunc <- FALSE
     }
 
@@ -149,7 +153,6 @@ format_vector <- function(name, x, ..., control, style, section, indent)
         y <- rep(style$ellipsis, length(y))
         width <- utf8_width(style$ellipsis)
         name <- style$ellipsis
-        right <- FALSE
     }
 
     # compute new indent
