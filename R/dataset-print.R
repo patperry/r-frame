@@ -140,7 +140,7 @@ format_matrix <- function(name, x, control, indent, page)
 {
     nc <- dim(x)[[2L]]
     if (nc == 0L) {
-        x <- flatten_dataset(record(x), flat = TRUE)[[1L]]
+        x <- rep_len("[]", nrow(x))
         return(format_vector(name, x, control, indent, page))
     }
 
