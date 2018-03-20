@@ -74,17 +74,15 @@ col_width <- function(name, x, limit = NA)
             wj <- col_width(names[[j]], xj, limit - w)
 
             w <- w + wj
-            if (isTRUE(w >= limit)) {
+            if (isTRUE(w >= limit))
                 return(limit)
-            }
         }
     }
 
     w <- max(n, w)
     if (isTRUE(w >= limit))
-        limit
-    else
-        w
+        return(limit)
+    w
 }
 
 
