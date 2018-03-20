@@ -117,7 +117,8 @@ format_entry <- function(x, control, indent)
         paste0("<", cl, ">")
     } else {
         if (is.object(x) || !is.character(x)) {
-            x <- format(x)
+            x <- format(x, control = control, indent = indent,
+                        justify = "none")
         }
         wellipsis <- utf8_width(control$ellipsis)
         width <- max(1, control$line - indent)

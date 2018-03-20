@@ -82,27 +82,25 @@ col_width <- function(name, x, limit = NA)
 
 format_vector <- function(name, x, control, indent, page)
 {
-    ellipsis <- utf8_width(control$ellipsis)
-    chars <- max(24, control$line - indent - ellipsis)
+    num <- is.numeric(x) || is.complex(x)
+    justify <- if (num) "right" else "left"
 
-    # determine column justification
-    justify <- if (is.numeric(x) || is.complex(x)) "right" else "left"
-
-    # convert factor to character
-    cl <- class(x)
-    if (is.factor(x)) {
-        x <- as.character(x)
-        cl <- class(x)
-    }
-
-    # format character and list specially, otherwise use S3
-    if (is.character(x) && (identical(cl, "character")
-                            || identical(cl, "AsIs"))) {
-        y <- utf8_format(x, chars = chars, justify = "none")
-    } else if (is.list(x) && identical(cl, "list")) {
+    if ((is.list(x) && !is.object(x)) || is.record(x)) {
         y <- vapply(x, format_entry, "", control, indent)
     } else {
-        y <- format(x, chars = chars, justify = "none")
+        if (!is.character(x)) {
+            y <- format(x, control = control, indent = indent,
+                        justify = "none")
+        } else {
+            y <- x
+        }
+
+        if (!num) {
+            ellipsis <- utf8_width(control$ellipsis)
+            chars <- max(24, control$line - indent - ellipsis)
+            y <- utf8_format(y, chars = chars, justify = "none")
+            y[is.na(x)] <- "<NA>"
+        }
     }
 
     # compute width, determine whether to truncate
