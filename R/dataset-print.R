@@ -88,7 +88,7 @@ col_width <- function(name, x, limit = NA)
 }
 
 
-format_list <- function(x, width, control, style)
+format_list <- function(x, style)
 {
     times <- style$times
     y <- vapply(x, FUN.VALUE = "", function(elt) class(elt)[[1L]])
@@ -105,7 +105,7 @@ format_list <- function(x, width, control, style)
         }
     })
     y <- paste0(y, suffix)
-    utf8_format(y, justify = "none", width = width)
+    utf8_format(y, justify = "none")
 }
 
 
@@ -117,9 +117,6 @@ format_vector <- function(name, x, ..., control, style, section, indent)
     # determine column justification
     justify <- if (is.numeric(x) || is.complex(x)) "right" else "left"
 
-    # determine the minimum element width
-    min_width <- utf8_width(name)
-
     # convert factor to character
     cl <- class(x)
     if (is.factor(x)) {
@@ -130,12 +127,11 @@ format_vector <- function(name, x, ..., control, style, section, indent)
     # format character and list specially, otherwise use S3
     if (is.character(x) && (identical(cl, "character")
                             || identical(cl, "AsIs"))) {
-        y <- utf8_format(x, chars = chars, justify = "none",
-                         width = min_width)
+        y <- utf8_format(x, chars = chars, justify = "none")
     } else if (is.list(x) && identical(cl, "list")) {
-        y <- format_list(x, min_width, control, style)
+        y <- format_list(x, style)
     } else {
-        y <- format(x, ..., chars = chars, justify = "none", width = min_width)
+        y <- format(x, ..., chars = chars, justify = "none")
     }
 
     # compute width, determine whether to truncate
