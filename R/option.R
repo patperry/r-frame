@@ -80,20 +80,40 @@ as.format.control <- function(x)
         #  + no ANSI faint; use gray instead
         #  + no ANSI bold; use color instead
         #
-        record(faint = "38;5;246", #666666
-               bold  = "38;5;203", #FF3333
-               line  = as.line(NULL),
-               tab   = as.tab(NULL),
-               pages = as.pages(NULL))
+        x <- record(
+            faint  = "38;5;246", #666666
+            bold   = "38;5;203", #FF3333
+            line   = as.line(NULL),
+            tab    = as.tab(NULL),
+            pages  = as.pages(NULL),
+            horiz2    = "\u2550",
+            ellipsis  = "\u2026",
+            vellipsis = "\u22ee",
+            vline     = "\u2502")
     } else {
-        x <- as.list(x)[c("faint", "bold", "line", "tab", "pages")]
-        x$faint <- as.ansi(x$faint)
-        x$bold  <- as.ansi(x$bold)
-        x$line  <- as.line(x$line)
-        x$tab   <- as.tab(x$tab)
-        x$pages <- as.pages(x$pages)
-        as.record(x)
+        x <- as.list(x)[c("faint", "bold", "line", "tab", "pages",
+                          "horiz2", "ellipsis", "vellipsis", "vline")]
+        x$faint  <- as.ansi(x$faint)
+        x$bold   <- as.ansi(x$bold)
+        x$line   <- as.line(x$line)
+        x$tab    <- as.tab(x$tab)
+        x$pages  <- as.pages(x$pages)
+        x$horiz2    <- if (is.null(x$horiz2)) "\u2550"
+                       else as.character.scalar(x$horiz2)
+        x$ellipsis  <- if (is.null(x$ellipsis)) "\u2026"
+                       else as.character.scalar(x$ellipsis)
+        x$vellipsis <- if (is.null(x$vellipsis)) "\u22ee"
+                       else as.character.scalar(x$vellipsis)
+        x$vline     <- if (is.null(x$vline)) "\u2502"
+                       else as.character.scalar(x$vline)
+        x <- as.record(x)
     }
+
+    x$horiz2    <- utf8_fallback(x$horiz2, "=")
+    x$ellipsis  <- utf8_fallback(x$ellipsis, "...")
+    x$vellipsis <- utf8_fallback(x$vellipsis, ".")
+    x$vline     <- utf8_fallback(x$vline, "|")
+    x
 }
 
 

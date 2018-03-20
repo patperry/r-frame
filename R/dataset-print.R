@@ -40,12 +40,7 @@ new_format_style <- function(control)
         x
     }
 
-    style <- list(normal = normal, bold = bold, faint = faint)
-    style$horiz2    <- utf8_fallback("\u2550", "=")
-    style$ellipsis  <- utf8_fallback("\u2026", "...")
-    style$vellipsis <- utf8_fallback("\u22ee", ".")
-    style$vline     <- utf8_fallback("\u2502", "|")
-    as.record(style)
+    as.record(list(normal = normal, bold = bold, faint = faint))
 }
 
 
@@ -107,7 +102,7 @@ format_list <- function(x)
 
 format_vector <- function(name, x, control, style, indent, section)
 {
-    ellipsis <- utf8_width(style$ellipsis)
+    ellipsis <- utf8_width(control$ellipsis)
     chars <- max(24, control$line - indent - ellipsis)
 
     # determine column justification
@@ -142,9 +137,9 @@ format_vector <- function(name, x, control, style, indent, section)
 
     # truncate if necessary
     if (trunc) {
-        y <- rep(style$ellipsis, length(y))
-        width <- utf8_width(style$ellipsis)
-        name <- style$ellipsis
+        y <- rep(control$ellipsis, length(y))
+        width <- utf8_width(control$ellipsis)
+        name <- control$ellipsis
     }
 
     # compute new indent
@@ -183,7 +178,7 @@ format_matrix <- function(name, x, control, style, indent, section)
     y <- as.record(vector("list", nc))
     trunc <- FALSE
 
-    ellipsis <- utf8_width(style$ellipsis)
+    ellipsis <- utf8_width(control$ellipsis)
     line <- control$line
     pages <- control$pages
 
@@ -229,8 +224,8 @@ format_matrix <- function(name, x, control, style, indent, section)
         if (fmt$trunc) {
             if (j < nc && length(dim(xj)) > 1) {
                 j <- j + 1
-                names[[j]] <- style$ellipsis
-                y[[j]] <- rep(style$ellipsis, nrow(x))
+                names[[j]] <- control$ellipsis
+                y[[j]] <- rep(control$ellipsis, nrow(x))
                 section[[j]] <- next_section
                 indent[[j]] <- next_indent
                 width[[j]] <- ellipsis
@@ -258,8 +253,7 @@ format_matrix <- function(name, x, control, style, indent, section)
 
 format_column <- function(name, x, control, style, indent, section)
 {
-    vec <- length(dim(x)) <= 1
-    if (vec) {
+    if (length(dim(x)) <= 1) {
         format_vector(name, x, control, style, indent, section)
     } else {
         format_matrix(name, x, control, style, indent, section)
@@ -381,10 +375,10 @@ print_header <- function(control, style, index, path, names, indent, width,
                 pad <- max(0, w - wnm)
                 lpad <- floor(pad / 2)
                 rpad <- ceiling(pad / 2)
-                banner <- paste0(paste0(rep(style$horiz2, lpad),
+                banner <- paste0(paste0(rep(control$horiz2, lpad),
                                         collapse = ""),
                                  nm,
-                                 paste0(rep(style$horiz2, rpad),
+                                 paste0(rep(control$horiz2, rpad),
                                         collapse = ""))
                 head <- paste0(head, style$bold(banner))
                 pos <- pos + max(w, wnm)
@@ -470,9 +464,9 @@ format_rows <- function(control, style, nrow, number, keys)
     row_body <- style$faint(row_body)
 
     if (!is.null(keys)) {
-        row_head <- paste0(row_head, " ", style$faint(style$vline), " ")
+        row_head <- paste0(row_head, " ", style$faint(control$vline), " ")
         row_width <- row_width + 3
-        row_body <- paste0(row_body, " ", style$faint(style$vline), " ")
+        row_body <- paste0(row_body, " ", style$faint(control$vline), " ")
     } else if (row_width > 0) {
         row_head <- paste0(row_head, " ")
         row_body <- paste0(row_body, " ")
@@ -548,7 +542,7 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
         }
 
         if (start > 1L) {
-            cat(style$faint(style$vellipsis), "\n", sep="")
+            cat(style$faint(control$vellipsis), "\n", sep="")
         }
 
         print_header(control = control, style = style,
@@ -585,7 +579,7 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
     if (nr == 0) {
         cat("(0 rows)\n")
     } else if (!is.null(caption)) {
-        vellipsis <- if (meta$trunc_rows) style$vellipsis else ""
+        vellipsis <- if (meta$trunc_rows) control$vellipsis else ""
         foot <- utf8_format(paste0(" ", caption),
                             width = max(0,
                                         foot_width
