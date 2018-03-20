@@ -85,21 +85,24 @@ format_record_limit <- function(x, limit = NA)
 
 format_record_values <- function(x, control, indent)
 {
-    as.record(lapply(x, format_record_value,
-                     control = control,
-                     indent = indent))
+    as.record(lapply(x, format_record_value, control, indent))
 }
 
 
 format_record_value <- function(x, control, indent)
 {
-    if (is.record(x)) {
-        if (length(x) == 0)
-            return("{}")
-        else
-            return(format_record_values(x, control, indent))
+    if (!is.record(x)) {
+        format_entry(x, control, indent)
+    } else if (length(x) == 0) {
+        "{}"
+    } else {
+        format_record_values(x, control, indent)
     }
+}
 
+
+format_entry <- function(x, control, indent)
+{
     cl <- paste(class(x), collapse = ".")
     d <- dim(x)
     n <- length(x)
@@ -110,15 +113,17 @@ format_record_value <- function(x, control, indent)
         paste0(cl, "[", paste0(d, collapse = ", "), "]")
     } else if (n != 1 || (is.list(x) && !is.object(x))) {
         paste0(cl, "(", n, ")")
-    } else if (is.character(x) && !is.object(x)) {
-        wellipsis <- 1
-        width <- max(1, control$line - indent)
-        chars <- if (is.na(width)) .Machine$integer.max else (width - wellipsis)
-        utf8_format(x, chars = chars)
     } else if (is.function(x) || is.language(x)) {
         paste0("<", cl, ">")
     } else {
-        format(x, control = control, indent = indent)
+        if (is.object(x) || !is.character(x)) {
+            x <- format(x)
+        }
+        wellipsis <- utf8_width(control$ellipsis)
+        width <- max(1, control$line - indent)
+        chars <- if (is.na(width)) .Machine$integer.max
+                 else (width - wellipsis)
+        utf8_format(x, chars = chars)
     }
 }
 

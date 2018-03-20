@@ -109,7 +109,7 @@ test_that("with names", {
 "  funny     : 10",
 "  cool      : 0",
 "  useful    : 1",
-"text        : I'm a fan of soft serve ice cream and Guptill's Coney Express ...",
+"text        : I'm a fan of soft serve ice cream and Guptill's Coney Expres...",
 "date        : 2009-06-09",
 "business_id : wbpbaWBfU54JbjLIDwERQA")
 
@@ -141,7 +141,7 @@ test_that("without names", {
 "  [[1]] : 10",
 "  [[2]] : 0",
 "  [[3]] : 1",
-"[[5]]   : I'm a fan of soft serve ice cream and Guptill's Coney Express has ...",
+"[[5]]   : I'm a fan of soft serve ice cream and Guptill's Coney Express ha...",
 "[[6]]   : 2009-06-09",
 "[[7]]   : wbpbaWBfU54JbjLIDwERQA")
 
