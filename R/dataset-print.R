@@ -80,7 +80,7 @@ col_width <- function(name, x, limit = NA)
 }
 
 
-format_vector <- function(name, x, control, indent, section)
+format_vector <- function(name, x, control, indent, page)
 {
     ellipsis <- utf8_width(control$ellipsis)
     chars <- max(24, control$line - indent - ellipsis)
@@ -106,7 +106,7 @@ format_vector <- function(name, x, control, indent, section)
     }
 
     # compute width, determine whether to truncate
-    if (!is.na(control$pages) && section == control$pages) {
+    if (!is.na(control$pages) && page == control$pages) {
         limit <- control$line - indent
         width <- col_width(name, y, limit + 1)
         trunc <- (width > limit)
@@ -126,24 +126,24 @@ format_vector <- function(name, x, control, indent, section)
     start <- (indent == 0L)
     next_indent <- indent + width + 1
     if (next_indent > control$line + 1 && !start
-            && !is.na(control$pages) && section < control$pages) {
+            && !is.na(control$pages) && page < control$pages) {
         # new page, re-format with new indent
-        format_vector(name, x, control, 0L, section + 1L)
+        format_vector(name, x, control, 0L, page + 1L)
     } else {
         list(name = name, value = y, trunc = trunc,
-             section = section, indent = indent, width = width,
-             justify = justify, next_section = section,
+             page = page, indent = indent, width = width,
+             justify = justify, next_page = page,
              next_indent = next_indent)
     }
 }
 
 
-format_matrix <- function(name, x, control, indent, section)
+format_matrix <- function(name, x, control, indent, page)
 {
     nc <- dim(x)[[2L]]
     if (nc == 0L) {
         x <- flatten_dataset(record(x), flat = TRUE)[[1L]]
-        return(format_vector(name, x, control, indent, section))
+        return(format_vector(name, x, control, indent, page))
     }
 
     names <- dimnames(x)[[2L]]
@@ -162,17 +162,17 @@ format_matrix <- function(name, x, control, indent, section)
     line <- control$line
     pages <- control$pages
 
-    section_start <- section
+    page_start <- page
     indent_start <- indent
-    next_section <- section
+    next_page <- page
     next_indent <- indent
-    section <- vector("list", nc)
+    page <- vector("list", nc)
     indent <- vector("list", nc)
     width <- vector("list", nc)
     justify <- vector("list", nc)
 
     for (j in seq_len(nc)) {
-        if (!is.na(pages) && next_section == pages && j < nc) {
+        if (!is.na(pages) && next_page == pages && j < nc) {
             control$line <- line - 1 - ellipsis
         } else {
             control$line <- line
@@ -180,21 +180,20 @@ format_matrix <- function(name, x, control, indent, section)
 
         xj <- if (is.data.frame(x)) x[[j]] else x[, j, drop = TRUE]
 
-        fmt <- format_column(names[[j]], xj, control,
-                             next_indent, next_section)
+        fmt <- format_column(names[[j]], xj, control, next_indent, next_page)
 
         names[[j]] <- fmt$name
         y[[j]] <- fmt$value
-        section[[j]] <- fmt$section
+        page[[j]] <- fmt$page
         indent[[j]] <- fmt$indent
         width[[j]] <- fmt$width
         justify[[j]] <- fmt$justify
-        next_section <- fmt$next_section
+        next_page <- fmt$next_page
         next_indent <- fmt$next_indent
 
         # if at end add extra indent to fit name
         if (j == nc) {
-            if (next_section != section_start) {
+            if (next_page != page_start) {
                 indent_start <- 0L
             }
             next_indent <- max(next_indent,
@@ -206,7 +205,7 @@ format_matrix <- function(name, x, control, indent, section)
                 j <- j + 1
                 names[[j]] <- control$ellipsis
                 y[[j]] <- rep(control$ellipsis, nrow(x))
-                section[[j]] <- next_section
+                page[[j]] <- next_page
                 indent[[j]] <- next_indent
                 width[[j]] <- ellipsis
                 justify[[j]] <- "left"
@@ -214,7 +213,7 @@ format_matrix <- function(name, x, control, indent, section)
             }
             y <- y[1:j]
             names <- names[1:j]
-            section <- section[1:j]
+            page <- page[1:j]
             indent <- indent[1:j]
             width <- width[1:j]
             justify <- justify[1:j]
@@ -225,18 +224,18 @@ format_matrix <- function(name, x, control, indent, section)
 
     names(y) <- names
     y <- as.dataset(y)
-    list(name = name, value = y, trunc = trunc, section = section,
+    list(name = name, value = y, trunc = trunc, page = page,
          indent = indent, width = width, justify = justify,
-         next_section = next_section, next_indent = next_indent)
+         next_page = next_page, next_indent = next_indent)
 }
 
 
-format_column <- function(name, x, control, indent, section)
+format_column <- function(name, x, control, indent, page)
 {
     if (length(dim(x)) <= 1) {
-        format_vector(name, x, control, indent, section)
+        format_vector(name, x, control, indent, page)
     } else {
-        format_matrix(name, x, control, indent, section)
+        format_matrix(name, x, control, indent, page)
     }
 }
 
@@ -279,7 +278,7 @@ format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
         attr(y, "format.meta") <-
             list(trunc_rows = rtrunc,
                  trunc_cols = fmt$trunc,
-                 section    = fmt$section,
+                 page       = fmt$page,
                  indent     = fmt$indent,
                  width      = fmt$width,
                  justify    = fmt$justify)
@@ -485,7 +484,7 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
     control$line <- max(1L, control$line - row_width)
     fmt <- format.dataset(x, limit = limit, control = control, meta = TRUE)
     meta <- attr(fmt, "format.meta")
-    section <- unlist(meta$section)
+    page <- unlist(meta$page)
     indent <- unlist(meta$indent)
     width <- unlist(meta$width)
     justify <- unlist(meta$justify)
@@ -514,9 +513,9 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
 
     foot_width <- row_width
     start <- 1L
-    sec <- 1L
+    pg <- 1L
     for (i in seq_along(cols)) {
-        if (i < length(cols) && section[[i + 1L]] == sec) {
+        if (i < length(cols) && page[[i + 1L]] == pg) {
             next
         }
 
@@ -538,7 +537,7 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
 
         foot_width <- max(foot_width, row_width + indent[[i]] + width[[i]])
         start <- i + 1L
-        sec <- sec + 1L
+        pg <- pg + 1L
     }
 
     if (meta$trunc_cols) {
