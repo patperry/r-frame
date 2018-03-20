@@ -268,10 +268,11 @@ format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
         x <- x[seq_len(limit), , drop = FALSE]
     }
 
-    fmt   <- format_column("", x, control, indent, 1L)
+    fmt <- format_column("", x, control, indent, 1L)
 
-    y <- fmt$value
+    y       <- fmt$value
     keys(y) <- keys(x)
+
     if (meta) {
         attr(y, "format.meta") <-
             list(trunc_rows = rtrunc,
