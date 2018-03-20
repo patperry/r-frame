@@ -17,12 +17,12 @@ new_format_style <- function(control)
 {
     utf8 <- output_utf8()
     if (output_ansi()) {
-        escapes <- style_faint
-        bold  <- function(x) paste0("\x1b[", style_bold, "m",
+        escapes <- control$faint
+        bold  <- function(x) paste0("\x1b[", control$bold, "m",
                                     utf8_encode(x, display = TRUE,
                                                 utf8 = utf8),
                                     "\x1b[0m")
-        faint <- function(x) paste0("\x1b[", style_faint, "m",
+        faint <- function(x) paste0("\x1b[", control$faint, "m",
                                     utf8_encode(x, display = TRUE,
                                                 utf8 = utf8),
                                     "\x1b[0m")
