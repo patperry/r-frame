@@ -146,11 +146,11 @@ format_matrix <- function(name, x, control, indent, page)
 
     names <- dimnames(x)[[2L]]
     if (is.null(names)) {
-        names <- paste0("[,", as.character(seq_len(nc)), "]")
+        names <- paste0("[,", seq_len(nc), "]")
     } else {
         isna <- which(is.na(names) | !nzchar(names))
         if (length(isna) > 0) {
-            names[isna] <- paste0("[,", as.character(isna), "]")
+            names[isna] <- paste0("[,", isna, "]")
         }
     }
     y <- as.record(vector("list", nc))
