@@ -335,7 +335,7 @@ format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
             caption <- NULL
         }
 
-        attr(y, "trunc_rows") <- rtrunc
+        attr(y, "format.meta") <- list(trunc_rows = rtrunc)
         attr(y, "trunc_cols") <- ctrunc
         attr(y, "section") <- fmt$section
         attr(y, "indent") <- fmt$indent
@@ -542,6 +542,7 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
 
     control$line <- max(1L, control$line - row_width)
     fmt <- format.dataset(x, limit = limit, control = control, meta = TRUE)
+    meta <- attr(fmt, "format.meta")
     section <- unlist(attr(fmt, "section"))
     indent <- unlist(attr(fmt, "indent"))
     width <- unlist(attr(fmt, "width"))
@@ -602,8 +603,7 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
     if (nrow(x) == 0) {
         cat("(0 rows)\n")
     } else if (!is.null(caption)) {
-        rtrunc <- attr(fmt, "trunc_rows")
-        vellipsis <- if (rtrunc) style$vellipsis else ""
+        vellipsis <- if (meta$trunc_rows) style$vellipsis else ""
         foot <- utf8_format(paste0(" ", caption),
                             width = max(0,
                                         foot_width
