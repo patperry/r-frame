@@ -338,10 +338,10 @@ format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
         attr(y, "format.meta") <-
             list(trunc_rows = rtrunc,
                  trunc_cols = ctrunc,
-                 section    = fmt$section)
-        attr(y, "indent") <- fmt$indent
-        attr(y, "width") <- fmt$width
-        attr(y, "justify") <- fmt$justify
+                 section    = fmt$section,
+                 indent     = fmt$indent,
+                 width      = fmt$width,
+                 justify    = fmt$justify)
         attr(y, "caption") <- caption
     }
 
@@ -473,8 +473,9 @@ format_rows <- function(control, style, nrow, number, keys)
         kcontrol <- control
         kcontrol$line <- .Machine$integer.max - 1
         cols <- format.dataset(keys, control = kcontrol, meta = TRUE)
-        width <- unlist(attr(cols, "width"))
-        justify <- unlist(attr(cols, "justify"))
+        meta <- attr(cols, "format.meta")
+        width <- unlist(meta$width)
+        justify <- unlist(meta$justify)
 
         kb <- mapply(function(k, w, j)
                          utf8_format(k, chars = .Machine$integer.max,
@@ -545,9 +546,9 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
     fmt <- format.dataset(x, limit = limit, control = control, meta = TRUE)
     meta <- attr(fmt, "format.meta")
     section <- unlist(meta$section)
-    indent <- unlist(attr(fmt, "indent"))
-    width <- unlist(attr(fmt, "width"))
-    justify <- unlist(attr(fmt, "justify"))
+    indent <- unlist(meta$indent)
+    width <- unlist(meta$width)
+    justify <- unlist(meta$justify)
 
     cols <- flatten_dataset(fmt, flat = TRUE, path = TRUE)
     path <- attr(cols, "path")
