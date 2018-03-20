@@ -109,7 +109,7 @@ format_list <- function(x, style)
 }
 
 
-format_vector <- function(name, x, ..., control, style, section, indent)
+format_vector <- function(name, x, control, style, indent, section)
 {
     ellipsis <- utf8_width(style$ellipsis)
     chars <- max(24, control$line - indent - ellipsis)
@@ -131,7 +131,7 @@ format_vector <- function(name, x, ..., control, style, section, indent)
     } else if (is.list(x) && identical(cl, "list")) {
         y <- format_list(x, style)
     } else {
-        y <- format(x, ..., chars = chars, justify = "none")
+        y <- format(x, chars = chars, justify = "none")
     }
 
     # compute width, determine whether to truncate
@@ -157,8 +157,7 @@ format_vector <- function(name, x, ..., control, style, section, indent)
     if (next_indent > control$line + 1 && !start
             && !is.na(control$pages) && section < control$pages) {
         # new page, re-format with new indent
-        format_vector(name, x, ..., control = control, style = style,
-                      section = section + 1L, indent = 0L)
+        format_vector(name, x, control, style, 0L, section + 1L)
     } else {
         list(name = name, value = y, trunc = trunc,
              section = section, indent = indent, width = width,
@@ -173,8 +172,7 @@ format_matrix <- function(name, x, ..., control, style, section, indent)
     nc <- dim(x)[[2L]]
     if (nc == 0L) {
         x <- flatten_dataset(record(x), flat = TRUE)[[1L]]
-        return(format_vector(name, x, ..., control = control, style = style,
-                             section = section, indent = indent))
+        return(format_vector(name, x, control, style, indent, section))
     }
 
     names <- dimnames(x)[[2L]]
@@ -267,8 +265,7 @@ format_column <- function(name, x, ..., control, style, section, indent)
 {
     vec <- length(dim(x)) <= 1
     if (vec) {
-        format_vector(name, x, ..., control = control, style = style,
-                      section = section, indent = indent)
+        format_vector(name, x, control, style, indent, section)
     } else {
         format_matrix(name, x, ..., control = control, style = style,
                       section = section, indent = indent)
