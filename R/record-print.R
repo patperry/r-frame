@@ -129,7 +129,7 @@ format.record <- function(x, limit = NA, control = NULL, indent = 0,
     x       <- as.record(x)
     limit   <- as.limit(limit)
     control <- as.format.control(control)
-    indent  <- as.size.scalar(indent)
+    indent  <- as.indent(indent)
     meta    <- as.option(meta)
 
     lfmt   <- format_record_limit(x, limit)

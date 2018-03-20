@@ -295,31 +295,24 @@ ncol_recursive <- function(x, offset = 0)
 format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
                            meta = FALSE, ...)
 {
-    x     <- as.dataset(x)
-    limit <- as.limit(limit)
+    x       <- as.dataset(x)
+    limit   <- as.limit(limit)
     control <- as.format.control(control)
-    indent <- as.integer.scalar(indent)
-    meta <- as.option(meta)
+    indent  <- as.indent(indent)
+    meta    <- as.option(meta)
 
-    n <- dim(x)[[1L]]
-    style <- new_format_style(control)
-
-    if (is.null(indent)) {
-        indent <- 0L
-    }
-    if (is.na(limit) || limit < 0) {
-        limit <- n
-    }
-
-    if ((rtrunc <- (n > limit))) {
+    rtrunc <- FALSE
+    if (isTRUE(limit > 0) && (nrow(x) > limit)) {
+        rtrunc <- TRUE
         x <- x[seq_len(limit), , drop = FALSE]
     }
 
-    fmt <- format_column("", x, control = control, style = style,
-                         section = 1L, indent = indent)
+    style <- new_format_style(control)
+    fmt   <- format_column("", x, control = control, style = style,
+                           section = 1L, indent = indent)
+
     y <- fmt$value
     keys(y) <- keys(x)
-
     if (meta) {
         attr(y, "format.meta") <-
             list(trunc_rows = rtrunc,

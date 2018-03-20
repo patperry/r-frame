@@ -32,6 +32,16 @@ as.pages <- function(x)
 }
 
 
+as.indent <- function(x)
+{
+    x <- as.size.scalar(x)
+    if (is.na(x))
+        0L
+    else
+        x
+}
+
+
 as.line <- function(x)
 {
     if (is.null(x)) {
