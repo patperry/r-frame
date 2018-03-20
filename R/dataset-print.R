@@ -320,29 +320,14 @@ format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
     y <- fmt$value
     keys(y) <- keys(x)
 
-    if ((ctrunc <- fmt$trunc)) {
-        nc <- ncol_recursive(x)
-    }
-
     if (meta) {
-        if (rtrunc && ctrunc) {
-            caption <- sprintf("(%.0f rows, %.0f columns total)", n, nc)
-        } else if (rtrunc) {
-            caption <- sprintf("(%.0f rows total)", n)
-        } else if (ctrunc) {
-            caption <- sprintf("(%.0f columns total)", nc)
-        } else {
-            caption <- NULL
-        }
-
         attr(y, "format.meta") <-
             list(trunc_rows = rtrunc,
-                 trunc_cols = ctrunc,
+                 trunc_cols = fmt$trunc,
                  section    = fmt$section,
                  indent     = fmt$indent,
                  width      = fmt$width,
                  justify    = fmt$justify)
-        attr(y, "caption") <- caption
     }
 
     y
@@ -522,8 +507,8 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
     limit   <- as.limit(limit)
     control <- as.format.control(control)
 
-    number <- is.null(keys(x))
-    n <- dim(x)[[1L]]
+    number  <- is.null(keys(x))
+    n <- nr <- dim(x)[[1L]]
     style <- new_format_style(control)
 
     if (length(x) == 0) {
@@ -601,8 +586,21 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
         sec <- sec + 1L
     }
 
-    caption <- attr(fmt, "caption")
-    if (nrow(x) == 0) {
+    if (meta$trunc_cols) {
+        nc <- ncol_recursive(x)
+
+        if (meta$trunc_rows) {
+            caption <- sprintf("(%.0f rows, %.0f columns total)", n, nc)
+        } else {
+            caption <- sprintf("(%.0f columns total)", nc)
+        }
+    } else if (meta$trunc_rows) {
+        caption <- sprintf("(%.0f rows total)", n)
+    } else {
+        caption <- NULL
+    }
+
+    if (nr == 0) {
         cat("(0 rows)\n")
     } else if (!is.null(caption)) {
         vellipsis <- if (meta$trunc_rows) style$vellipsis else ""
