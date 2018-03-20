@@ -41,9 +41,8 @@ new_format_style <- function(control)
     }
 
     style <- list(normal = normal, bold = bold, faint = faint)
-    style$banner    <- utf8_fallback("\u2550", "=")
+    style$horiz2    <- utf8_fallback("\u2550", "=")
     style$ellipsis  <- utf8_fallback("\u2026", "...")
-    style$times     <- utf8_fallback("\u00d7", "x")
     style$vellipsis <- utf8_fallback("\u22ee", ".")
     style$vline     <- utf8_fallback("\u2502", "|")
     as.record(style)
@@ -86,9 +85,8 @@ col_width <- function(name, x, limit = NA)
 }
 
 
-format_list <- function(x, style)
+format_list <- function(x)
 {
-    times <- style$times
     y <- vapply(x, FUN.VALUE = "", function(elt) class(elt)[[1L]])
     suffix <- vapply(x, FUN.VALUE = "", function(elt) {
         d <- dim(elt)
@@ -127,7 +125,7 @@ format_vector <- function(name, x, control, style, indent, section)
                             || identical(cl, "AsIs"))) {
         y <- utf8_format(x, chars = chars, justify = "none")
     } else if (is.list(x) && identical(cl, "list")) {
-        y <- format_list(x, style)
+        y <- format_list(x)
     } else {
         y <- format(x, chars = chars, justify = "none")
     }
@@ -383,10 +381,10 @@ print_header <- function(control, style, index, path, names, indent, width,
                 pad <- max(0, w - wnm)
                 lpad <- floor(pad / 2)
                 rpad <- ceiling(pad / 2)
-                banner <- paste0(paste0(rep(style$banner, lpad),
+                banner <- paste0(paste0(rep(style$horiz2, lpad),
                                         collapse = ""),
                                  nm,
-                                 paste0(rep(style$banner, rpad),
+                                 paste0(rep(style$horiz2, rpad),
                                         collapse = ""))
                 head <- paste0(head, style$bold(banner))
                 pos <- pos + max(w, wnm)
