@@ -178,8 +178,7 @@ format_matrix <- function(index, name, x, control, indent, page)
             control$line <- line
         }
 
-        xj <- if (is.data.frame(x)) x[[j]] else x[, j, drop = TRUE]
-
+        xj  <- x[, j, drop = TRUE]
         fmt <- format_column(c(index, j), names[[j]], xj, control,
                              next_indent, next_page)
 
@@ -230,8 +229,10 @@ format_matrix <- function(index, name, x, control, indent, page)
     y <- as.dataset(y)
     list(name = name, value = y, trunc = trunc,
          index = do.call(c, colindex),
-         page = page,
-         indent = indent, width = width, justify = justify,
+         page = do.call(c, page),
+         indent = do.call(c, indent),
+         width = do.call(c, width),
+         justify = do.call(c, justify),
          next_page = next_page, next_indent = next_indent)
 }
 
@@ -492,15 +493,14 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
     control$line <- max(1L, control$line - row_width)
     fmt <- format.dataset(x, limit = limit, control = control, meta = TRUE)
     meta <- attr(fmt, "format.meta")
-    page <- unlist(meta$page)
-    indent <- unlist(meta$indent)
-    width <- unlist(meta$width)
-    justify <- unlist(meta$justify)
+    page <- meta$page
+    indent <- meta$indent
+    width <- meta$width
+    justify <- meta$justify
 
     cols <- flatten_dataset(fmt, flat = TRUE, path = TRUE)
     path <- attr(cols, "path")
     index <- meta$index
-    ## index <- attr(cols, "index")
     names <- vapply(path, tail, "", n = 1)
 
     # justify columns, names
