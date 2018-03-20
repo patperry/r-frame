@@ -165,7 +165,7 @@ format_vector <- function(name, x, control, style, indent, section)
 }
 
 
-format_matrix <- function(name, x, ..., control, style, section, indent)
+format_matrix <- function(name, x, control, style, indent, section)
 {
     nc <- dim(x)[[2L]]
     if (nc == 0L) {
@@ -207,9 +207,8 @@ format_matrix <- function(name, x, ..., control, style, section, indent)
 
         xj <- if (is.data.frame(x)) x[[j]] else x[, j, drop = TRUE]
 
-        fmt <- format_column(names[[j]], xj, ..., control = control,
-                             style = style, section = next_section,
-                             indent = next_indent)
+        fmt <- format_column(names[[j]], xj, control, style,
+                             next_indent, next_section)
 
         names[[j]] <- fmt$name
         y[[j]] <- fmt$value
@@ -259,14 +258,13 @@ format_matrix <- function(name, x, ..., control, style, section, indent)
 }
 
 
-format_column <- function(name, x, ..., control, style, section, indent)
+format_column <- function(name, x, control, style, indent, section)
 {
     vec <- length(dim(x)) <= 1
     if (vec) {
         format_vector(name, x, control, style, indent, section)
     } else {
-        format_matrix(name, x, ..., control = control, style = style,
-                      section = section, indent = indent)
+        format_matrix(name, x, control, style, indent, section)
     }
 }
 
@@ -302,8 +300,7 @@ format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
     }
 
     style <- new_format_style(control)
-    fmt   <- format_column("", x, control = control, style = style,
-                           section = 1L, indent = indent)
+    fmt   <- format_column("", x, control, style, indent, 1L)
 
     y <- fmt$value
     keys(y) <- keys(x)
