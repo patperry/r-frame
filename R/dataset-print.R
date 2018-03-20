@@ -206,7 +206,7 @@ format_matrix <- function(index, name, x, control, indent, page)
                 j <- j + 1L
                 names[[j]] <- control$ellipsis
                 y[[j]] <- rep(control$ellipsis, nrow(x))
-                colindex[[j]] <- c(index, j)
+                colindex[[j]] <- list(c(index, j))
                 page[[j]] <- next_page
                 indent[[j]] <- next_indent
                 width[[j]] <- ellipsis
