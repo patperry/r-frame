@@ -228,12 +228,13 @@ format_matrix <- function(index, name, x, control, indent, page)
     names(y) <- names
     y <- as.dataset(y)
     list(name = name, value = y, trunc = trunc,
-         index = do.call(c, colindex),
-         page = do.call(c, page),
-         indent = do.call(c, indent),
-         width = do.call(c, width),
+         index   = do.call(c, colindex),
+         page    = do.call(c, page),
+         indent  = do.call(c, indent),
+         width   = do.call(c, width),
          justify = do.call(c, justify),
-         next_page = next_page, next_indent = next_indent)
+         next_page   = next_page,
+         next_indent = next_indent)
 }
 
 
