@@ -80,26 +80,6 @@ col_width <- function(name, x, limit = NA)
 }
 
 
-format_list <- function(x)
-{
-    y <- vapply(x, FUN.VALUE = "", function(elt) class(elt)[[1L]])
-    suffix <- vapply(x, FUN.VALUE = "", function(elt) {
-        d <- dim(elt)
-        n <- length(elt)
-        if (!is.null(d)) {
-            paste0("[", paste0(d, collapse = ", "), "]")
-        } else if (!is.null(n) && !is.null(elt)) {
-            n <- length(elt)
-            paste0("(", n, ")")
-        } else {
-            ""
-        }
-    })
-    y <- paste0(y, suffix)
-    utf8_format(y, justify = "none")
-}
-
-
 format_vector <- function(name, x, control, indent, section)
 {
     ellipsis <- utf8_width(control$ellipsis)
@@ -120,7 +100,7 @@ format_vector <- function(name, x, control, indent, section)
                             || identical(cl, "AsIs"))) {
         y <- utf8_format(x, chars = chars, justify = "none")
     } else if (is.list(x) && identical(cl, "list")) {
-        y <- format_list(x)
+        y <- vapply(x, format_entry, "", control, indent)
     } else {
         y <- format(x, chars = chars, justify = "none")
     }
