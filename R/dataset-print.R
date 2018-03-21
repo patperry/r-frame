@@ -305,7 +305,7 @@ format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
 }
 
 
-format_header <- function(x, meta, control, style)
+format_head <- function(x, meta, control, style)
 {
     # find column names and paths to nested columns
     n <- nrow(meta)
@@ -425,9 +425,9 @@ format_header <- function(x, meta, control, style)
 }
 
 
-print_header <- function(x, meta, control, style, row_head, row_width)
+print_head <- function(x, meta, control, style, row_head, row_width)
 {
-    lines <- format_header(x, meta, control, style)
+    lines <- format_head(x, meta, control, style)
     depth <- length(lines)
 
     for (d in seq_len(depth - 1)) {
@@ -584,8 +584,7 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
             cat(style$faint(control$vellipsis), "\n", sep="")
         }
 
-        print_header(fmt, meta[start:i, ], control, style,
-                     row_head, row_width)
+        print_head(fmt, meta[start:i, ], control, style, row_head, row_width)
 
         if (n > 0) {
             print_body(fmt, meta[start:i, ], control, style, row_body)
