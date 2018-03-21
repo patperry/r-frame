@@ -167,8 +167,8 @@ format_matrix <- function(index, name, x, control, indent, page)
     line <- control$line
     pages <- control$pages
 
-    page_start <- page
-    indent_start <- indent
+    start_page   <- page
+    start_indent <- indent
     next_page <- page
     next_indent <- indent
     colindex <- vector("list", nc)
@@ -201,11 +201,11 @@ format_matrix <- function(index, name, x, control, indent, page)
 
         # if at end add extra indent to fit name
         if (j == nc) {
-            if (next_page != page_start) {
-                indent_start <- 0L
+            if (next_page != start_page) {
+                start_indent <- 0L
             }
             next_indent <- max(next_indent,
-                               indent_start + utf8_width(name) + 1)
+                               start_indent + utf8_width(name) + 1)
         }
 
         if (fmt$trunc) {
@@ -260,15 +260,16 @@ format_column <- function(index, name, x, control, indent, page)
 
 ncol_recursive <- function(x, offset = 0)
 {
-    if (length(dim(x)) <= 1) {
+    d <- dim(x)
+    if (length(d) <= 1) {
         offset + 1
-    } else if (is.dataset(x)) {
-        for (j in seq_len(ncol(x))) {
+    } else if (is.dataset(x) || is.data.frame(x)) {
+        for (j in seq_len(d[[2]])) {
             offset <- ncol_recursive(x[[j]], offset)
         }
         offset
     } else {
-        offset + ncol(x)
+        offset + d[[2]]
     }
 }
 
