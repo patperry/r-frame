@@ -32,12 +32,8 @@ new_format_style <- function(control)
             utf8_encode(x, display = TRUE, utf8 = utf8)
     }
 
-    normal <- function(x, width) {
-        x <- utf8_encode(x, escapes = escapes,
-                         display = TRUE, utf8 = utf8)
-        x[is.na(x)] <- utf8_encode("<NA>", width = width,
-                                   display = TRUE, utf8 = utf8)
-        x
+    normal <- function(x) {
+        utf8_encode(x, escapes = escapes, display = TRUE, utf8 = utf8)
     }
 
     as.record(list(normal = normal, bold = bold, faint = faint))
@@ -450,20 +446,13 @@ print_body <- function(x, meta, control, style, row_body)
     n <- nrow(meta)
     cols <- vector("list", n)
     for (i in seq_len(n)) {
-        cols[[i]] <- x[[meta$index[[i]]]]
+        y <- x[[meta$index[[i]]]]
+        y <- utf8_format(y, width = meta$width[[i]],
+                         justify = meta$justify[[i]],
+                         chars = .Machine$integer.max)
+        y <- style$normal(y)
+        cols[[i]] <- y
     }
-
-    # justify columns, names
-    cols <- mapply(function(col, w, j)
-                       utf8_format(as.character(col), width = w,
-                                   chars = .Machine$integer.max,
-                                   justify = j),
-                   cols, meta$width, meta$justify,
-                   SIMPLIFY = FALSE, USE.NAMES = FALSE)
-
-    # apply formatting
-    cols <- mapply(style$normal, cols, meta$width,
-                   SIMPLIFY = FALSE, USE.NAMES = FALSE)
 
     body <- row_body
     pos <- 0
@@ -574,25 +563,12 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
     rows.trunc <- attr(fmt, "format.meta.rows.trunc", TRUE)
     cols.trunc <- attr(fmt, "format.meta.cols.trunc", TRUE)
 
-    cols <- flatten_dataset(fmt, flat = TRUE, path = TRUE)
-
-    # justify columns, names
-    cols <- mapply(function(col, w, j)
-                       utf8_format(as.character(col), width = w,
-                                   chars = .Machine$integer.max,
-                                   justify = j),
-                   cols, meta$width, meta$justify,
-                   SIMPLIFY = FALSE, USE.NAMES = FALSE)
-
-    # apply formatting
-    cols <- mapply(style$normal, cols, meta$width,
-                   SIMPLIFY = FALSE, USE.NAMES = FALSE)
-
     foot_width <- row_width
     start <- 1L
     pg <- 1L
-    for (i in seq_along(cols)) {
-        if (i < length(cols) && meta$page[[i + 1L]] == pg) {
+    nc <- nrow(meta)
+    for (i in seq_len(nc)) {
+        if (i < nc && meta$page[[i + 1L]] == pg) {
             next
         }
 
