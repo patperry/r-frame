@@ -93,14 +93,18 @@ format_vector <- function(index, name, x, control, indent, page)
 
         if (!num) {
             ellipsis <- utf8_width(control$ellipsis)
-            chars <- max(24, control$line - indent - ellipsis)
+            if (is.na(control$line)) {
+                chars <- .Machine$integer.max
+            } else {
+                chars <- max(24, control$line - indent - ellipsis)
+            }
             y <- utf8_format(y, chars = chars, justify = "none")
             y[is.na(x)] <- "<NA>"
         }
     }
 
     # compute width, determine whether to truncate
-    if (!is.na(control$pages) && page == control$pages) {
+    if (isTRUE(page == control$pages) && !is.na(control$line)) {
         limit <- control$line - indent
         width <- col_width(name, y, limit + 1)
         trunc <- (width > limit)
@@ -119,8 +123,8 @@ format_vector <- function(index, name, x, control, indent, page)
     # compute new indent
     start <- (indent == 0L)
     next_indent <- indent + width + 1
-    if (next_indent > control$line + 1 && !start
-            && !is.na(control$pages) && page < control$pages) {
+    if (isTRUE(next_indent > control$line + 1) && !start
+            && isTRUE(page < control$pages)) {
         # new page, re-format with new indent
         format_vector(index, name, x, control, 0L, page + 1L)
     } else {
@@ -160,7 +164,7 @@ format_matrix <- function(index, name, x, control, indent, page)
     trunc <- FALSE
 
     ellipsis <- utf8_width(control$ellipsis)
-    line <- control$line
+    line  <- control$line
     pages <- control$pages
 
     start_page   <- page
@@ -493,7 +497,7 @@ format_rows <- function(control, style, nrow, number, keys)
             names(keys) <- character(length(keys))
         }
         kcontrol <- control
-        kcontrol$line <- .Machine$integer.max - 1
+        kcontrol$line <- NA
         cols <- format.dataset(keys, control = kcontrol, meta = TRUE)
         meta <- attr(cols, "format.meta")
         width <- meta$width
