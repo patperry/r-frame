@@ -509,14 +509,8 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
     rows.trunc <- attr(fmt, "format.meta.rows.trunc", TRUE)
     cols.trunc <- attr(fmt, "format.meta.cols.trunc", TRUE)
 
-    page <- meta$page
-    indent <- meta$indent
-    width <- meta$width
-    justify <- meta$justify
-
     cols <- flatten_dataset(fmt, flat = TRUE, path = TRUE)
     path  <- attr(cols, "path")
-    index <- meta$index
     names <- vapply(path, tail, "", n = 1)
 
     # justify columns, names
@@ -524,15 +518,16 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
                        utf8_format(as.character(col), width = w,
                                    chars = .Machine$integer.max,
                                    justify = j),
-                   cols, width, justify, SIMPLIFY = FALSE, USE.NAMES = FALSE)
+                   cols, meta$width, meta$justify,
+                   SIMPLIFY = FALSE, USE.NAMES = FALSE)
     names <- mapply(function(name, w, j)
                         utf8_format(name, width = w,
                                     chars = .Machine$integer.max, justify = j),
-                    names, width, justify,
+                    names, meta$width, meta$justify,
                     SIMPLIFY = TRUE, USE.NAMES = FALSE)
 
     # apply formatting
-    cols <- mapply(style$normal, cols, width,
+    cols <- mapply(style$normal, cols, meta$width,
                    SIMPLIFY = FALSE, USE.NAMES = FALSE)
     names <- style$bold(names)
 
@@ -540,7 +535,7 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
     start <- 1L
     pg <- 1L
     for (i in seq_along(cols)) {
-        if (i < length(cols) && page[[i + 1L]] == pg) {
+        if (i < length(cols) && meta$page[[i + 1L]] == pg) {
             next
         }
 
@@ -549,18 +544,20 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
         }
 
         print_header(control = control, style = style,
-                     index = index[start:i], path = path[start:i],
-                     names = names[start:i], indent = indent[start:i],
-                     width = width[start:i], row_head = row_head,
+                     index = meta$index[start:i], path = path[start:i],
+                     names = names[start:i], indent = meta$indent[start:i],
+                     width = meta$width[start:i], row_head = row_head,
                      row_width = row_width)
 
         if (n > 0) {
             print_body(control = control, cols = cols[start:i],
-                       indent = indent[start:i], width = width[start:i],
+                       indent = meta$indent[start:i],
+                       width = meta$width[start:i],
                        row_body = row_body)
         }
 
-        foot_width <- max(foot_width, row_width + indent[[i]] + width[[i]])
+        foot_width <- max(foot_width,
+                          row_width + meta$indent[[i]] + meta$width[[i]])
         start <- i + 1L
         pg <- pg + 1L
     }
