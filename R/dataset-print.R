@@ -440,7 +440,7 @@ print_header <- function(x, meta, control, style, row_head, row_width)
     }
     lines[[depth]] <- paste0(row_head, lines[[depth]])
 
-    cat(paste0(lines, collapse = "\n"), "\n", sep = "")
+    cat(lines, sep = "\n")
 }
 
 
