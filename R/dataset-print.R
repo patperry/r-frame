@@ -295,14 +295,14 @@ format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
     keys(y) <- keys(x)
 
     if (meta) {
-        attr(y, "format.meta") <-
-            list(trunc_rows = rtrunc,
-                 trunc_cols = fmt$trunc,
-                 index      = fmt$index,
-                 page       = fmt$page,
-                 indent     = fmt$indent,
-                 width      = fmt$width,
-                 justify    = fmt$justify)
+        meta <- dataset(index   = fmt$index,
+                        page    = fmt$page,
+                        indent  = fmt$indent,
+                        width   = fmt$width,
+                        justify = fmt$justify)
+        attr(y, "format.meta") <- meta
+        attr(y, "format.meta.rows.trunc") <- rtrunc
+        attr(y, "format.meta.cols.trunc") <- fmt$trunc
     }
 
     y
@@ -503,8 +503,12 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
     row_body <- rfmt$body
 
     control$line <- max(1L, control$line - row_width)
+
     fmt <- format.dataset(x, limit = limit, control = control, meta = TRUE)
-    meta <- attr(fmt, "format.meta")
+    meta       <- attr(fmt, "format.meta", TRUE)
+    rows.trunc <- attr(fmt, "format.meta.rows.trunc", TRUE)
+    cols.trunc <- attr(fmt, "format.meta.cols.trunc", TRUE)
+
     page <- meta$page
     indent <- meta$indent
     width <- meta$width
@@ -561,15 +565,14 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
         pg <- pg + 1L
     }
 
-    if (meta$trunc_cols) {
+    if (cols.trunc) {
         nc <- ncol_recursive(x)
-
-        if (meta$trunc_rows) {
+        if (rows.trunc) {
             caption <- sprintf("(%.0f rows, %.0f columns total)", n, nc)
         } else {
             caption <- sprintf("(%.0f columns total)", nc)
         }
-    } else if (meta$trunc_rows) {
+    } else if (rows.trunc) {
         caption <- sprintf("(%.0f rows total)", n)
     } else {
         caption <- NULL
@@ -578,7 +581,7 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
     if (nr == 0) {
         cat("(0 rows)\n")
     } else if (!is.null(caption)) {
-        vellipsis <- if (meta$trunc_rows) control$vellipsis else ""
+        vellipsis <- if (rows.trunc) control$vellipsis else ""
         foot <- utf8_format(paste0(" ", caption),
                             width = max(0,
                                         foot_width
