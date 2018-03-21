@@ -444,14 +444,33 @@ print_header <- function(x, meta, control, style, row_head, row_width)
 }
 
 
-print_body <- function(control, cols, indent, width, row_body)
+
+print_body <- function(x, meta, control, style, row_body)
 {
-    n <- length(cols)
+    n <- nrow(meta)
+    cols <- vector("list", n)
+    for (i in seq_len(n)) {
+        cols[[i]] <- x[[meta$index[[i]]]]
+    }
+
+    # justify columns, names
+    cols <- mapply(function(col, w, j)
+                       utf8_format(as.character(col), width = w,
+                                   chars = .Machine$integer.max,
+                                   justify = j),
+                   cols, meta$width, meta$justify,
+                   SIMPLIFY = FALSE, USE.NAMES = FALSE)
+
+    # apply formatting
+    cols <- mapply(style$normal, cols, meta$width,
+                   SIMPLIFY = FALSE, USE.NAMES = FALSE)
+
     body <- row_body
     pos <- 0
     for (i in seq_len(n)) {
-        body <- paste0(body, format("", width = indent[[i]] - pos), cols[[i]])
-        pos <- indent[[i]] + width[[i]]
+        body <- paste0(body, format("", width = meta$indent[[i]] - pos),
+                       cols[[i]])
+        pos <- meta$indent[[i]] + meta$width[[i]]
     }
     cat(body, sep = "\n")
 }
@@ -581,14 +600,11 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
             cat(style$faint(control$vellipsis), "\n", sep="")
         }
 
-        print_header(fmt, meta[start:i, ], control = control, style = style,
-                     row_head = row_head, row_width = row_width)
+        print_header(fmt, meta[start:i, ], control, style,
+                     row_head, row_width)
 
         if (n > 0) {
-            print_body(control = control, cols = cols[start:i],
-                       indent = meta$indent[start:i],
-                       width = meta$width[start:i],
-                       row_body = row_body)
+            print_body(fmt, meta[start:i, ], control, style, row_body)
         }
 
         foot_width <- max(foot_width,
