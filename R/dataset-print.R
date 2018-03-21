@@ -478,13 +478,11 @@ print_body <- function(x, meta, control, style, row_body)
 format_rows <- function(control, style, nrow, number, keys)
 {
     if (number) {
-        row_body <- utf8_format(as.character(seq_len(nrow)),
-                                chars = .Machine$integer.max,
-                                justify = "left")
+        row_body <- format(as.character(seq_len(nrow)), justify = "left")
         num_width <- max(0, utf8_width(row_body))
-        row_head <- utf8_format("", width = num_width)
+        row_head <- format("", width = num_width)
     } else {
-        row_body <- rep("", nrow)
+        row_body <- character(nrow)
         num_width <- 0
         row_head <- ""
     }
