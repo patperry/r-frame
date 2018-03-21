@@ -129,7 +129,7 @@ format_vector <- function(index, name, x, control, indent, page)
         format_vector(index, name, x, control, 0L, page + 1L)
     } else {
         list(name = name, value = y, trunc = trunc,
-             index = list(index), name = list(name),
+             index = list(index),
              page = page, indent = indent, width = width,
              justify = justify, next_page = page,
              next_indent = next_indent)
