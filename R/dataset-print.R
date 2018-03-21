@@ -309,8 +309,9 @@ format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
 }
 
 
-print_header <- function(x, meta, control, style, row_head, row_width)
+format_header <- function(x, meta, control, style)
 {
+    # find column names and paths to nested columns
     n <- nrow(meta)
     path <- vector("list", n)
     names <- character(n)
@@ -362,11 +363,13 @@ print_header <- function(x, meta, control, style, row_head, row_width)
         }
     }
 
-    # print header
+    # format group header
+    lines <- character(depth)
+
     for (d in seq_len(depth - 1)) {
         grp <- group[d, ]
         gnm <- gname[d, ]
-        head <- format("", width = row_width)
+        head <- ""
         pos <- 0
         i <- 1
         while (i <= n) {
@@ -401,7 +404,8 @@ print_header <- function(x, meta, control, style, row_head, row_width)
             }
             i <- i + 1
         }
-        cat(head, "\n", sep = "")
+
+        lines[[d]] <- head
     }
 
     # format names
@@ -412,7 +416,7 @@ print_header <- function(x, meta, control, style, row_head, row_width)
     }
     names <- style$bold(names)
 
-    head <- row_head
+    head <- ""
     pos <- 0
     for (i in seq_len(n)) {
         head <- paste0(head, format("", width = meta$indent[[i]] - pos),
@@ -420,7 +424,23 @@ print_header <- function(x, meta, control, style, row_head, row_width)
         pos <- meta$indent[[i]] + meta$width[[i]]
     }
 
-    cat(head, "\n", sep = "")
+    lines[[depth]] <- head
+    lines
+}
+
+
+print_header <- function(x, meta, control, style, row_head, row_width)
+{
+    lines <- format_header(x, meta, control, style)
+    depth <- length(lines)
+
+    for (d in seq_len(depth - 1)) {
+        pad <- format("", width = row_width)
+        lines[[d]] <- paste0(pad, lines[[d]])
+    }
+    lines[[depth]] <- paste0(row_head, lines[[depth]])
+
+    cat(paste0(lines, collapse = "\n"), "\n", sep = "")
 }
 
 
