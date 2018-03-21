@@ -200,7 +200,7 @@ format_matrix <- function(index, name, x, control, indent, page)
         next_indent <- fmt$next_indent
 
         # if at end add extra indent to fit name
-        if (j == nc && length(name) > 0) {
+        if (j == nc) {
             if (next_page != page_start) {
                 indent_start <- 0L
             }
