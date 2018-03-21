@@ -137,23 +137,29 @@ format_vector <- function(index, name, x, control, indent, page)
 }
 
 
-format_matrix <- function(index, name, x, control, indent, page)
+fix_col_names <- function(names, n)
 {
-    nc <- dim(x)[[2L]]
-    if (nc == 0L) {
-        x <- rep_len("[]", nrow(x))
-        return(format_vector(index, name, x, control, indent, page))
-    }
-
-    names <- dimnames(x)[[2L]]
     if (is.null(names)) {
-        names <- paste0("[,", seq_len(nc), "]")
+        names <- paste0("[,", seq_len(n), "]")
     } else {
         isna <- which(is.na(names) | !nzchar(names))
         if (length(isna) > 0) {
             names[isna] <- paste0("[,", isna, "]")
         }
     }
+    names
+}
+
+
+format_matrix <- function(index, name, x, control, indent, page)
+{
+    nc <- dim(x)[[2]]
+    if (nc == 0) {
+        x <- rep_len("[]", dim(x)[[1]])
+        return(format_vector(index, name, x, control, indent, page))
+    }
+
+    names <- fix_col_names(dimnames(x)[[2]], nc)
     y <- as.record(vector("list", nc))
     trunc <- FALSE
 
@@ -172,7 +178,7 @@ format_matrix <- function(index, name, x, control, indent, page)
     justify  <- vector("list", nc)
 
     for (j in seq_len(nc)) {
-        if (!is.na(pages) && next_page == pages && j < nc) {
+        if (isTRUE(next_page == pages) && j < nc) {
             control$line <- line - 1 - ellipsis
         } else {
             control$line <- line
