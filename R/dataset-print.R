@@ -181,6 +181,8 @@ format_matrix <- function(index, name, x, control, indent, page)
         }
 
         xj  <- x[, j, drop = TRUE]
+        if (is.null(xj))
+            xj <- rep_len("NULL", nrow(x))
         fmt <- format_column(c(index, j), names[[j]], xj, control,
                              next_indent, next_page)
 

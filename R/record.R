@@ -60,7 +60,10 @@ is.record <- function(x, n = NULL, names = NULL)
 
 as.list.record <- function(x, ...)
 {
-    unclass(x)
+    names <- names(x)
+    attributes(x) <- NULL
+    names(x) <- names
+    x
 }
 
 
