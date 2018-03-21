@@ -309,14 +309,29 @@ format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
 }
 
 
-print_header <- function(control, style, index, path, names, indent, width,
+print_header <- function(x, meta, control, style, names,
                          row_head, row_width)
 {
-    n <- length(index)
+    n <- nrow(meta)
+    path <- vector("list", n)
+    for (i in seq_len(n)) {
+        index <- meta$index[[i]]
+        m <- length(index)
+        p <- character(m)
+        y <- x
+        for (j in seq_len(m)) {
+            k <- index[[j]]
+            p[[j]] <- names(y)[[k]]
+            if (j < m) {
+                y <- y[[k]]
+            }
+        }
+        path[[i]] <- p
+    }
 
     # determine header for nested groups
-    depth <- max(1, vapply(index, length, 0))
-    group <- matrix(unlist(lapply(index, `length<-`, depth)), nrow = depth)
+    depth <- max(1, vapply(meta$index, length, 0))
+    group <- matrix(unlist(lapply(meta$index, `length<-`, depth)), nrow = depth)
     gname <- matrix(unlist(lapply(path, `length<-`, depth)), nrow = depth)
 
     for (d in seq(from = depth - 1, by = -1, length.out = depth - 1)) {
@@ -353,11 +368,11 @@ print_header <- function(control, style, index, path, names, indent, width,
         pos <- 0
         i <- 1
         while (i <= n) {
-            head <- paste0(head, format("", width = indent[[i]] - pos))
-            pos <- indent[[i]]
+            head <- paste0(head, format("", width = meta$indent[[i]] - pos))
+            pos <- meta$indent[[i]]
 
             if (is.na(grp[[i]])) {
-                w <- width[[i]]
+                w <- meta$width[[i]]
                 head <- paste0(head, format("", width = w))
                 pos <- pos + w
             } else {
@@ -366,7 +381,7 @@ print_header <- function(control, style, index, path, names, indent, width,
                 while (i < n && grp[[i + 1]] %in% g) { # use %in% to handle NA
                     i <- i + 1
                 }
-                w <- (indent[[i]] - pos) + width[[i]]
+                w <- (meta$indent[[i]] - pos) + meta$width[[i]]
 
                 # center justify group name, using banner instead of spaces
                 nm <- gnm[[i]]
@@ -390,8 +405,9 @@ print_header <- function(control, style, index, path, names, indent, width,
     head <- row_head
     pos <- 0
     for (i in seq_len(n)) {
-        head <- paste0(head, format("", width = indent[[i]] - pos), names[[i]])
-        pos <- indent[[i]] + width[[i]]
+        head <- paste0(head, format("", width = meta$indent[[i]] - pos),
+                       names[[i]])
+        pos <- meta$indent[[i]] + meta$width[[i]]
     }
 
     cat(head, "\n", sep = "")
@@ -543,11 +559,9 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
             cat(style$faint(control$vellipsis), "\n", sep="")
         }
 
-        print_header(control = control, style = style,
-                     index = meta$index[start:i], path = path[start:i],
-                     names = names[start:i], indent = meta$indent[start:i],
-                     width = meta$width[start:i], row_head = row_head,
-                     row_width = row_width)
+        print_header(fmt, meta[start:i, ], control = control, style = style,
+                     names = names[start:i],
+                     row_head = row_head, row_width = row_width)
 
         if (n > 0) {
             print_body(control = control, cols = cols[start:i],
