@@ -309,11 +309,12 @@ format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
 }
 
 
-print_header <- function(x, meta, control, style, names,
-                         row_head, row_width)
+print_header <- function(x, meta, control, style, row_head, row_width)
 {
     n <- nrow(meta)
     path <- vector("list", n)
+    names <- character(n)
+
     for (i in seq_len(n)) {
         index <- meta$index[[i]]
         m <- length(index)
@@ -326,7 +327,8 @@ print_header <- function(x, meta, control, style, names,
                 y <- y[[k]]
             }
         }
-        path[[i]] <- p
+        path[[i]]  <- p
+        names[[i]] <- p[[m]]
     }
 
     # determine header for nested groups
@@ -401,6 +403,14 @@ print_header <- function(x, meta, control, style, names,
         }
         cat(head, "\n", sep = "")
     }
+
+    # format names
+    for (i in seq_len(n)) {
+        names[[i]] <- utf8_format(names[[i]], width = meta$width[[i]],
+                                  justify = meta$justify[[i]],
+                                  chars = .Machine$integer.max)
+    }
+    names <- style$bold(names)
 
     head <- row_head
     pos <- 0
@@ -515,8 +525,8 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
     rfmt <- format_rows(control = control, style = style, nrow = n,
                         number = number, keys = keys)
     row_width <- rfmt$width
-    row_head <- rfmt$head
-    row_body <- rfmt$body
+    row_head  <- rfmt$head
+    row_body  <- rfmt$body
 
     control$line <- max(1L, control$line - row_width)
 
@@ -526,8 +536,6 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
     cols.trunc <- attr(fmt, "format.meta.cols.trunc", TRUE)
 
     cols <- flatten_dataset(fmt, flat = TRUE, path = TRUE)
-    path  <- attr(cols, "path")
-    names <- vapply(path, tail, "", n = 1)
 
     # justify columns, names
     cols <- mapply(function(col, w, j)
@@ -536,16 +544,10 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
                                    justify = j),
                    cols, meta$width, meta$justify,
                    SIMPLIFY = FALSE, USE.NAMES = FALSE)
-    names <- mapply(function(name, w, j)
-                        utf8_format(name, width = w,
-                                    chars = .Machine$integer.max, justify = j),
-                    names, meta$width, meta$justify,
-                    SIMPLIFY = TRUE, USE.NAMES = FALSE)
 
     # apply formatting
     cols <- mapply(style$normal, cols, meta$width,
                    SIMPLIFY = FALSE, USE.NAMES = FALSE)
-    names <- style$bold(names)
 
     foot_width <- row_width
     start <- 1L
@@ -560,7 +562,6 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
         }
 
         print_header(fmt, meta[start:i, ], control = control, style = style,
-                     names = names[start:i],
                      row_head = row_head, row_width = row_width)
 
         if (n > 0) {
