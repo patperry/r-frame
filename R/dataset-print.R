@@ -440,8 +440,7 @@ print_header <- function(x, meta, control, style, row_head, row_width)
 }
 
 
-
-print_body <- function(x, meta, control, style, row_body)
+format_body <- function(x, meta, control, style)
 {
     n <- nrow(meta)
     cols <- vector("list", n)
@@ -454,14 +453,23 @@ print_body <- function(x, meta, control, style, row_body)
         cols[[i]] <- y
     }
 
-    body <- row_body
+    lines <- character(nrow(x))
     pos <- 0
     for (i in seq_len(n)) {
-        body <- paste0(body, format("", width = meta$indent[[i]] - pos),
-                       cols[[i]])
+        lines <- paste0(lines, format("", width = meta$indent[[i]] - pos),
+                        cols[[i]])
         pos <- meta$indent[[i]] + meta$width[[i]]
     }
-    cat(body, sep = "\n")
+
+    lines
+}
+
+
+print_body <- function(x, meta, control, style, row_body)
+{
+    lines <- format_body(x, meta, control, style)
+    lines <- paste0(row_body, lines)
+    cat(lines, sep = "\n")
 }
 
 
