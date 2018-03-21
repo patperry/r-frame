@@ -307,7 +307,7 @@ format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
 }
 
 
-format_head <- function(x, meta, control, style)
+format_head <- function(x, meta, style, char)
 {
     # find column names and paths to nested columns
     n <- nrow(meta)
@@ -392,12 +392,12 @@ format_head <- function(x, meta, control, style)
                 pad <- max(0, w - wnm)
                 lpad <- floor(pad / 2)
                 rpad <- ceiling(pad / 2)
-                banner <- paste0(paste0(rep(control$horiz2, lpad),
+                banner <- paste0(paste0(rep(char, lpad),
                                         collapse = ""),
                                  nm,
-                                 paste0(rep(control$horiz2, rpad),
+                                 paste0(rep(char, rpad),
                                         collapse = ""))
-                head <- paste0(head, style$bold(banner))
+                head <- paste0(head, style(banner))
                 pos <- pos + max(w, wnm)
             }
             i <- i + 1
@@ -412,7 +412,7 @@ format_head <- function(x, meta, control, style)
                                   justify = meta$justify[[i]],
                                   chars = .Machine$integer.max)
     }
-    names <- style$bold(names)
+    names <- style(names)
 
     head <- ""
     pos <- 0
@@ -429,7 +429,7 @@ format_head <- function(x, meta, control, style)
 
 print_head <- function(x, meta, control, style, row_head, row_width)
 {
-    lines <- format_head(x, meta, control, style)
+    lines <- format_head(x, meta, style$bold, control$horiz2)
     depth <- length(lines)
 
     for (d in seq_len(depth - 1)) {
@@ -442,7 +442,7 @@ print_head <- function(x, meta, control, style, row_head, row_width)
 }
 
 
-format_body <- function(x, meta, control, style)
+format_body <- function(x, meta, style)
 {
     n <- nrow(meta)
     cols <- vector("list", n)
@@ -451,7 +451,7 @@ format_body <- function(x, meta, control, style)
         y <- utf8_format(y, width = meta$width[[i]],
                          justify = meta$justify[[i]],
                          chars = .Machine$integer.max)
-        y <- style$normal(y)
+        y <- style(y)
         cols[[i]] <- y
     }
 
@@ -469,7 +469,7 @@ format_body <- function(x, meta, control, style)
 
 print_body <- function(x, meta, control, style, row_body)
 {
-    lines <- format_body(x, meta, control, style)
+    lines <- format_body(x, meta, style$normal)
     lines <- paste0(row_body, lines)
     cat(lines, sep = "\n")
 }
