@@ -106,10 +106,10 @@ format_vector <- function(index, name, x, control, indent, page)
     # compute width, determine whether to truncate
     if (!is.na(control$pages) && page == control$pages) {
         limit <- control$line - indent
-        width <- col_width(tail(name, 1), y, limit + 1)
+        width <- col_width(name, y, limit + 1)
         trunc <- (width > limit)
     } else {
-        width <- col_width(tail(name, 1), y)
+        width <- col_width(name, y)
         trunc <- FALSE
     }
 
@@ -117,7 +117,7 @@ format_vector <- function(index, name, x, control, indent, page)
     if (trunc) {
         y <- rep(control$ellipsis, length(y))
         width <- utf8_width(control$ellipsis)
-        name[[length(name)]] <- control$ellipsis
+        name <- control$ellipsis
     }
 
     # compute new indent
@@ -128,7 +128,7 @@ format_vector <- function(index, name, x, control, indent, page)
         # new page, re-format with new indent
         format_vector(index, name, x, control, 0L, page + 1L)
     } else {
-        list(value = y, trunc = trunc,
+        list(name = name, value = y, trunc = trunc,
              index = list(index), name = list(name),
              page = page, indent = indent, width = width,
              justify = justify, next_page = page,
@@ -166,7 +166,6 @@ format_matrix <- function(index, name, x, control, indent, page)
     next_page <- page
     next_indent <- indent
     colindex <- vector("list", nc)
-    colname  <- vector("list", nc)
     page     <- vector("list", nc)
     indent   <- vector("list", nc)
     width    <- vector("list", nc)
@@ -180,12 +179,12 @@ format_matrix <- function(index, name, x, control, indent, page)
         }
 
         xj  <- x[, j, drop = TRUE]
-        fmt <- format_column(c(index, j), c(name, names[[j]]), xj, control,
+        fmt <- format_column(c(index, j), names[[j]], xj, control,
                              next_indent, next_page)
 
+        names[[j]]    <- fmt$name
         y[[j]]        <- fmt$value
         colindex[[j]] <- fmt$index
-        colname[[j]]  <- fmt$name
         page[[j]]     <- fmt$page
         indent[[j]]   <- fmt$indent
         width[[j]]    <- fmt$width
@@ -200,22 +199,15 @@ format_matrix <- function(index, name, x, control, indent, page)
                 indent_start <- 0L
             }
             next_indent <- max(next_indent,
-                               indent_start + utf8_width(tail(name, 1)) + 1)
+                               indent_start + utf8_width(name) + 1)
         }
 
         if (fmt$trunc) {
-            rj <- length(dim(xj))
-            if (rj <= 1) {
-                names[[j]] <- control$ellipsis
-            }
-
-            if (j < nc && rj > 1) {
+            if (j < nc && length(dim(xj)) > 1) {
                 j <- j + 1L
-                names[[j]] <- control$ellipsis
-
+                names[[j]]    <- control$ellipsis
                 y[[j]]        <- rep(control$ellipsis, nrow(x))
                 colindex[[j]] <- list(c(index, j))
-                colname[[j]]  <- list(c(name, control$ellipsis))
                 page[[j]]     <- next_page
                 indent[[j]]   <- next_indent
                 width[[j]]    <- ellipsis
@@ -226,7 +218,6 @@ format_matrix <- function(index, name, x, control, indent, page)
             y <- y[1:j]
             names <- names[1:j]
             colindex <- colindex[1:j]
-            colname  <- colname[1:j]
             page <- page[1:j]
             indent <- indent[1:j]
             width <- width[1:j]
@@ -238,9 +229,9 @@ format_matrix <- function(index, name, x, control, indent, page)
 
     names(y) <- names
     y <- as.dataset(y)
-    list(value   = y,
+    list(name    = name,
+         value   = y,
          index   = do.call(c, colindex),
-         name    = do.call(c, colname),
          page    = do.call(c, page),
          indent  = do.call(c, indent),
          width   = do.call(c, width),
@@ -291,7 +282,7 @@ format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
         x <- x[seq_len(limit), , drop = FALSE]
     }
 
-    fmt <- format_column(integer(), character(), x, control, indent, 1)
+    fmt <- format_column(integer(), "", x, control, indent, 1)
 
     y       <- fmt$value
     keys(y) <- keys(x)
@@ -301,7 +292,6 @@ format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
             list(trunc_rows = rtrunc,
                  trunc_cols = fmt$trunc,
                  index      = fmt$index,
-                 name       = fmt$name,
                  page       = fmt$page,
                  indent     = fmt$indent,
                  width      = fmt$width,
@@ -514,7 +504,7 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
     justify <- meta$justify
 
     cols <- flatten_dataset(fmt, flat = TRUE, path = TRUE)
-    path  <- meta$name
+    path  <- attr(cols, "path")
     index <- meta$index
     names <- vapply(path, tail, "", n = 1)
 
