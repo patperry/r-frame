@@ -427,8 +427,8 @@ format_rows <- function(control, style, nrow, number, keys)
         kcontrol$line <- .Machine$integer.max - 1
         cols <- format.dataset(keys, control = kcontrol, meta = TRUE)
         meta <- attr(cols, "format.meta")
-        width <- unlist(meta$width)
-        justify <- unlist(meta$justify)
+        width <- meta$width
+        justify <- meta$justify
 
         kb <- mapply(function(k, w, j)
                          utf8_format(k, chars = .Machine$integer.max,
