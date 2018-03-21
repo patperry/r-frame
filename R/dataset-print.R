@@ -497,7 +497,7 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
 
     keys <- keys(x)[seq_len(n), , drop = FALSE]
     rfmt <- format_rows(control = control, style = style, nrow = n,
-                       number = number, keys = keys)
+                        number = number, keys = keys)
     row_width <- rfmt$width
     row_head <- rfmt$head
     row_body <- rfmt$body
