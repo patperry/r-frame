@@ -250,10 +250,16 @@ format.dataset <- function(x, limit = NA, line = NA, control = NULL,
         x <- x[seq_len(limit), , drop = FALSE]
     }
 
-    fmt <- format_column(integer(), "", x, line, control, 0, 1)
-
-    y       <- fmt$value
-    keys(y) <- keys(x)
+    if (length(x) > 0) {
+        fmt <- format_column(integer(), "", x, line, control, 0, 1)
+        y <- fmt$value
+        keys(y) <- keys(x)
+    } else {
+        y <- x
+        fmt <- list(index = list(), page = integer(), indent = integer(),
+                    width = integer(), justify = character(),
+                    trunc = FALSE)
+    }
 
     if (meta) {
         meta <- dataset(index   = fmt$index,
