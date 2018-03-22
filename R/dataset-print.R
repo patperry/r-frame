@@ -40,42 +40,6 @@ new_format_style <- function(control)
 }
 
 
-col_width <- function(name, x, limit = NA)
-{
-    n <- utf8_width(name)
-
-    if (length(dim(x)) <= 1) {
-        w <- max(0, utf8_width(x), na.rm = TRUE)
-        if (anyNA(x)) {
-            naw <- utf8_width("<NA>")
-            w <- max(w, naw)
-        }
-    } else {
-        nc <- ncol(x)
-        names <- colnames(x)
-        w <- 0
-
-        for (j in seq_len(nc)) {
-            if (j > 1) {
-                w <- w + 1
-            }
-
-            xj <- x[, j, drop = TRUE]
-            wj <- col_width(names[[j]], xj, limit - w)
-
-            w <- w + wj
-            if (isTRUE(w >= limit))
-                return(limit)
-        }
-    }
-
-    w <- max(n, w)
-    if (isTRUE(w >= limit))
-        return(limit)
-    w
-}
-
-
 format_vector <- function(index, name, x, control, indent, page)
 {
     num <- is.numeric(x) || is.complex(x)
@@ -100,16 +64,17 @@ format_vector <- function(index, name, x, control, indent, page)
             }
             y <- utf8_format(y, chars = chars, justify = "none")
             y[is.na(x)] <- "<NA>"
+        } else {
+            y[is.na(x)] <- "NA"
         }
     }
 
     # compute width, determine whether to truncate
+    width <- max(utf8_width(name), utf8_width(y))
     if (isTRUE(page == control$pages) && !is.na(control$line)) {
         limit <- control$line - indent
-        width <- col_width(name, y, limit + 1)
         trunc <- (width > limit)
     } else {
-        width <- col_width(name, y)
         trunc <- FALSE
     }
 
