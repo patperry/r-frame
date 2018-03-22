@@ -370,3 +370,24 @@ test_that("printing empty matrix", {
 '5 []')
     expect_equal(strsplit(capture_output(print(x)), "\n")[[1]], lines)
 })
+
+
+test_that("depth-2 keys", {
+    ctype <- switch_ctype("C")
+    on.exit(Sys.setlocale("LC_CTYPE", ctype), add = TRUE)
+
+    k <- dataset(key = dataset(k1 = 1:5, k2 = letters[1:5]))
+    x <- dataset(a = c(-10, 3, 1.1, 8, -2))
+    keys(x) <- k
+
+    lines <- c(
+'=key= |      ',
+'k1 k2 |     a',
+' 1 a  | -10.0',
+' 2 b  |   3.0',
+' 3 c  |   1.1',
+' 4 d  |   8.0',
+' 5 e  |  -2.0')
+
+    expect_equal(strsplit(capture_output(print(x)), "\n")[[1]], lines)
+})

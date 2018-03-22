@@ -438,12 +438,18 @@ print_head <- function(row, x, meta, control, style)
     lines <- format_head(x, meta, style, control$horiz2)
     depth <- length(lines)
 
-    for (d in seq_len(depth - 1)) {
-        pad <- format("", width = row$width)
-        lines[[d]] <- paste0(pad, lines[[d]])
-    }
-    lines[[depth]] <- paste0(row$head, lines[[depth]])
+    row_head  <- row$head
+    row_depth <- length(row_head)
 
+    if (row_depth < depth) {
+        pad <- format("", width = row$width)
+        row_head <- c(rep_len(pad, depth - row_depth), row_head)
+    } else if (row_depth > depth) {
+        pad <- format("", width = attr(lines, "width", TRUE))
+        lines <- c(rep_len(pad, row_depth - depth), lines)
+    }
+
+    lines <- paste0(row_head, lines)
     if (length(lines) > 0)
         cat(lines, sep = "\n")
 }
