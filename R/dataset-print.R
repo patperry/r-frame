@@ -498,20 +498,16 @@ format_rows <- function(nrow, number, keys, control, style)
     gap  <- style(" ")
 
     if (!is.null(keys)) {
-        names <- names(keys)
-        if (is.null(names)) {
-            names(keys) <- character(length(keys))
-        }
-
         control$line <- NA
-        keys <- format.dataset(keys, control = control, meta = TRUE)
+        keys <- format.dataset(keys, limit = NA, control = control,
+                               meta = TRUE)
         meta <- attr(keys, "format.meta")
 
         key_head  <- format_head(keys, meta, style, control$horiz2)
         key_body  <- format_body(keys, meta, style)
         key_width <- attr(key_head, "width")
 
-        if (number) {
+        if (width > 0) {
             head  <- paste0(head, gap, key_head)
             body  <- paste0(body, gap, key_body)
             width <- width + 1 + key_width
@@ -525,7 +521,6 @@ format_rows <- function(nrow, number, keys, control, style)
         body  <- paste0(body, gap, style(control$vline))
         width <- width + 1 + utf8_width(control$vline)
     }
-    
 
     list(width = width, head = head, body = body)
 }
@@ -537,7 +532,6 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
     limit   <- as.limit(limit)
     control <- as.format.control(control)
 
-    number  <- is.null(keys(x))
     n <- nr <- dim(x)[[1L]]
     style <- new_format_style(control)
 
@@ -550,26 +544,26 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
         n <- min(n, limit)
     }
 
-    keys <- keys(x)[seq_len(n), , drop = FALSE]
-    rfmt <- format_rows(n, number, keys, control, style$faint)
+    keys   <- keys(x)[seq_len(n), , drop = FALSE]
+    number <- is.null(keys)
+    row    <- format_rows(n, number, keys, control, style$faint)
 
-    row_head  <- rfmt$head
-    row_body  <- rfmt$body
-    row_width <- rfmt$width
-    if (row_width > 0) {
-        row_head  <- paste0(row_head, style$normal(" "))
-        row_body  <- paste0(row_body, style$normal(" "))
-        row_width <- row_width + 1
+    if (row$width > 0) {
+        row$head  <- paste0(row$head, style$normal(" "))
+        row$body  <- paste0(row$body, style$normal(" "))
+        row$width <- row$width + 1
     }
 
-    control$line <- max(1L, control$line - row_width)
+    if (!is.na(control$line)) {
+        control$line <- max(1L, control$line - row$width)
+    }
 
     fmt <- format.dataset(x, limit = limit, control = control, meta = TRUE)
     meta       <- attr(fmt, "format.meta", TRUE)
     rows.trunc <- attr(fmt, "format.meta.rows.trunc", TRUE)
     cols.trunc <- attr(fmt, "format.meta.cols.trunc", TRUE)
 
-    foot_width <- row_width
+    foot_width <- row$width
     start <- 1L
     pg <- 1L
     nc <- nrow(meta)
@@ -582,14 +576,14 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
             cat(style$faint(control$vellipsis), "\n", sep="")
         }
 
-        print_head(fmt, meta[start:i, ], control, style, row_head, row_width)
+        print_head(fmt, meta[start:i, ], control, style, row$head, row$width)
 
         if (n > 0) {
-            print_body(fmt, meta[start:i, ], control, style, row_body)
+            print_body(fmt, meta[start:i, ], control, style, row$body)
         }
 
         foot_width <- max(foot_width,
-                          row_width + meta$indent[[i]] + meta$width[[i]])
+                          row$width + meta$indent[[i]] + meta$width[[i]])
         start <- i + 1L
         pg <- pg + 1L
     }
