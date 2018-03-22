@@ -242,13 +242,11 @@ ncol_recursive <- function(x, offset = 0)
 }
 
 
-format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
-                           meta = FALSE, ...)
+format.dataset <- function(x, limit = NA, control = NULL, meta = FALSE, ...)
 {
     x       <- as.dataset(x)
     limit   <- as.limit(limit)
     control <- as.format.control(control)
-    indent  <- as.indent(indent)
     meta    <- as.option(meta)
 
     rtrunc <- FALSE
@@ -257,7 +255,7 @@ format.dataset <- function(x, limit = NA, control = NULL, indent = 0,
         x <- x[seq_len(limit), , drop = FALSE]
     }
 
-    fmt <- format_column(integer(), "", x, control, indent, 1)
+    fmt <- format_column(integer(), "", x, control, 0, 1)
 
     y       <- fmt$value
     keys(y) <- keys(x)
@@ -469,7 +467,7 @@ format_rows <- function(nrow, keys, control, style)
         body <- style(body)
     } else {
         control$line <- NA
-        keys <- format.dataset(keys, nrow, control, meta = TRUE)
+        keys <- format.dataset(keys, nrow, control, TRUE)
         meta <- attr(keys, "format.meta")
 
         key_head  <- format_head(keys, meta, style, control$horiz2)
@@ -515,7 +513,7 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
         control$line <- max(1L, control$line - row$width)
     }
 
-    fmt   <- format.dataset(x, limit, control, meta = TRUE)
+    fmt   <- format.dataset(x, limit, control, TRUE)
     meta  <- attr(fmt, "format.meta", TRUE)
     npage <- max(0, meta$page)
 
