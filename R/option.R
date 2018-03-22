@@ -134,27 +134,3 @@ as.ansi <- function(x)
     }
     x
 }
-
-
-option_rows <- function(rows)
-{
-    if (is.null(rows)) {
-        rows <- getOption("frame.rows")
-        if (is.null(rows)) {
-            rows <- 20L
-        }
-    }
-    rows
-}
-
-
-option_wrap <- function(wrap)
-{
-    if (is.null(wrap)) {
-        wrap <- getOption("frame.wrap")
-        if (is.null(wrap)) {
-            wrap <- 0L
-        }
-    }
-    wrap
-}
