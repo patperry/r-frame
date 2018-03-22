@@ -49,8 +49,9 @@ format_vector <- function(index, name, x, control, indent, page)
         y <- vapply(x, format_entry, "", control, indent)
     } else {
         if (!is.character(x)) {
-            y <- format(x, control = control, indent = indent,
-                        justify = "none")
+            ctrl <- control
+            ctrl$line <- ctrl$line - indent
+            y <- format(x, limit = NA, control = ctrl)
         } else {
             y <- x
         }
