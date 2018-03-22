@@ -16,7 +16,7 @@
 new_format_style <- function(control)
 {
     utf8 <- output_utf8()
-    if (output_ansi()) {
+    if (output_ansi()) { # nocov start
         escapes <- control$faint
         bold  <- function(x) paste0("\x1b[", control$bold, "m",
                                     utf8_encode(x, display = TRUE,
@@ -26,7 +26,7 @@ new_format_style <- function(control)
                                     utf8_encode(x, display = TRUE,
                                                 utf8 = utf8),
                                     "\x1b[0m")
-    } else {
+    } else { # nocov end
         escapes <- NULL
         bold <- faint <- function(x)
             utf8_encode(x, display = TRUE, utf8 = utf8)
