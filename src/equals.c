@@ -44,7 +44,7 @@ int rframe_equals_column(SEXP x_, R_xlen_t i1, R_xlen_t i2)
         return rframe_equals_character(x_, i1, i2);
         break;
 
-    case LISTSXP:
+    case VECSXP:
         return rframe_equals_dataset(x_, i1, i2);
         break;
 

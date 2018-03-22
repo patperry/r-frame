@@ -48,7 +48,7 @@ void rframe_hash_column(uint64_t *hash, R_xlen_t n, SEXP x_)
         rframe_hash_character(hash, n, x_);
         break;
 
-    case LISTSXP:
+    case VECSXP:
         rframe_hash_dataset(hash, n, x_);
         break;
 
