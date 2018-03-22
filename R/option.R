@@ -73,7 +73,6 @@ as.format.control <- function(x)
         x <- record(
             faint  = "38;5;246", #666666
             bold   = "38;5;203", #FF3333
-            line   = as.line(NULL),
             tab    = as.tab(NULL),
             pages  = as.pages(NULL),
             horiz2    = "\u2550",
@@ -81,11 +80,10 @@ as.format.control <- function(x)
             vellipsis = "\u22ee",
             vline     = "\u2502")
     } else {
-        x <- as.list(x)[c("faint", "bold", "line", "tab", "pages",
+        x <- as.list(x)[c("faint", "bold", "tab", "pages",
                           "horiz2", "ellipsis", "vellipsis", "vline")]
         x$faint  <- as.ansi(x$faint)
         x$bold   <- as.ansi(x$bold)
-        x$line   <- as.line(x$line)
         x$tab    <- as.tab(x$tab)
         x$pages  <- as.pages(x$pages)
         x$horiz2    <- if (is.null(x$horiz2)) "\u2550"

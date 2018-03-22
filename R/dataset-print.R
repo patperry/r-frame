@@ -40,28 +40,26 @@ new_format_style <- function(control)
 }
 
 
-format_vector <- function(index, name, x, control, indent, page)
+format_vector <- function(index, name, x, line, control, indent, page)
 {
     num <- is.numeric(x) || is.complex(x)
     justify <- if (num) "right" else "left"
 
     if ((is.list(x) && !is.object(x)) || is.record(x)) {
-        y <- vapply(x, format_entry, "", control$line - indent, control)
+        y <- vapply(x, format_entry, "", line - indent, control)
     } else {
         if (!is.character(x)) {
-            ctrl <- control
-            ctrl$line <- ctrl$line - indent
-            y <- format(x, limit = NA, control = ctrl)
+            y <- format(x, limit = NA, line = line - indent, control = control)
         } else {
             y <- x
         }
 
         if (!num) {
             ellipsis <- utf8_width(control$ellipsis)
-            if (is.na(control$line)) {
+            if (is.na(line)) {
                 chars <- .Machine$integer.max
             } else {
-                chars <- max(24, control$line - indent - ellipsis)
+                chars <- max(24, line - indent - ellipsis)
             }
             y <- utf8_format(y, chars = chars, justify = "none")
             y[is.na(x)] <- "<NA>"
@@ -72,8 +70,8 @@ format_vector <- function(index, name, x, control, indent, page)
 
     # compute width, determine whether to truncate
     width <- max(utf8_width(name), utf8_width(y))
-    if (isTRUE(page == control$pages) && !is.na(control$line)) {
-        limit <- control$line - indent
+    if (isTRUE(page == control$pages) && !is.na(line)) {
+        limit <- line - indent
         trunc <- (width > limit)
     } else {
         trunc <- FALSE
@@ -89,10 +87,10 @@ format_vector <- function(index, name, x, control, indent, page)
     # compute new indent
     start <- (indent == 0L)
     next_indent <- indent + width + 1
-    if (isTRUE(next_indent > control$line + 1) && !start
+    if (isTRUE(next_indent > line + 1) && !start
             && isTRUE(page < control$pages)) {
         # new page, re-format with new indent
-        format_vector(index, name, x, control, 0L, page + 1L)
+        format_vector(index, name, x, line, control, 0, page + 1)
     } else {
         list(name = name, value = y, trunc = trunc,
              index = list(index),
@@ -117,12 +115,12 @@ fix_col_names <- function(names, n)
 }
 
 
-format_matrix <- function(index, name, x, control, indent, page)
+format_matrix <- function(index, name, x, line, control, indent, page)
 {
     nc <- dim(x)[[2]]
     if (nc == 0) {
         x <- rep_len("[]", dim(x)[[1]])
-        return(format_vector(index, name, x, control, indent, page))
+        return(format_vector(index, name, x, line, control, indent, page))
     }
 
     names <- fix_col_names(dimnames(x)[[2]], nc)
@@ -130,9 +128,9 @@ format_matrix <- function(index, name, x, control, indent, page)
     trunc <- FALSE
 
     ellipsis <- utf8_width(control$ellipsis)
-    line  <- control$line
     pages <- control$pages
 
+    start_line   <- line
     start_page   <- page
     start_indent <- indent
     next_page <- page
@@ -145,16 +143,16 @@ format_matrix <- function(index, name, x, control, indent, page)
 
     for (j in seq_len(nc)) {
         if (isTRUE(next_page == pages) && j < nc) {
-            control$line <- line - 1 - ellipsis
+            line <- start_line - 1 - ellipsis
         } else {
-            control$line <- line
+            line <- start_line
         }
 
         xj  <- x[, j, drop = TRUE]
         if (is.null(xj))
             xj <- vector("list", nrow(x))
 
-        fmt <- format_column(c(index, j), names[[j]], xj, control,
+        fmt <- format_column(c(index, j), names[[j]], xj, line, control,
                              next_indent, next_page)
 
         names[[j]]    <- fmt$name
@@ -217,12 +215,12 @@ format_matrix <- function(index, name, x, control, indent, page)
 }
 
 
-format_column <- function(index, name, x, control, indent, page)
+format_column <- function(index, name, x, line, control, indent, page)
 {
     if (length(dim(x)) <= 1) {
-        format_vector(index, name, x, control, indent, page)
+        format_vector(index, name, x, line, control, indent, page)
     } else {
-        format_matrix(index, name, x, control, indent, page)
+        format_matrix(index, name, x, line, control, indent, page)
     }
 }
 
@@ -243,10 +241,12 @@ ncol_recursive <- function(x, offset = 0)
 }
 
 
-format.dataset <- function(x, limit = NA, control = NULL, meta = FALSE, ...)
+format.dataset <- function(x, limit = NA, line = NA, control = NULL,
+                           meta = FALSE, ...)
 {
     x       <- as.dataset(x)
     limit   <- as.limit(limit)
+    line    <- as.line(line)
     control <- as.format.control(control)
     meta    <- as.option(meta)
 
@@ -256,7 +256,7 @@ format.dataset <- function(x, limit = NA, control = NULL, meta = FALSE, ...)
         x <- x[seq_len(limit), , drop = FALSE]
     }
 
-    fmt <- format_column(integer(), "", x, control, 0, 1)
+    fmt <- format_column(integer(), "", x, line, control, 0, 1)
 
     y       <- fmt$value
     keys(y) <- keys(x)
@@ -467,8 +467,7 @@ format_rows <- function(nrow, keys, control, style)
         head <- style(head)
         body <- style(body)
     } else {
-        control$line <- NA
-        keys <- format.dataset(keys, nrow, control, TRUE)
+        keys <- format.dataset(keys, nrow, NA, control, TRUE)
         meta <- attr(keys, "format.meta")
 
         key_head  <- format_head(keys, meta, style, control$horiz2)
@@ -485,10 +484,11 @@ format_rows <- function(nrow, keys, control, style)
 }
 
 
-print.dataset <- function(x, limit = NULL, control = NULL, ...)
+print.dataset <- function(x, limit = NULL, line = NULL, control = NULL, ...)
 {
     x       <- as.dataset(x)
     limit   <- as.limit(limit)
+    line    <- as.line(line)
     control <- as.format.control(control)
 
     n <- nr <- dim(x)[[1L]]
@@ -510,11 +510,11 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
         row$width <- row$width + 1
     }
 
-    if (!is.na(control$line)) {
-        control$line <- max(1L, control$line - row$width)
+    if (!is.na(line)) {
+        line <- max(1, line - row$width)
     }
 
-    fmt   <- format.dataset(x, limit, control, TRUE)
+    fmt   <- format.dataset(x, limit, line, control, TRUE)
     meta  <- attr(fmt, "format.meta", TRUE)
     npage <- max(0, meta$page)
 
