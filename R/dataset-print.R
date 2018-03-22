@@ -68,10 +68,10 @@ format_vector <- function(index, name, x, line, control, indent, page)
         }
     }
 
-    # compute width, possibly truncate
+    # maybe truncate if at least page
     width <- max(utf8_width(name), utf8_width(y))
-    if (isTRUE(page == control$pages) && !is.na(line)) {
-        trunc <- width > (line - indent)
+    if (isTRUE(page == control$pages)) {
+        trunc <- isTRUE(width > line - indent)
 
         if (trunc) {
             y <- rep(control$ellipsis, length(y))
@@ -80,22 +80,18 @@ format_vector <- function(index, name, x, line, control, indent, page)
         }
     } else {
         trunc <- FALSE
+
+        # maybe wrap to next page
+        if (isTRUE(width > line - indent) && (indent > 0)) {
+            fmt <- format_vector(index, name, x, line, control, 0, page + 1)
+            return(fmt)
+        }
     }
 
-    # compute new indent
-    start <- (indent == 0)
     next_indent <- indent + width + 1
-    if (isTRUE(next_indent > line + 1) && !start
-            && isTRUE(page < control$pages)) {
-        # new page, re-format with new indent
-        format_vector(index, name, x, line, control, 0, page + 1)
-    } else {
-        list(name = name, value = y, trunc = trunc,
-             index = list(index),
-             page = page, indent = indent, width = width,
-             justify = justify, next_page = page,
-             next_indent = next_indent)
-    }
+    list(index = list(index), name  = name, value = y, trunc = trunc,
+         page = page, indent = indent, width = width, justify = justify,
+         next_page = page, next_indent = next_indent)
 }
 
 
