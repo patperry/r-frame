@@ -421,8 +421,8 @@ format_head <- function(x, meta, style, char)
     head <- ""
     pos <- 0
     for (i in seq_len(n)) {
-        head <- paste0(head, format("", width = meta$indent[[i]] - pos),
-                       names[[i]])
+        gap <- format("", width = meta$indent[[i]] - pos)
+        head <- paste0(head, style(gap), names[[i]])
         pos <- meta$indent[[i]] + meta$width[[i]]
     }
 
@@ -463,8 +463,8 @@ format_body <- function(x, meta, style)
     lines <- character(nrow(x))
     pos <- 0
     for (i in seq_len(n)) {
-        lines <- paste0(lines, format("", width = meta$indent[[i]] - pos),
-                        cols[[i]])
+        gap <- format("", width = meta$indent[[i]] - pos)
+        lines <- paste0(lines, style(gap), cols[[i]])
         pos <- meta$indent[[i]] + meta$width[[i]]
     }
 
@@ -481,73 +481,53 @@ print_body <- function(x, meta, control, style, row_body)
 }
 
 
-format_rows <- function(control, style, nrow, number, keys)
+format_rows <- function(nrow, number, keys, control, style)
 {
     if (number) {
-        row_body <- format(as.character(seq_len(nrow)), justify = "left")
-        row_width <- max(0, utf8_width(row_body))
-        row_head <- format("", width = row_width)
+        body <- format(as.character(seq_len(nrow)), justify = "left")
+        width <- max(0, utf8_width(body))
+        head <- format("", width = width)
     } else {
-        row_body <- character(nrow)
-        row_width <- 0
-        row_head <- ""
+        body <- character(nrow)
+        width <- 0
+        head <- ""
     }
 
-    row_head <- style$faint(row_head)
-    row_body <- style$faint(row_body)
+    head <- style(head)
+    body <- style(body)
+    gap  <- style(" ")
 
     if (!is.null(keys)) {
         names <- names(keys)
         if (is.null(names)) {
             names(keys) <- character(length(keys))
         }
-        kcontrol <- control
-        kcontrol$line <- NA
-        cols <- format.dataset(keys, control = kcontrol, meta = TRUE)
-        meta <- attr(cols, "format.meta")
 
-        #row_head2 <- format_head(cols, meta, style$faint, control$horiz2)
-        #row_body2 <- format_body(cols, meta, style$faint)
+        control$line <- NA
+        keys <- format.dataset(keys, control = control, meta = TRUE)
+        meta <- attr(keys, "format.meta")
 
-        width <- meta$width
-        justify <- meta$justify
+        key_head  <- format_head(keys, meta, style, control$horiz2)
+        key_body  <- format_body(keys, meta, style)
+        key_width <- attr(key_head, "width")
 
-        kb <- mapply(function(k, w, j)
-                         utf8_format(k, chars = .Machine$integer.max,
-                                     justify = j, width = w),
-                     cols, width, justify,
-                     SIMPLIFY = FALSE, USE.NAMES = FALSE)
-        kh <- mapply(function(n, w, j)
-                        utf8_format(n, chars = .Machine$integer.max,
-                                    justify = j, width = w),
-                     names(cols), width, justify, USE.NAMES = FALSE)
-
-        kb <- do.call(paste, kb)
-        kh <- paste(kh, collapse = " ")
-        row_width <- row_width + utf8_width(kh)
-        kb <- style$faint(kb)
-        kh <- style$faint(kh)
         if (number) {
-            row_head <- paste(row_head, kh)
-            row_body <- paste(row_body, kb)
-            row_width <- row_width + 1
+            head  <- paste0(head, gap, key_head)
+            body  <- paste0(body, gap, key_body)
+            width <- width + 1 + key_width
         } else {
-            row_head <- kh
-            row_body <- kb
+            head  <- key_head
+            body  <- key_body
+            width <- key_width
         }
-    }
 
-    if (!is.null(keys)) {
-        row_head <- paste0(row_head, " ", style$faint(control$vline), " ")
-        row_width <- row_width + 3
-        row_body <- paste0(row_body, " ", style$faint(control$vline), " ")
-    } else if (row_width > 0) {
-        row_head <- paste0(row_head, " ")
-        row_body <- paste0(row_body, " ")
-        row_width <- row_width + 1
+        head  <- paste0(head, gap, style(control$vline))
+        body  <- paste0(body, gap, style(control$vline))
+        width <- width + 1 + utf8_width(control$vline)
     }
+    
 
-    list(width = row_width, head = row_head, body = row_body)
+    list(width = width, head = head, body = body)
 }
 
 
@@ -571,11 +551,16 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
     }
 
     keys <- keys(x)[seq_len(n), , drop = FALSE]
-    rfmt <- format_rows(control = control, style = style, nrow = n,
-                        number = number, keys = keys)
-    row_width <- rfmt$width
+    rfmt <- format_rows(n, number, keys, control, style$faint)
+
     row_head  <- rfmt$head
     row_body  <- rfmt$body
+    row_width <- rfmt$width
+    if (row_width > 0) {
+        row_head  <- paste0(row_head, style$normal(" "))
+        row_body  <- paste0(row_body, style$normal(" "))
+        row_width <- row_width + 1
+    }
 
     control$line <- max(1L, control$line - row_width)
 
