@@ -432,16 +432,16 @@ format_head <- function(x, meta, style, char)
 }
 
 
-print_head <- function(x, meta, control, style, row_head, row_width)
+print_head <- function(row, x, meta, control, style)
 {
-    lines <- format_head(x, meta, style$bold, control$horiz2)
+    lines <- format_head(x, meta, style, control$horiz2)
     depth <- length(lines)
 
     for (d in seq_len(depth - 1)) {
-        pad <- format("", width = row_width)
+        pad <- format("", width = row$width)
         lines[[d]] <- paste0(pad, lines[[d]])
     }
-    lines[[depth]] <- paste0(row_head, lines[[depth]])
+    lines[[depth]] <- paste0(row$head, lines[[depth]])
 
     cat(lines, sep = "\n")
 }
@@ -473,10 +473,10 @@ format_body <- function(x, meta, style)
 }
 
 
-print_body <- function(x, meta, control, style, row_body)
+print_body <- function(row, x, meta, control, style)
 {
-    lines <- format_body(x, meta, style$normal)
-    lines <- paste0(row_body, lines)
+    lines <- format_body(x, meta, style)
+    lines <- paste0(row$body, lines)
     cat(lines, sep = "\n")
 }
 
@@ -576,10 +576,10 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
             cat(style$faint(control$vellipsis), "\n", sep="")
         }
 
-        print_head(fmt, meta[start:i, ], control, style, row$head, row$width)
+        print_head(row, fmt, meta[start:i, ], control, style$bold)
 
         if (n > 0) {
-            print_body(fmt, meta[start:i, ], control, style, row$body)
+            print_body(row, fmt, meta[start:i, ], control, style$normal)
         }
 
         foot_width <- max(foot_width,
