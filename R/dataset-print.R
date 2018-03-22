@@ -266,9 +266,9 @@ format.dataset <- function(x, limit = NA, control = NULL, meta = FALSE, ...)
                         indent  = fmt$indent,
                         width   = fmt$width,
                         justify = fmt$justify)
+        attr(meta, "rows.trunc") <- rtrunc
+        attr(meta, "cols.trunc") <- fmt$trunc
         attr(y, "format.meta") <- meta
-        attr(y, "format.meta.rows.trunc") <- rtrunc
-        attr(y, "format.meta.cols.trunc") <- fmt$trunc
     }
 
     y
@@ -527,8 +527,8 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
         print_body(row, fmt, mp, control, style$normal)
     }
 
-    rows.trunc <- attr(fmt, "format.meta.rows.trunc", TRUE)
-    cols.trunc <- attr(fmt, "format.meta.cols.trunc", TRUE)
+    rows.trunc <- attr(meta, "rows.trunc", TRUE)
+    cols.trunc <- attr(meta, "cols.trunc", TRUE)
     if (cols.trunc) {
         nc <- ncol_recursive(x)
         if (rows.trunc) {
