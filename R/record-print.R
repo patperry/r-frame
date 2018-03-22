@@ -83,25 +83,25 @@ format_record_limit <- function(x, limit = NA)
 }
 
 
-format_record_values <- function(x, control, indent)
+format_record_values <- function(x, line, control)
 {
-    as.record(lapply(x, format_record_value, control, indent))
+    as.record(lapply(x, format_record_value, line, control))
 }
 
 
-format_record_value <- function(x, control, indent)
+format_record_value <- function(x, line, control)
 {
     if (!is.record(x)) {
-        format_entry(x, control, indent)
+        format_entry(x, line, control)
     } else if (length(x) == 0) {
         "{}"
     } else {
-        format_record_values(x, control, indent)
+        format_record_values(x, line, control)
     }
 }
 
 
-format_entry <- function(x, control, indent)
+format_entry <- function(x, line, control)
 {
     cl <- paste(class(x), collapse = ".")
     d <- dim(x)
@@ -118,11 +118,10 @@ format_entry <- function(x, control, indent)
     } else {
         if (is.object(x) || !is.character(x)) {
             ctrl <- control
-            ctrl$line <- ctrl$line - indent
-            x <- format(x, limit = NA, control = control)
+            x <- format(x, limit = NA, line = line, control = control)
         }
         wellipsis <- utf8_width(control$ellipsis)
-        width <- max(1, control$line - indent)
+        width <- max(1, line)
         chars <- if (is.na(width)) .Machine$integer.max
                  else (width - wellipsis)
         utf8_format(x, chars = chars)
@@ -130,10 +129,12 @@ format_entry <- function(x, control, indent)
 }
 
 
-format.record <- function(x, limit = NA, control = NULL, meta = FALSE, ...)
+format.record <- function(x, limit = NA, line = NA, control = NULL,
+                          meta = FALSE, ...)
 {
     x       <- as.record(x)
     limit   <- as.limit(limit)
+    line    <- as.line(line)
     control <- as.format.control(control)
     meta    <- as.option(meta)
 
@@ -143,7 +144,7 @@ format.record <- function(x, limit = NA, control = NULL, meta = FALSE, ...)
     nwidth <- nfmt$width
 
     indent <- nwidth + 3
-    y <- format_record_values(nfmt$object, control, indent)
+    y <- format_record_values(nfmt$object, line - indent, control)
 
     if (meta) {
         attr(y, "format.meta") <- list(name.width = nwidth, trunc = trunc)
@@ -189,16 +190,17 @@ format_record_lines <- function(x, name.width, control)
 }
 
 
-print.record <- function(x, limit = NULL, control = NULL, ...)
+print.record <- function(x, limit = NULL, line = NULL, control = NULL, ...)
 {
     x       <- as.record(x)
     limit   <- as.limit(limit)
+    line    <- as.line(line)
     control <- as.format.control(control)
 
     if (length(x) == 0) {
         cat("{}\n")
     } else {
-        fmt <- format.record(x, limit, control, TRUE)
+        fmt <- format.record(x, limit, line, control, TRUE)
         meta <- attr(fmt, "format.meta")
         lines <- format_record_lines(fmt, meta$name.width, control)
         if (length(lines) > 0) {

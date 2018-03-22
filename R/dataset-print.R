@@ -46,7 +46,7 @@ format_vector <- function(index, name, x, control, indent, page)
     justify <- if (num) "right" else "left"
 
     if ((is.list(x) && !is.object(x)) || is.record(x)) {
-        y <- vapply(x, format_entry, "", control, indent)
+        y <- vapply(x, format_entry, "", control$line - indent, control)
     } else {
         if (!is.character(x)) {
             ctrl <- control
