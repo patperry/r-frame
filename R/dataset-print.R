@@ -427,6 +427,7 @@ format_head <- function(x, meta, style, char)
     }
 
     lines[[depth]] <- head
+    attr(lines, "width") <- pos
     lines
 }
 
@@ -467,6 +468,7 @@ format_body <- function(x, meta, style)
         pos <- meta$indent[[i]] + meta$width[[i]]
     }
 
+    attr(lines, "width") <- pos
     lines
 }
 
@@ -483,13 +485,16 @@ format_rows <- function(control, style, nrow, number, keys)
 {
     if (number) {
         row_body <- format(as.character(seq_len(nrow)), justify = "left")
-        num_width <- max(0, utf8_width(row_body))
-        row_head <- format("", width = num_width)
+        row_width <- max(0, utf8_width(row_body))
+        row_head <- format("", width = row_width)
     } else {
         row_body <- character(nrow)
-        num_width <- 0
+        row_width <- 0
         row_head <- ""
     }
+
+    row_head <- style$faint(row_head)
+    row_body <- style$faint(row_body)
 
     if (!is.null(keys)) {
         names <- names(keys)
@@ -500,6 +505,10 @@ format_rows <- function(control, style, nrow, number, keys)
         kcontrol$line <- NA
         cols <- format.dataset(keys, control = kcontrol, meta = TRUE)
         meta <- attr(cols, "format.meta")
+
+        #row_head2 <- format_head(cols, meta, style$faint, control$horiz2)
+        #row_body2 <- format_body(cols, meta, style$faint)
+
         width <- meta$width
         justify <- meta$justify
 
@@ -515,18 +524,18 @@ format_rows <- function(control, style, nrow, number, keys)
 
         kb <- do.call(paste, kb)
         kh <- paste(kh, collapse = " ")
-        if (nzchar(row_head)) {
+        row_width <- row_width + utf8_width(kh)
+        kb <- style$faint(kb)
+        kh <- style$faint(kh)
+        if (number) {
             row_head <- paste(row_head, kh)
             row_body <- paste(row_body, kb)
+            row_width <- row_width + 1
         } else {
             row_head <- kh
             row_body <- kb
         }
     }
-
-    row_width <- utf8_width(row_head)
-    row_head <- style$faint(row_head)
-    row_body <- style$faint(row_body)
 
     if (!is.null(keys)) {
         row_head <- paste0(row_head, " ", style$faint(control$vline), " ")
