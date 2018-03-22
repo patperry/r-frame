@@ -68,24 +68,22 @@ format_vector <- function(index, name, x, line, control, indent, page)
         }
     }
 
-    # compute width, determine whether to truncate
+    # compute width, possibly truncate
     width <- max(utf8_width(name), utf8_width(y))
     if (isTRUE(page == control$pages) && !is.na(line)) {
-        limit <- line - indent
-        trunc <- (width > limit)
+        trunc <- width > (line - indent)
+
+        if (trunc) {
+            y <- rep(control$ellipsis, length(y))
+            width <- utf8_width(control$ellipsis)
+            name <- control$ellipsis
+        }
     } else {
         trunc <- FALSE
     }
 
-    # truncate if necessary
-    if (trunc) {
-        y <- rep(control$ellipsis, length(y))
-        width <- utf8_width(control$ellipsis)
-        name <- control$ellipsis
-    }
-
     # compute new indent
-    start <- (indent == 0L)
+    start <- (indent == 0)
     next_indent <- indent + width + 1
     if (isTRUE(next_indent > line + 1) && !start
             && isTRUE(page < control$pages)) {
