@@ -443,7 +443,8 @@ print_head <- function(row, x, meta, control, style)
     }
     lines[[depth]] <- paste0(row$head, lines[[depth]])
 
-    cat(lines, sep = "\n")
+    if (length(lines) > 0)
+        cat(lines, sep = "\n")
 }
 
 
@@ -461,14 +462,16 @@ format_body <- function(x, meta, style)
     }
 
     lines <- character(nrow(x))
-    pos <- 0
-    for (i in seq_len(n)) {
-        gap <- format("", width = meta$indent[[i]] - pos)
-        lines <- paste0(lines, style(gap), cols[[i]])
-        pos <- meta$indent[[i]] + meta$width[[i]]
+    if (length(lines) > 0) {
+        pos <- 0
+        for (i in seq_len(n)) {
+            gap <- format("", width = meta$indent[[i]] - pos)
+            lines <- paste0(lines, style(gap), cols[[i]])
+            pos <- meta$indent[[i]] + meta$width[[i]]
+        }
     }
 
-    attr(lines, "width") <- pos
+    attr(lines, "width") <- (meta$indent[[n]] + meta$width[[n]])
     lines
 }
 
@@ -476,8 +479,10 @@ format_body <- function(x, meta, style)
 print_body <- function(row, x, meta, control, style)
 {
     lines <- format_body(x, meta, style)
-    lines <- paste0(row$body, lines)
-    cat(lines, sep = "\n")
+    if (length(lines) > 0) {
+        lines <- paste0(row$body, lines)
+        cat(lines, sep = "\n")
+    }
 }
 
 
@@ -540,7 +545,7 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
         return(invisible(x))
     }
 
-    if (!is.na(limit) && limit >= 0) {
+    if (isTRUE(limit >= 0)) {
         n <- min(n, limit)
     }
 
@@ -558,36 +563,22 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
         control$line <- max(1L, control$line - row$width)
     }
 
-    fmt <- format.dataset(x, limit = limit, control = control, meta = TRUE)
-    meta       <- attr(fmt, "format.meta", TRUE)
-    rows.trunc <- attr(fmt, "format.meta.rows.trunc", TRUE)
-    cols.trunc <- attr(fmt, "format.meta.cols.trunc", TRUE)
+    fmt   <- format.dataset(x, limit = limit, control = control, meta = TRUE)
+    meta  <- attr(fmt, "format.meta", TRUE)
+    npage <- max(0, meta$page)
 
-    foot_width <- row$width
-    start <- 1L
-    pg <- 1L
-    nc <- nrow(meta)
-    for (i in seq_len(nc)) {
-        if (i < nc && meta$page[[i + 1L]] == pg) {
-            next
+    for (page in seq_len(npage)) {
+        if (page > 1) {
+            cat(style$faint(control$vellipsis), "\n", sep = "")
         }
 
-        if (start > 1L) {
-            cat(style$faint(control$vellipsis), "\n", sep="")
-        }
-
-        print_head(row, fmt, meta[start:i, ], control, style$bold)
-
-        if (n > 0) {
-            print_body(row, fmt, meta[start:i, ], control, style$normal)
-        }
-
-        foot_width <- max(foot_width,
-                          row$width + meta$indent[[i]] + meta$width[[i]])
-        start <- i + 1L
-        pg <- pg + 1L
+        mp <- meta[meta$page == page, ]
+        print_head(row, fmt, mp, control, style$bold)
+        print_body(row, fmt, mp, control, style$normal)
     }
 
+    rows.trunc <- attr(fmt, "format.meta.rows.trunc", TRUE)
+    cols.trunc <- attr(fmt, "format.meta.cols.trunc", TRUE)
     if (cols.trunc) {
         nc <- ncol_recursive(x)
         if (rows.trunc) {
@@ -605,12 +596,11 @@ print.dataset <- function(x, limit = NULL, control = NULL, ...)
         cat("(0 rows)\n")
     } else if (!is.null(caption)) {
         vellipsis <- if (rows.trunc) control$vellipsis else ""
-        foot <- utf8_format(paste0(" ", caption),
-                            width = max(0,
-                                        foot_width
-                                        - utf8_width(vellipsis)),
+        width     <- row$width + max(meta$indent + meta$width)
+        foot_width <- max(0, width - utf8_width(vellipsis))
+        foot <- utf8_format(paste0(" ", caption), width = foot_width,
                             justify = "right")
-        cat(style$faint(vellipsis), foot, "\n", sep="")
+        cat(style$faint(vellipsis), foot, "\n", sep = "")
     }
 
     invisible(x)
