@@ -104,7 +104,7 @@ append_copy_num <- function(x, nkey, id)
     }
     names <- names(x)
     if (is.null(names)) {
-        names <- rep_len(NA_character_, length(x))
+        names <- character(length(x))
     }
 
     x[[length(x) + 1L]] <- newkey

@@ -52,12 +52,12 @@
             nm <- names(i1)
             if (!is.null(nm)) {
                 if (is.null(names)) {
-                    names <- rep_len(NA, n)
+                    names <- character(n)
                 }
                 names[[i1]] <- nm
                 names(x) <- names
             } else if (i1 > n && !is.null(names)) {
-                names(x) <- c(names, rep_len(NA, i1 - n))
+                names(x) <- c(names, character(i1 - n))
             }
         }
 
@@ -128,7 +128,7 @@
     nx2 <- length(x)
 
     if (nx1 < nx2) {
-        names(x)[(nx1 + 1L):nx2] <- NA_character_
+        names(x)[(nx1 + 1L):nx2] <- ""
     }
 
     names <- names(i)

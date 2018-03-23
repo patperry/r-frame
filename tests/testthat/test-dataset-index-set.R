@@ -90,7 +90,7 @@ test_that("appending column by index", {
     x[[n + 1L]] <- col
 
     ds[[n + 1L]] <- col
-    names(ds)[[n + 1L]] <- NA
+    names(ds)[[n + 1L]] <- ""
     y <- as.dataset(ds)
 
     expect_equal(x, y)

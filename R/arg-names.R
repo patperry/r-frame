@@ -4,7 +4,6 @@ arg_names <- function(value, name)
         return(NULL)
 
     raw <- as.character(value)
-    raw[!nzchar(raw)] <- NA
 
     if (!all(utf8_valid(raw), na.rm = TRUE)) {
         invalid <- which(!utf8_valid(raw))[[1]]
