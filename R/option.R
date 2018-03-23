@@ -115,10 +115,11 @@ as.ansi <- function(x)
         return(x)
 
     if (!grepl("^[0-9;]*$", x)) {
-        stop("argument must be a valid ANSI SGR parameter string")
+        stop(sprintf("argument \"%s\" is not an ANSI SGR parameter string",
+                     x))
     }
     if (nchar(x) >= 128) {
-        stop("argument must have length below 128 characters")
+        stop("argument exceeds 127 characters")
     }
     x
 }

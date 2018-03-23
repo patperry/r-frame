@@ -78,6 +78,12 @@ test_that("'print.dataset' can wrap 4 columns", {
                                          width = 80),
                           "\n")[[1]],
                  lines)
+
+    control <- list(pages = 0)
+    expect_equal(strsplit(capture_output(print.dataset(x, control = control),
+                                         width = 80),
+                          "\n")[[1]],
+                 lines)
 })
 
 
@@ -430,4 +436,19 @@ test_that("trunc rows and columns", {
     expect_equal(strsplit(capture_output(print(x, 5), width = 40),
                           "\n")[[1]],
                  lines)
+})
+
+
+test_that("format with no column", {
+    x <- as.dataset(matrix(0, 5, 0))
+    expect_equal(format(x), x)
+})
+
+
+test_that("invalid styles", {
+    expect_error(print.dataset(mtcars, control = list(bold = "zzz")),
+                 "argument \"zzz\" is not an ANSI SGR parameter string")
+    long <- paste0(rep_len("1", 128), collapse = "")
+    expect_error(print.dataset(mtcars, control = list(bold = long)),
+                 "argument exceeds 127 characters")
 })
