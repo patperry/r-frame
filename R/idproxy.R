@@ -32,7 +32,10 @@ idproxy.vector <- function(x)
     if (is.object(x)) {
         xtfrm(x)
     } else if (is.atomic(x)) {
-        x
+        if (is.character(x))
+            as_utf8(x)
+        else
+            x
     } else {
         cl <- class(x)
         stop(sprintf("cannot compute idproxy for objects of class \"%s\"",

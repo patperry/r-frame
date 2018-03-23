@@ -63,9 +63,29 @@ test_that("character", {
 })
 
 
+test_that("character with empty, NA", {
+    set.seed(0)
+    set <- c(NA, NA, "", "", "a", "b", "c")
+    x <- dataset(col = sample(set, 100, replace = TRUE))
+    expect_equal(anyDuplicated(x), anyDuplicated(x$col))
+    expect_equal(duplicated(x), duplicated(x$col))
+    expect_equal(unique(x), dataset(col = unique(x$col)))
+})
+
+
 test_that("large set", {
     set.seed(0)
     x <- dataset(col = sample.int(200, 1000, replace = TRUE))
+    expect_equal(anyDuplicated(x), anyDuplicated(x$col))
+    expect_equal(duplicated(x), duplicated(x$col))
+    expect_equal(unique(x), dataset(col = unique(x$col)))
+})
+
+
+test_that("mixed encoding", {
+    col <- c("fa\u00E7ile", "fa\xE7ile")
+    Encoding(col[2]) <- "latin1"
+    x <- dataset(col = col)
     expect_equal(anyDuplicated(x), anyDuplicated(x$col))
     expect_equal(duplicated(x), duplicated(x$col))
     expect_equal(unique(x), dataset(col = unique(x$col)))
