@@ -253,13 +253,13 @@ format.dataset <- function(x, limit = NA, line = NA, control = NULL,
     if (length(x) > 0) {
         fmt <- format_column(integer(), "", x, line, control, 0, 1)
         y <- fmt$value
-        keys(y) <- keys(x)
     } else {
-        y <- x
+        y <- as.dataset(matrix(0, nrow(x), 0))
         fmt <- list(index = list(), page = integer(), indent = integer(),
                     width = integer(), justify = character(),
                     trunc = FALSE)
     }
+    keys(y) <- keys(x)
 
     if (meta) {
         meta <- dataset(index   = fmt$index,
