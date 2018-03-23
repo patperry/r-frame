@@ -62,12 +62,12 @@ S3method(duplicated, dataset)    ; export(duplicated.dataset)
 S3method(anyDuplicated, dataset) ; export(anyDuplicated.dataset)
 
 
-### proxy
+### idproxy
 
-export(proxy)
-S3method(proxy, dataset) ; export(proxy.dataset)
-S3method(proxy, default) ; export(proxy.default)
-S3method(proxy, matrix)  ; export(proxy.matrix)
+export(idproxy)
+S3method(idproxy, dataset) ; export(idproxy.dataset)
+S3method(idproxy, default) ; export(idproxy.default)
+S3method(idproxy, matrix)  ; export(idproxy.matrix)
 
 
 ### normal

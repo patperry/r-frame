@@ -1,11 +1,11 @@
 
-proxy <- function(x)
+idproxy <- function(x)
 {
-    UseMethod("proxy")
+    UseMethod("idproxy")
 }
 
 
-proxy.default <- function(x)
+idproxy.default <- function(x)
 {
     if (is.null(x))
         return(x)
@@ -14,16 +14,16 @@ proxy.default <- function(x)
     r <- length(d)
 
     if (r <= 1) {
-        proxy.vector(x)
+        idproxy.vector(x)
     } else if (r == 2) {
-        proxy.matrix(x)
+        idproxy.matrix(x)
     } else {
-        stop(sprintf("cannot compute proxy for rank-%.0f objects", r))
+        stop(sprintf("cannot compute idproxy for rank-%.0f objects", r))
     }
 }
 
 
-proxy.vector <- function(x)
+idproxy.vector <- function(x)
 {
     d <- dim(x)
     if (length(d) > 1)
@@ -35,30 +35,30 @@ proxy.vector <- function(x)
         x
     } else {
         cl <- class(x)
-        stop(sprintf("cannot compute proxy for objects of class \"%s\"",
+        stop(sprintf("cannot compute idproxy for objects of class \"%s\"",
                      paste(cl, collapse = ".")))
     }
 }
 
 
-proxy.matrix <- function(x)
+idproxy.matrix <- function(x)
 {
     d <- dim(x)
     if (length(d) != 2)
         stop("argument is not a matrix")
 
     x <- as.dataset.matrix(x)
-    proxy.dataset(x)
+    idproxy.dataset(x)
 }
 
 
-proxy.dataset <- function(x)
+idproxy.dataset <- function(x)
 {
     x <- as.dataset(x)
     null <- logical(length(x))
 
     for (i in seq_along(x)) {
-        p <- proxy(x[[i]])
+        p <- idproxy(x[[i]])
         if (is.null(p)) {
             null[[i]] <- TRUE
         } else {

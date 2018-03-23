@@ -2,7 +2,7 @@
 
 unique.dataset <- function(x, incomparables = FALSE, ...)
 {
-    p <- proxy(x)
+    p <- idproxy(x)
     u <- .Call(rframe_unique, p)
     x[u$types, ]
 }
@@ -10,7 +10,7 @@ unique.dataset <- function(x, incomparables = FALSE, ...)
 
 duplicated.dataset <- function(x, incomparables = FALSE, ...)
 {
-    x <- proxy(x)
+    x <- idproxy(x)
     u <- .Call(rframe_unique, x)
     duplicated(u$group)
 }
@@ -18,7 +18,7 @@ duplicated.dataset <- function(x, incomparables = FALSE, ...)
 
 anyDuplicated.dataset <- function(x, incomparables = FALSE, ...)
 {
-    x <- proxy(x)
+    x <- idproxy(x)
     u <- .Call(rframe_unique, x)
 
     if (length(u$types) < length(u$group))
