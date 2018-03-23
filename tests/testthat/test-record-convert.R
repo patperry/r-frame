@@ -70,7 +70,7 @@ test_that("setting names with wrong encoding", {
     Encoding(names) <- "UTF-8"
 
     x <- record(a = 1, b = 18, c = "foo")
-    expect_error(names(x) <- names, "^encoding error: `value` entry 2")
+    expect_error(names(x) <- names) #, "^encoding error: `value` entry 2")
 })
 
 
