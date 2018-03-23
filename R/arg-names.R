@@ -6,13 +6,11 @@ arg_names <- function(value, name)
     raw <- as.character(value)
     raw[!nzchar(raw)] <- NA
 
-    names <- tryCatch(as_utf8(raw, normalize = TRUE),
-                      error = function(cond) NULL)
-    if (is.null(names)) {
+    if (!all(utf8_valid(raw), na.rm = TRUE)) {
         invalid <- which(!utf8_valid(raw))[[1]]
         fmt <- "encoding error: %s entry %.0f (\"%s\")"
         stop(simpleError(sprintf(fmt, name, invalid, raw[[invalid]]), call))
     }
 
-    names
+    as_utf8(raw)
 }

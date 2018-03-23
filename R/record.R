@@ -92,8 +92,8 @@ as.record.default <- function(x)
 
 
 # Record names are themselves records, but unlike most R objects, they
-# are required to be encoded in normalized UTF-8, and they cannot contain NA.
-# They are, however, allowed to contain the empty string (`""`).
+# are required to be encoded in UTF-8, and they cannot contain the
+# empty string (`""`).  They are, however, allowed to contain `NA`.
 #
 # Note that `names(x)` may contain duplicate values.
 
