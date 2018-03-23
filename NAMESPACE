@@ -62,6 +62,14 @@ S3method(duplicated, dataset)    ; export(duplicated.dataset)
 S3method(anyDuplicated, dataset) ; export(anyDuplicated.dataset)
 
 
+### proxy
+
+export(proxy)
+S3method(proxy, dataset) ; export(proxy.dataset)
+S3method(proxy, default) ; export(proxy.default)
+S3method(proxy, matrix)  ; export(proxy.matrix)
+
+
 ### normal
 
 export(as.normal)
