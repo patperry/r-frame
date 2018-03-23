@@ -46,3 +46,12 @@ test_that("complex", {
     expect_equal(duplicated(x), duplicated(y))
     expect_equal(unique(x), x[!duplicated(x), ])
 })
+
+
+test_that("large set", {
+    set.seed(0)
+    x <- dataset(col = sample.int(200, 1000, replace = TRUE))
+    expect_equal(anyDuplicated(x), anyDuplicated(x$col))
+    expect_equal(duplicated(x), duplicated(x$col))
+    expect_equal(unique(x), dataset(col = unique(x$col)))
+})
