@@ -5,8 +5,10 @@
 
 static int rframe_equals_column(SEXP x_, R_xlen_t i1, R_xlen_t i2);
 static int rframe_equals_logical(SEXP x_, R_xlen_t i1, R_xlen_t i2);
+static int rframe_equals_raw(SEXP x_, R_xlen_t i1, R_xlen_t i2);
 static int rframe_equals_integer(SEXP x_, R_xlen_t i1, R_xlen_t i2);
 static int rframe_equals_double(SEXP x_, R_xlen_t i1, R_xlen_t i2);
+static int rframe_equals_complex(SEXP x_, R_xlen_t i1, R_xlen_t i2);
 static int rframe_equals_character(SEXP x_, R_xlen_t i1, R_xlen_t i2);
 
 
@@ -34,19 +36,23 @@ int rframe_equals_column(SEXP x_, R_xlen_t i1, R_xlen_t i2)
     case LGLSXP:
         return rframe_equals_logical(x_, i1, i2);
 
+    case RAWSXP:
+        return rframe_equals_raw(x_, i1, i2);
+
     case INTSXP:
         return rframe_equals_integer(x_, i1, i2);
 
     case REALSXP:
         return rframe_equals_double(x_, i1, i2);
 
+    case CPLXSXP:
+        return rframe_equals_complex(x_, i1, i2);
+
     case STRSXP:
         return rframe_equals_character(x_, i1, i2);
-        break;
 
     case VECSXP:
         return rframe_equals_dataset(x_, i1, i2);
-        break;
 
     default:
         assert(t == NILSXP);
@@ -62,6 +68,13 @@ int rframe_equals_logical(SEXP x_, R_xlen_t i1, R_xlen_t i2)
 }
 
 
+int rframe_equals_raw(SEXP x_, R_xlen_t i1, R_xlen_t i2)
+{
+    const Rbyte *x = RAW(x_);
+    return x[i1] == x[i2];
+}
+
+
 int rframe_equals_integer(SEXP x_, R_xlen_t i1, R_xlen_t i2)
 {
     const int *x = INTEGER(x_);
@@ -69,10 +82,31 @@ int rframe_equals_integer(SEXP x_, R_xlen_t i1, R_xlen_t i2)
 }
 
 
+static int equals_double(double x1, double x2)
+{
+    union {
+        double d;
+        uint64_t u;
+    } value1, value2;
+    value1.d = x1;
+    value2.d = x2;
+    return (value1.u == value2.u);
+}
+
+
 int rframe_equals_double(SEXP x_, R_xlen_t i1, R_xlen_t i2)
 {
-    const uint64_t *x = (const uint64_t *)REAL(x_);
-    return x[i1] == x[i2];
+    const double *x = REAL(x_);
+    return equals_double(x[i1], x[i2]);
+}
+
+
+// Diverge from the R behavior, which considers NA+i and NA to be equal
+int rframe_equals_complex(SEXP x_, R_xlen_t i1, R_xlen_t i2)
+{
+    const Rcomplex *x = COMPLEX(x_);
+    return (equals_double(x[i1].r, x[i2].r)
+            && equals_double(x[i1].i, x[i2].i));
 }
 
 

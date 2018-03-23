@@ -6,8 +6,10 @@
 
 static void rframe_hash_column(uint64_t *hash, R_xlen_t n, SEXP x_);
 static void rframe_hash_logical(uint64_t *hash, R_xlen_t n, SEXP x_);
+static void rframe_hash_raw(uint64_t *hash, R_xlen_t n, SEXP x_);
 static void rframe_hash_integer(uint64_t *hash, R_xlen_t n, SEXP x_);
 static void rframe_hash_double(uint64_t *hash, R_xlen_t n, SEXP x_);
+static void rframe_hash_complex(uint64_t *hash, R_xlen_t n, SEXP x_);
 static void rframe_hash_character(uint64_t *hash, R_xlen_t n, SEXP x_);
 
 static uint64_t rframe_hash_combine(uint64_t seed, uint64_t hash);
@@ -36,12 +38,20 @@ void rframe_hash_column(uint64_t *hash, R_xlen_t n, SEXP x_)
         rframe_hash_logical(hash, n, x_);
         break;
 
+    case RAWSXP:
+        rframe_hash_raw(hash, n, x_);
+        break;
+
     case INTSXP:
         rframe_hash_integer(hash, n, x_);
         break;
 
     case REALSXP:
         rframe_hash_double(hash, n, x_);
+        break;
+
+    case CPLXSXP:
+        rframe_hash_complex(hash, n, x_);
         break;
 
     case STRSXP:
@@ -75,6 +85,22 @@ void rframe_hash_logical(uint64_t *hash, R_xlen_t n, SEXP x_)
 }
 
 
+void rframe_hash_raw(uint64_t *hash, R_xlen_t n, SEXP x_)
+{
+    const Rbyte *x;
+    R_xlen_t i;
+    uint64_t h;
+
+    x = RAW(x_);
+    for (i = 0; i < n; i++) {
+        RFRAME_CHECK_INTERRUPT(i);
+
+        h = (uint64_t)x[i];
+        hash[i] = rframe_hash_combine(hash[i], h);
+    }
+}
+
+
 void rframe_hash_integer(uint64_t *hash, R_xlen_t n, SEXP x_)
 {
     const int *x;
@@ -91,21 +117,48 @@ void rframe_hash_integer(uint64_t *hash, R_xlen_t n, SEXP x_)
 }
 
 
-void rframe_hash_double(uint64_t *hash, R_xlen_t n, SEXP x_)
+
+static uint64_t hash_double(double x)
 {
-    const double *x;
-    R_xlen_t i;
     union {
         double d;
         uint64_t u;
     } value;
+    value.d = x;
+    return value.u;
+}
+
+
+void rframe_hash_double(uint64_t *hash, R_xlen_t n, SEXP x_)
+{
+    const double *x;
+    R_xlen_t i;
+    uint64_t h;
 
     x = REAL(x_);
     for (i = 0; i < n; i++) {
         RFRAME_CHECK_INTERRUPT(i);
         
-        value.d = x[i];
-        hash[i] = rframe_hash_combine(hash[i], value.u);
+        h = hash_double(x[i]);
+        hash[i] = rframe_hash_combine(hash[i], h);
+    }
+}
+
+
+void rframe_hash_complex(uint64_t *hash, R_xlen_t n, SEXP x_)
+{
+    const Rcomplex *x;
+    R_xlen_t i;
+    uint64_t hr, hi;
+
+    x = COMPLEX(x_);
+    for (i = 0; i < n; i++) {
+        RFRAME_CHECK_INTERRUPT(i);
+
+        hr = hash_double(x[i].r);
+        hi = hash_double(x[i].i);
+        hash[i] = rframe_hash_combine(hash[i], hr);
+        hash[i] = rframe_hash_combine(hash[i], hi);
     }
 }
 
