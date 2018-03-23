@@ -48,6 +48,21 @@ test_that("complex", {
 })
 
 
+test_that("character", {
+    set.seed(0)
+
+    set <- c(letters)
+    for (i in 1:4) {
+        set <- c(set, paste0(set, set))
+    }
+
+    x <- dataset(col = sample(c("", NA, set), 1000, replace = TRUE))
+    expect_equal(anyDuplicated(x), anyDuplicated(x$col))
+    expect_equal(duplicated(x), duplicated(x$col))
+    expect_equal(unique(x), dataset(col = unique(x$col)))
+})
+
+
 test_that("large set", {
     set.seed(0)
     x <- dataset(col = sample.int(200, 1000, replace = TRUE))
