@@ -13,7 +13,7 @@ test_that("logical", {
 
 test_that("raw", {
     x <- as.raw(c(0, 1, 254, 255))
-    expect_equal(as.normal(x), as.normal(as.integer(x)))
+    expect_equal(as.raw(as.normal(x)), x)
 })
 
 
@@ -44,21 +44,21 @@ test_that("double", {
 
 test_that("complex", {
     x <- c(-1-1i, -1, 0, 1, 1i, 1i)
-    y <- dataset(re = Re(x), im = Im(x))
-    expect_equal(as.normal(x), as.normal(y))
+    expect_equal(as.complex(as.normal(x)), x)
 })
 
 
 test_that("character", {
     x <- c("a", "zzzz", "", NA)
-    y <- c("a", "zzzz", NA, NA)
-    expect_equal(as.normal(x), as.normal(y))
+    expect_equal(as.character(as.normal(x)), x)
 })
 
 
 test_that("factor", {
     x <- factor(c("5", "4", "3", "2", "1"), c(1, 2, 5, 3, 4))
-    expect_equal(as.normal(x), as.normal(as.character(x)))
+    expect_true(is.factor(as.normal(x)))
+    expect_equal(levels(as.normal(x)), levels(x))
+    expect_equal(as.integer(as.normal(x)), as.integer(x))
 })
 
 
@@ -112,26 +112,30 @@ test_that("POSIXlt in America/Los_Angeles", {
 
 test_that("list", {
     l <- list(1, 2, 17)
-    expect_equal(as.normal(l), as.normal(as.numeric(l)))
+    #expect_equal(as.normal(l), as.normal(as.numeric(l)))
+    expect_error(as.normal(l),
+                 "cannot convert objects of mode \"list\" to normal")
 })
 
 
 test_that("list of boxed", {
     l <- list(list(1), list(2), list(17))
-    expect_equal(as.normal(l), as.normal(c(1, 2, 17)))
+    #expect_equal(as.normal(l), as.normal(c(1, 2, 17)))
+    expect_error(as.normal(l),
+                 "cannot convert objects of mode \"list\" to normal")
 })
 
 
 test_that("list of heterogeneous", {
     l <- list(1, c(1, 3), 1)
     expect_error(as.normal(l),
-                 "cannot convert heterogeneous list to normal")
+                 "cannot convert objects of mode \"list\" to normal")
 })
 
 
 test_that("matrix-like", {
     x <- data.frame(a = 1:5, b = letters[1:5], c = rep(TRUE, 5))
-    y <- dataset(a = 1:5, b = letters[1:5], c = rep(TRUE, 5))
+    y <- dataset(a = 1:5, b = factor(letters[1:5]), c = rep(TRUE, 5))
     expect_equal(as.normal(x), as.normal(y))
 })
 

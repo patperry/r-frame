@@ -45,27 +45,17 @@ as.normal.default <- function(x)
 
     mode <- storage.mode(x)
     if (mode == "character") {
-        x <- as_utf8(x, normalize = TRUE)
-        x[!nzchar(x)] <- NA
+        x <- as_utf8(x)
     } else if (mode == "double") {
-        x[is.nan(x)] <- NA
+        x
     } else if (mode == "integer") {
         # pass
     } else if (mode == "logical") {
         # pass
     } else if (mode == "complex") {
-        x <- dataset(re = as.normal(Re(x)), im = as.normal(Im(x)))
-        return(x)
-    } else if (mode == "list") {
-        lengths <- vapply(x, length, 0)
-        if (!all(lengths == 1)) {
-            stop(sprintf("cannot convert heterogeneous list to normal"))
-        }
-        x <- do.call(c, x)
-        x <- as.normal(x)
-        return(x)
+        x[is.na(x)] <- NA
     } else if (mode == "raw") {
-        x <- as.integer(x)
+        # pass
     } else {
         stop(sprintf("cannot convert objects of mode \"%s\" to normal", mode))
     }
@@ -81,9 +71,10 @@ as.normal.dataset <- function(x)
         return(x)
 
     x <- as.dataset(x)
-    for (i in seq_along(x)) {
-        x[[i]] <- as.normal(x[[i]])
-    }
+    k <- keys(x)
+    x <- as.record(lapply(x, as.normal))
+    x <- as.dataset(x)
+    keys(x) <- k
     x
 }
 
@@ -111,8 +102,13 @@ as.normal.POSIXlt <- function(x)
 
 as.normal.factor <- function(x)
 {
-    levels <- as.normal(levels(x))
-    levels[x]
+    levels(x) <- as.normal(levels(x))
+    cl <- if (is.ordered(x))
+              c("normal", "ordered", "factor")
+          else
+              c("normal", "factor")
+    class(x) <- cl
+    x
 }
 
 
@@ -155,5 +151,12 @@ un.normal <- function(x)
 `[<-.normal` <- function(x, i, value)
 {
     x <- NextMethod("[<-")
+    un.normal(x)
+}
+
+
+`levels<-.normal` <- function(x, value)
+{
+    x <- NextMethod("levels<-")
     un.normal(x)
 }

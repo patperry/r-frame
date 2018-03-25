@@ -89,6 +89,7 @@ S3method(`[`, normal)
 S3method(`[<-`, normal)
 S3method(`[[`, normal)
 S3method(`[[<-`, normal)
+S3method(`levels<-`, normal)
 
 
 ### keyset
