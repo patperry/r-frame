@@ -111,6 +111,8 @@ format_entry <- function(x, line, control)
         "NULL"
     } else if (!is.null(d)) {
         paste0(cl, "[", paste0(d, collapse = ", "), "]")
+    } else if (n == 0) {
+        paste0(cl, "()")
     } else if (n != 1 || (is.list(x) && !is.object(x))) {
         paste0(cl, "(", n, ")")
     } else if (is.function(x) || is.language(x)) {

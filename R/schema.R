@@ -28,7 +28,8 @@ schema.default <- function(x)
     if (r <= 1) {
         x[0]
     } else if (r == 2) {
-        x[0, , drop = TRUE]
+        x <- as.dataset(x[0, , drop = TRUE])
+        schema(x)
     } else {
         stop(sprintf("cannot get schema of rank-%.0f object", r))
     }
