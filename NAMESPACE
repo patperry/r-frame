@@ -62,6 +62,13 @@ S3method(duplicated, dataset)    ; export(duplicated.dataset)
 S3method(anyDuplicated, dataset) ; export(anyDuplicated.dataset)
 
 
+### schema
+
+export(schema)
+S3method(schema, default) ; export(schema.default)
+S3method(schema, record)  ; export(schema.record)
+
+
 ### idproxy
 
 export(idproxy)
@@ -182,9 +189,6 @@ export(numeric.map)
 # export(rowid.default)
 # export(rowid.keyset)
 # export(rowid.NULL)
-# export(schema)
-# export(schema.dataset)
-# export(schema.default)
 
 ## Deprecated
 # (none)
@@ -204,8 +208,6 @@ export(numeric.map)
 # S3method(rowid, default)
 # S3method(rowid, keyset)
 # S3method(rowid, NULL)
-# S3method(schema, dataset)
-# S3method(schema, default)
 
 
 ## Base S3 methods

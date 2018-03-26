@@ -38,6 +38,7 @@ schema.default <- function(x)
 
 schema.record <- function(x)
 {
+    x <- as.record(x)
     x <- lapply(x, schema)
     as.record(x)
 }
