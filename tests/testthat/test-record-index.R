@@ -134,7 +134,7 @@ test_that("list assign", {
 test_that("field assign NULL", {
     x <- record(a = 1, b = 2, c = 3)
     x[[2]] <- NULL
-    expect_equal(x, record(a = 1, c = 3))
+    expect_equal(x, record(a = 1, b = NULL, c = 3))
 })
 
 

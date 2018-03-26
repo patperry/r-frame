@@ -46,19 +46,21 @@
         i1 <- arg_index(i[[1]], n, names, FALSE)
 
         class(x) <- NULL
-        x[[i1]] <- value
+        if (is.null(value)) {
+            x[i1] <- list(NULL)
+        } else {
+            x[[i1]] <- value
+        }
 
-        if (!is.null(value)) {
-            nm <- names(i1)
-            if (!is.null(nm)) {
-                if (is.null(names)) {
-                    names <- character(n)
-                }
-                names[[i1]] <- nm
-                names(x) <- names
-            } else if (i1 > n && !is.null(names)) {
-                names(x) <- c(names, character(i1 - n))
+        nm <- names(i1)
+        if (!is.null(nm)) {
+            if (is.null(names)) {
+                names <- character(n)
             }
+            names[[i1]] <- nm
+            names(x) <- names
+        } else if (i1 > n && !is.null(names)) {
+            names(x) <- c(names, character(i1 - n))
         }
 
         class(x) <- "record"

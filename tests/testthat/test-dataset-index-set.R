@@ -44,7 +44,7 @@ test_that("deleting all columns", {
     x[] <- NULL
     y <- as.dataset(mtcars)
     for (i in rev(seq_along(y)))
-        y[[i]] <- NULL
+        y[i] <- NULL
     expect_equal(x, y)
 })
 
