@@ -533,12 +533,12 @@ print.dataset <- function(x, limit = NULL, line = NULL, control = NULL, ...)
     if (cols.trunc) {
         nc <- ncol_recursive(x)
         if (rows.trunc) {
-            caption <- sprintf("(%.0f rows, %.0f columns total)", n, nc)
+            caption <- sprintf("(%.0f rows, %.0f columns total)", nr, nc)
         } else {
             caption <- sprintf("(%.0f columns total)", nc)
         }
     } else if (rows.trunc) {
-        caption <- sprintf("(%.0f rows total)", n)
+        caption <- sprintf("(%.0f rows total)", nr)
     } else {
         caption <- NULL
     }

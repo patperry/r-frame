@@ -411,7 +411,7 @@ test_that("trunc rows", {
 'Datsun 710        | 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1',
 'Hornet 4 Drive    | 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1',
 'Hornet Sportabout | 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2',
-'.                                                       (5 rows total)')
+'.                                                      (32 rows total)')
 
     expect_equal(strsplit(capture_output(print(x, 5)),
                           "\n")[[1]],
@@ -431,7 +431,7 @@ test_that("trunc rows and columns", {
 'Datsun 710        | 22.8   4  108 ...',
 'Hornet 4 Drive    | 21.4   6  258 ...',
 'Hornet Sportabout | 18.7   8  360 ...',
-'.          (5 rows, 11 columns total)')
+'.         (32 rows, 11 columns total)')
 
     expect_equal(strsplit(capture_output(print(x, 5), width = 40),
                           "\n")[[1]],
