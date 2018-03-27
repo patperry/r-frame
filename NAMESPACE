@@ -69,6 +69,16 @@ S3method(schema, default) ; export(schema.default)
 S3method(schema, record)  ; export(schema.record)
 
 
+### cast_as
+
+export(cast_as)
+S3method(cast_as, default)
+S3method(cast_as, factor)
+S3method(cast_as, Date)
+S3method(cast_as, POSIXct)
+S3method(cast_as, record)
+
+
 ### idproxy
 
 export(idproxy)
