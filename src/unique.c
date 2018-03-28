@@ -10,8 +10,6 @@
 // Initial table size. Must be a positive power of 2.
 #define RFRAME_TABLE_SIZE_INIT 32
 
-// Code for an empty table item
-#define RFRAME_TABLE_ITEM_EMPTY (R_xlen_t)(-1)
 
 struct rframe_array {
     R_xlen_t *items;
@@ -120,8 +118,6 @@ int rframe_probe_advance(struct rframe_probe *p)
 
 void rframe_table_init(struct rframe_table *t, R_xlen_t size)
 {
-    R_xlen_t i;
-
     if (size <= RFRAME_TABLE_SIZE_INIT) {
         size = RFRAME_TABLE_SIZE_INIT;
     }
@@ -130,10 +126,7 @@ void rframe_table_init(struct rframe_table *t, R_xlen_t size)
     t->mask = (uint64_t)(t->size - 1);
     t->capacity = (R_xlen_t)(RFRAME_TABLE_LOAD_FACTOR * t->size);
     t->items = (void *)R_alloc(t->size, sizeof(*t->items));
-
-    for (i = 0; i < t->size; i++) {
-        t->items[i] = RFRAME_TABLE_ITEM_EMPTY;
-    }
+    memset(t->items, 0, t->size * sizeof(*t->items));
 }
 
 
@@ -155,8 +148,8 @@ void rframe_table_grow(struct rframe_table *t,
 
         rframe_probe_init(&p, &t2, hash[i]);
         while (rframe_probe_advance(&p)) {
-            if (t2.items[p.index] == RFRAME_TABLE_ITEM_EMPTY) {
-                t2.items[p.index] = j;
+            if (t2.items[p.index] == 0) {
+                t2.items[p.index] = (double)(j + 1);
                 break;
             }
         }
@@ -172,7 +165,7 @@ SEXP rframe_unique(SEXP x_)
     struct rframe_array types;
     struct rframe_table t;
     struct rframe_probe p;
-    R_xlen_t i, j, n;
+    R_xlen_t i, j, n, item;
     uint64_t *hash;
     double *id, *table, *typehash, *typerows;
     int nprot = 0;
@@ -195,39 +188,35 @@ SEXP rframe_unique(SEXP x_)
         rframe_probe_init(&p, &t, hash[i]);
 
         while (rframe_probe_advance(&p)) {
-            j = t.items[p.index];
+            item = (R_xlen_t)t.items[p.index];
 
-            if (j == RFRAME_TABLE_ITEM_EMPTY) {
+            if (item == 0) {
 
-                j = types.count;
+                item = types.count + 1;
                 rframe_array_push(&types, i);
-                t.items[p.index] = j;
+                t.items[p.index] = (double)item;
 
                 if (types.count == t.capacity) {
                     rframe_table_grow(&t, &types, hash);
                 }
 
                 break;
-            } else if (hash[i] != hash[types.items[j]]) {
-                continue;
-            } else if (rframe_equals_dataset(x_, i, types.items[j])) {
-                break;
+            } else {
+                j = item - 1;
+                if (hash[i] != hash[types.items[j]]) {
+                    continue;
+                } else if (rframe_equals_dataset(x_, i, types.items[j])) {
+                    break;
+                }
             }
         }
 
-        id[i] = (double)(j + 1);
+        id[i] = (double)item;
     }
 
     PROTECT(table_ = Rf_allocVector(REALSXP, t.size)); nprot++;
     table = REAL(table_);
-    for (i = 0; i < t.size; i++) {
-        j = t.items[i];
-        if (j == RFRAME_TABLE_ITEM_EMPTY) {
-            table[i] = 0;
-        } else {
-            table[i] = (double)(j + 1);
-        }
-    }
+    memcpy(table, t.items, t.size * sizeof(*table));
 
     PROTECT(typerows_ = Rf_allocVector(REALSXP, types.count)); nprot++;
     PROTECT(typehash_ = Rf_allocVector(REALSXP, types.count)); nprot++;
