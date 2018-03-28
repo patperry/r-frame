@@ -174,6 +174,18 @@ cast.record <- function(type, x)
                      n, nx))
     }
 
+    names <- names(type)
+    if (!is.null(names)) {
+        namesx <- names(x)
+        if (!is.null(namesx) && !identical(names, namesx)) {
+            i <- which(!mapply(identical, letters, LETTERS))
+            nfmt <- function(nm) if (is.na(nm)) "<NA>"
+                                 else paste0('"', nm, '"')
+            fmt <- "mismatch: type name %.0f is %s, value name is %s"
+            stop(sprintf(fmt, i, nfmt(names[[i]]), nfmt(namesx[[i]])))
+        }
+    }
+
     for (i in seq_len(n)) {
         x[[i]] <- cast(type[[i]], x[[i]])
     }
