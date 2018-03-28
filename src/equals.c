@@ -3,24 +3,25 @@
 #include <string.h>
 
 
-static int rframe_equals_column(SEXP x_, R_xlen_t i1, R_xlen_t i2);
-static int rframe_equals_logical(SEXP x_, R_xlen_t i1, R_xlen_t i2);
-static int rframe_equals_raw(SEXP x_, R_xlen_t i1, R_xlen_t i2);
-static int rframe_equals_integer(SEXP x_, R_xlen_t i1, R_xlen_t i2);
-static int rframe_equals_double(SEXP x_, R_xlen_t i1, R_xlen_t i2);
-static int rframe_equals_complex(SEXP x_, R_xlen_t i1, R_xlen_t i2);
-static int rframe_equals_character(SEXP x_, R_xlen_t i1, R_xlen_t i2);
+static int rframe_equals_column(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2);
+static int rframe_equals_logical(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2);
+static int rframe_equals_raw(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2);
+static int rframe_equals_integer(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2);
+static int rframe_equals_double(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2);
+static int rframe_equals_complex(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2);
+static int rframe_equals_character(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2);
 
 
-int rframe_equals_dataset(SEXP x_, R_xlen_t i1, R_xlen_t i2)
+int rframe_equals_dataset(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2)
 {
-    SEXP col;
+    SEXP col1, col2;
     R_xlen_t j, ncol;
 
-    ncol = XLENGTH(x_);
+    ncol = XLENGTH(x1_);
     for (j = 0; j < ncol; j++) {
-        col = VECTOR_ELT(x_, j);
-        if (!rframe_equals_column(col, i1, i2))
+        col1 = VECTOR_ELT(x1_, j);
+        col2 = (x1_ == x2_) ? col1 : VECTOR_ELT(x2_, j);
+        if (!rframe_equals_column(col1, i1, col2, i2))
             return 0;
     }
 
@@ -28,31 +29,31 @@ int rframe_equals_dataset(SEXP x_, R_xlen_t i1, R_xlen_t i2)
 }
 
 
-int rframe_equals_column(SEXP x_, R_xlen_t i1, R_xlen_t i2)
+int rframe_equals_column(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2)
 {
-    int t = TYPEOF(x_);
+    int t = TYPEOF(x1_);
 
     switch (t) {
     case LGLSXP:
-        return rframe_equals_logical(x_, i1, i2);
+        return rframe_equals_logical(x1_, i1, x2_, i2);
 
     case RAWSXP:
-        return rframe_equals_raw(x_, i1, i2);
+        return rframe_equals_raw(x1_, i1, x2_, i2);
 
     case INTSXP:
-        return rframe_equals_integer(x_, i1, i2);
+        return rframe_equals_integer(x1_, i1, x2_, i2);
 
     case REALSXP:
-        return rframe_equals_double(x_, i1, i2);
+        return rframe_equals_double(x1_, i1, x2_, i2);
 
     case CPLXSXP:
-        return rframe_equals_complex(x_, i1, i2);
+        return rframe_equals_complex(x1_, i1, x2_, i2);
 
     case STRSXP:
-        return rframe_equals_character(x_, i1, i2);
+        return rframe_equals_character(x1_, i1, x2_, i2);
 
     case VECSXP:
-        return rframe_equals_dataset(x_, i1, i2);
+        return rframe_equals_dataset(x1_, i1, x2_, i2);
 
     default:
         assert(t == NILSXP);
@@ -61,24 +62,27 @@ int rframe_equals_column(SEXP x_, R_xlen_t i1, R_xlen_t i2)
 }
 
 
-int rframe_equals_logical(SEXP x_, R_xlen_t i1, R_xlen_t i2)
+int rframe_equals_logical(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2)
 {
-    const int *x = LOGICAL(x_);
-    return x[i1] == x[i2];
+    const int *x1 = LOGICAL(x1_);
+    const int *x2 = (x1_ == x2_) ? x1 : LOGICAL(x2_);
+    return x1[i1] == x2[i2];
 }
 
 
-int rframe_equals_raw(SEXP x_, R_xlen_t i1, R_xlen_t i2)
+int rframe_equals_raw(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2)
 {
-    const Rbyte *x = RAW(x_);
-    return x[i1] == x[i2];
+    const Rbyte *x1 = RAW(x1_);
+    const Rbyte *x2 = (x1_ == x2_) ? x1 : RAW(x2_);
+    return x1[i1] == x2[i2];
 }
 
 
-int rframe_equals_integer(SEXP x_, R_xlen_t i1, R_xlen_t i2)
+int rframe_equals_integer(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2)
 {
-    const int *x = INTEGER(x_);
-    return x[i1] == x[i2];
+    const int *x1 = INTEGER(x1_);
+    const int *x2 = (x1_ == x2_) ? x1 : INTEGER(x2_);
+    return x1[i1] == x2[i2];
 }
 
 
@@ -94,31 +98,33 @@ static int equals_double(double x1, double x2)
 }
 
 
-int rframe_equals_double(SEXP x_, R_xlen_t i1, R_xlen_t i2)
+int rframe_equals_double(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2)
 {
-    const double *x = REAL(x_);
-    return equals_double(x[i1], x[i2]);
+    const double *x1 = REAL(x1_);
+    const double *x2 = (x1_ == x2_) ? x1 : REAL(x2_);
+    return equals_double(x1[i1], x2[i2]);
 }
 
 
 // Diverge from the R behavior, which considers NA+i and NA to be equal
-int rframe_equals_complex(SEXP x_, R_xlen_t i1, R_xlen_t i2)
+int rframe_equals_complex(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2)
 {
-    const Rcomplex *x = COMPLEX(x_);
-    return (equals_double(x[i1].r, x[i2].r)
-            && equals_double(x[i1].i, x[i2].i));
+    const Rcomplex *x1 = COMPLEX(x1_);
+    const Rcomplex *x2 = (x1_ == x2_) ? x1 : COMPLEX(x2_);
+    return (equals_double(x1[i1].r, x2[i2].r)
+            && equals_double(x1[i1].i, x2[i2].i));
 }
 
 
-int rframe_equals_character(SEXP x_, R_xlen_t i1, R_xlen_t i2)
+int rframe_equals_character(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2)
 {
     R_xlen_t n1, n2;
     SEXP x1, x2;
     const char *s1, *s2;
     int eq, cmp, nprot = 0;
 
-    PROTECT(x1 = STRING_ELT(x_, i1)); nprot++;
-    PROTECT(x2 = STRING_ELT(x_, i2)); nprot++;
+    PROTECT(x1 = STRING_ELT(x1_, i1)); nprot++;
+    PROTECT(x2 = STRING_ELT(x2_, i2)); nprot++;
 
     if (x1 == NA_STRING) {
         eq = (x2 == NA_STRING);

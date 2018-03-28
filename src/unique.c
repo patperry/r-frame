@@ -61,61 +61,6 @@ void rframe_array_push(struct rframe_array *a, R_xlen_t item)
 }
 
 
-struct rframe_table {
-    double *items;
-    R_xlen_t size;
-    R_xlen_t capacity;
-    uint64_t mask;
-};
-
-
-struct rframe_probe {
-    uint64_t mask;
-    uint64_t hash;
-    uint64_t nprobe;
-    uint64_t index;
-};
-
-
-// Start a new table probe at the given hash code.
-void rframe_probe_init(struct rframe_probe *p,
-                       const struct rframe_table *t,
-                       uint64_t hash)
-{
-    p->mask = t->mask;
-    p->hash = hash;
-    p->nprobe = 0;
-}
-
-// Advance a probe to the next index in the sequence. Calling this function
-// repeatedly will loop over all indices in the hash table.
-int rframe_probe_advance(struct rframe_probe *p)
-{
-    uint64_t index;
-
-    if (p->nprobe == 0) {
-        index = p->hash;
-    } else {
-        // Quadratic probing:
-        //
-        //     h(k,i) = h(k) + 0.5 i + 0.5 i^2
-        //
-        // index += nprobe;
-        //
-        // When the table size m is a power of 2, the values h(k,i) % m
-        // are all distinct for i = 0, 1, ..., m - 1
-        //
-        // https://en.wikipedia.org/wiki/Quadratic_probing
-        index = p->index + p->nprobe;
-    }
-
-    index &= p->mask;
-    p->nprobe++;
-    p->index = index;
-    return 1;
-}
-
-
 void rframe_table_init(struct rframe_table *t, R_xlen_t size)
 {
     if (size <= RFRAME_TABLE_SIZE_INIT) {
@@ -161,18 +106,18 @@ void rframe_table_grow(struct rframe_table *t,
 
 SEXP rframe_unique(SEXP x_)
 {
-    SEXP id_, table_, typehash_, typerows_, names_, out_;
+    SEXP group_, table_, typehash_, typeid_, names_, out_;
     struct rframe_array types;
     struct rframe_table t;
     struct rframe_probe p;
     R_xlen_t i, j, n, item;
     uint64_t *hash;
-    double *id, *table, *typehash, *typerows;
+    double *group, *table, *typehash, *typeid;
     int nprot = 0;
    
     n = rframe_nrow_dataset(x_);
-    PROTECT(id_ = Rf_allocVector(REALSXP, n)); nprot++;
-    id = REAL(id_);
+    PROTECT(group_ = Rf_allocVector(REALSXP, n)); nprot++;
+    group = REAL(group_);
 
     hash = (void *)R_alloc(n, sizeof(*hash));
     rframe_hash_init(hash, n);
@@ -205,25 +150,25 @@ SEXP rframe_unique(SEXP x_)
                 j = item - 1;
                 if (hash[i] != hash[types.items[j]]) {
                     continue;
-                } else if (rframe_equals_dataset(x_, i, types.items[j])) {
+                } else if (rframe_equals_dataset(x_, i, x_, types.items[j])) {
                     break;
                 }
             }
         }
 
-        id[i] = (double)item;
+        group[i] = (double)item;
     }
 
     PROTECT(table_ = Rf_allocVector(REALSXP, t.size)); nprot++;
     table = REAL(table_);
     memcpy(table, t.items, t.size * sizeof(*table));
 
-    PROTECT(typerows_ = Rf_allocVector(REALSXP, types.count)); nprot++;
+    PROTECT(typeid_ = Rf_allocVector(REALSXP, types.count)); nprot++;
     PROTECT(typehash_ = Rf_allocVector(REALSXP, types.count)); nprot++;
-    typerows = REAL(typerows_);
+    typeid = REAL(typeid_);
     typehash = REAL(typehash_);
     for (j = 0; j < types.count; j++) {
-        typerows[j] = (double)(types.items[j] + 1);
+        typeid[j] = (double)(types.items[j] + 1);
         typehash[j] = (double)hash[types.items[j]];
     }
 
@@ -234,8 +179,8 @@ SEXP rframe_unique(SEXP x_)
     SET_STRING_ELT(names_, 3, Rf_mkChar("table"));
 
     PROTECT(out_ = Rf_allocVector(VECSXP, 4)); nprot++;
-    SET_VECTOR_ELT(out_, 0, id_);
-    SET_VECTOR_ELT(out_, 1, typerows_);
+    SET_VECTOR_ELT(out_, 0, group_);
+    SET_VECTOR_ELT(out_, 1, typeid_);
     SET_VECTOR_ELT(out_, 2, typehash_);
     SET_VECTOR_ELT(out_, 3, table_);
     Rf_setAttrib(out_, R_NamesSymbol, names_);
