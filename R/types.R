@@ -93,3 +93,31 @@ as.size.scalar <- function(x)
         stop(sprintf("argument must be finite or NA, not `%f`", x))
     }
 }
+
+as.vector.type <- function(x)
+{
+    if (!(length(x) == 0 && length(dim(x)) <= 1))
+        stop("argument is not a vector type")
+    x
+}
+
+
+as.vector.value <- function(x)
+{
+    r <- length(dim(x))
+    if (r == 2) {
+        x <- as.simple.dataset(x)
+    } else if (r > 2) {
+        stop(sprintf("cannot cast from rank-%.0f object to vector", r))
+    }
+
+    if (is.record(x)) {
+        nx <- length(x)
+        if (nx != 1) {
+            stop(sprintf("mismatch: type has 1 components, value has %.0f", nx))
+        }
+        return(as.vector.value(x[[1]]))
+    }
+
+    x
+}

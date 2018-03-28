@@ -23,5 +23,6 @@ rowid.keyset <- function(table, x, default = NA)
     x       <- as.dataset(x)
     default <- as.integer.scalar(default)
 
-    x <- convert(x, schema(table))
+    type <- schema(table)
+    x    <- cast_as(type, x)
 }

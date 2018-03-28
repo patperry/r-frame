@@ -32,118 +32,124 @@ cast_as.default <- function(type, x)
 }
 
 
-to_vector_type <- function(type)
-{
-    if (!(length(x) == 0 && length(dim(x)) <= 1))
-        stop("argument is not a vector type")
-    type
-}
-
-
-from_vector <- function(x)
-{
-    r <- length(dim(x))
-    if (r == 2) {
-        x <- as.simple.dataset(x)
-    } else if (r > 2) {
-        stop(sprintf("cannot cast from rank-%.0f object", r))
-    }
-
-    if (is.record(x)) {
-        nx <- length(x)
-        if (nx != 1) {
-            stop(sprintf("mismatch: type has 1 components, object has %.0f",
-                         nx))
-        }
-        return(from_vector(x[[1]]))
-    }
-
-    x
-}
-
-
 cast_as.NULL <- function(type, x)
 {
-    type <- to_vector_type(type)
-    x    <- from_vector(x)
+    type <- as.vector.type(type)
+    x    <- as.vector.value(x)
     n <- length(x)
     if (n != 0)
         stop(sprintf("cannot cast from length-.%0f object to NULL", n))
-    NULL
+    type
 }
 
 
 cast_as.logical <- function(type, x)
 {
-    type <- to_vector_type(type)
-    x    <- from_vector(x)
-    as.logical(x)
+    type <- as.vector.type(type)
+    x    <- as.vector.value(x)
+
+    x <- as.logical(x)
+    type[seq_along(x)] <- x
+    type
+}
+
+
+cast_as.raw <- function(type, x)
+{
+    type <- as.vector.type(type)
+    x    <- as.vector.value(x)
+
+    x <- as.raw(x)
+    type[seq_along(x)] <- x
+    type
 }
 
 
 cast_as.integer <- function(type, x)
 {
-    type <- to_vector_type(type)
-    x    <- from_vector(x)
-    as.integer(x)
+    type <- as.vector.type(type)
+    x    <- as.vector.value(x)
+
+    x <- as.integer(x)
+    type[seq_along(x)] <- x
+    type
 }
 
 
 cast_as.double <- function(type, x)
 {
-    type <- to_vector_type(type)
-    x    <- from_vector(x)
-    as.double(x)
+    type <- as.vector.type(type)
+    x    <- as.vector.value(x)
+
+    x <- as.double(x)
+    type[seq_along(x)] <- x
+    type
 }
 
 
 cast_as.complex <- function(type, x)
 {
-    type <- to_vector_type(type)
-    x    <- from_vector(x)
-    as.complex(x)
+    type <- as.vector.type(type)
+    x    <- as.vector.value(x)
+
+    x <- as.complex(x)
+    type[seq_along(x)] <- x
+    type
 }
 
 
 cast_as.character <- function(type, x)
 {
-    type <- to_vector_type(type)
-    x    <- from_vector(x)
-    as.character(x)
+    type <- as.vector.type(type)
+    x    <- as.vector.value(x)
+
+    x <- as.character(x)
+    type[seq_along(x)] <- x
+    type
 }
 
 
 cast_as.factor <- function(type, x)
 {
-    type <- to_vector_type(type)
-    x    <- from_vector(x)
+    cast_as.vector(type, x)
+}
 
-    n <- length(x)
-    type[seq_len(n)] <- x
+
+cast_as.vector <- function(type, x)
+{
+    type <- as.vector.type(type)
+    x    <- as.vector.value(x)
+
+    type[seq_along(x)] <- x
     type
 }
 
 
 cast_as.Date <- function(type, x)
 {
-    type <- to_vector_type(type)
-    x    <- from_vector(x)
+    type <- as.vector.type(type)
+    x    <- as.vector.value(x)
 
     tz <- get_tzone(x)
     x  <- as.Date(x, tz = tz, origin = "1970-01-01")
-    structure(as.numeric(x), class = "Date")
+
+    type[seq_along(x)] <- x
+    type
 }
 
 
 cast_as.POSIXct <- function(type, x)
 {
-    type <- to_vector_type(type)
-    x    <- from_vector(x)
+    type <- as.vector.type(type)
+    x    <- as.vector.value(x)
 
     tz  <- get_tzone(type)
     tz0 <- get_tzone(x, tz)
     x <- as.POSIXct(x, tz0, origin = "1970-01-01")
-    structure(as.numeric(x), class = c("POSIXct", "POSIXt"), tzone = tz)
+    x <- structure(as.numeric(x), class = c("POSIXct", "POSIXt"), tzone = tz)
+
+    type[seq_along(x)] <- x
+    type
 }
 
 
@@ -164,7 +170,7 @@ cast_as.record <- function(type, x)
     n  <- length(type)
 
     if (n != nx) {
-        stop(sprintf("mismatch: type has %.0f components, values have %.0f",
+        stop(sprintf("mismatch: type has %.0f components, value has %.0f",
                      n, nx))
     }
 
