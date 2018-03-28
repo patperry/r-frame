@@ -48,10 +48,15 @@ as.keyset.dataset <- function(x)
     x <- as.normal.dataset(x)
     keys(x) <- NULL
 
-    if ((j <- anyDuplicated(x))) {
+    u <- .Call(rframe_unique, x)
+
+    if (length(u$types) < length(u$group)) {
+        j <- anyDuplicated(u$group)
         stop(sprintf("argument has a duplicate row (%.0f)", j))
     }
 
+    attr(x, "keyset.hash")  <- u$hash
+    attr(x, "keyset.table") <- u$table
     class(x) <- c("keyset", class(x))
     x
 }
