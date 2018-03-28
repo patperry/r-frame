@@ -24,5 +24,7 @@ rowid.keyset <- function(table, x, default = NA)
     default <- as.integer.scalar(default)
 
     type <- schema(table)
-    x    <- cast_as(type, x)
+    x    <- cast(type, x)
+    x    <- as.normal(x)
+    .Call(rframe_rowid_keyset, table, x, default)
 }
