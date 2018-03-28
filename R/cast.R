@@ -76,7 +76,8 @@ cast.integer <- function(type, x)
 }
 
 
-cast.double <- function(type, x)
+cast.double <-
+cast.numeric <- function(type, x)
 {
     type <- as.vector.type(type)
     x    <- as.vector.value(x)
