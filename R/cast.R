@@ -1,11 +1,11 @@
 
-cast_as <- function(type, x)
+cast <- function(type, x)
 {
-    UseMethod("cast_as")
+    UseMethod("cast")
 }
 
 
-cast_as.default <- function(type, x)
+cast.default <- function(type, x)
 {
     cl <- oldClass(type)
     if (!is.null(cl)) {
@@ -14,25 +14,25 @@ cast_as.default <- function(type, x)
 
     mode <- storage.mode(type)
     if (mode == "NULL")
-        cast_as.NULL(type, x)
+        cast.NULL(type, x)
     else if (mode == "logical")
-        cast_as.logical(type, x)
+        cast.logical(type, x)
     else if (mode == "raw")
-        cast_as.raw(type, x)
+        cast.raw(type, x)
     else if (mode == "integer")
-        cast_as.integer(type, x)
+        cast.integer(type, x)
     else if (mode == "double")
-        cast_as.double(type, x)
+        cast.double(type, x)
     else if (mode == "complex")
-        cast_as.complex(type, x)
+        cast.complex(type, x)
     else if (mode == "character")
-        cast_as.character(type, x)
+        cast.character(type, x)
     else
         stop(sprintf("cannot cast from object of mode \"%s\"", mode))
 }
 
 
-cast_as.NULL <- function(type, x)
+cast.NULL <- function(type, x)
 {
     type <- as.vector.type(type)
     x    <- as.vector.value(x)
@@ -43,7 +43,7 @@ cast_as.NULL <- function(type, x)
 }
 
 
-cast_as.logical <- function(type, x)
+cast.logical <- function(type, x)
 {
     type <- as.vector.type(type)
     x    <- as.vector.value(x)
@@ -54,7 +54,7 @@ cast_as.logical <- function(type, x)
 }
 
 
-cast_as.raw <- function(type, x)
+cast.raw <- function(type, x)
 {
     type <- as.vector.type(type)
     x    <- as.vector.value(x)
@@ -65,7 +65,7 @@ cast_as.raw <- function(type, x)
 }
 
 
-cast_as.integer <- function(type, x)
+cast.integer <- function(type, x)
 {
     type <- as.vector.type(type)
     x    <- as.vector.value(x)
@@ -76,7 +76,7 @@ cast_as.integer <- function(type, x)
 }
 
 
-cast_as.double <- function(type, x)
+cast.double <- function(type, x)
 {
     type <- as.vector.type(type)
     x    <- as.vector.value(x)
@@ -87,7 +87,7 @@ cast_as.double <- function(type, x)
 }
 
 
-cast_as.complex <- function(type, x)
+cast.complex <- function(type, x)
 {
     type <- as.vector.type(type)
     x    <- as.vector.value(x)
@@ -98,7 +98,7 @@ cast_as.complex <- function(type, x)
 }
 
 
-cast_as.character <- function(type, x)
+cast.character <- function(type, x)
 {
     type <- as.vector.type(type)
     x    <- as.vector.value(x)
@@ -109,13 +109,13 @@ cast_as.character <- function(type, x)
 }
 
 
-cast_as.factor <- function(type, x)
+cast.factor <- function(type, x)
 {
-    cast_as.vector(type, x)
+    cast.vector(type, x)
 }
 
 
-cast_as.vector <- function(type, x)
+cast.vector <- function(type, x)
 {
     type <- as.vector.type(type)
     x    <- as.vector.value(x)
@@ -125,7 +125,7 @@ cast_as.vector <- function(type, x)
 }
 
 
-cast_as.Date <- function(type, x)
+cast.Date <- function(type, x)
 {
     type <- as.vector.type(type)
     x    <- as.vector.value(x)
@@ -138,7 +138,7 @@ cast_as.Date <- function(type, x)
 }
 
 
-cast_as.POSIXct <- function(type, x)
+cast.POSIXct <- function(type, x)
 {
     type <- as.vector.type(type)
     x    <- as.vector.value(x)
@@ -163,7 +163,7 @@ get_tzone <- function(x, default = "UTC")
 }
 
 
-cast_as.record <- function(type, x)
+cast.record <- function(type, x)
 {
     x  <- as.simple.record(x)
     nx <- length(x)
@@ -175,7 +175,7 @@ cast_as.record <- function(type, x)
     }
 
     for (i in seq_len(n)) {
-        x[[i]] <- cast_as(type[[i]], x[[i]])
+        x[[i]] <- cast(type[[i]], x[[i]])
     }
 
     x

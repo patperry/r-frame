@@ -69,24 +69,24 @@ S3method(schema, default) ; export(schema.default)
 S3method(schema, record)  ; export(schema.record)
 
 
-### cast_as
+### cast
 
-export(cast_as)
+export(cast)
 
-S3method(cast_as, default) ; export(cast_as.default)
-S3method(cast_as, factor)  ; export(cast_as.factor)
-S3method(cast_as, Date)    ; export(cast_as.Date)
-S3method(cast_as, POSIXct) ; export(cast_as.POSIXct)
-S3method(cast_as, record)  ; export(cast_as.record)
+S3method(cast, default) ; export(cast.default)
+S3method(cast, factor)  ; export(cast.factor)
+S3method(cast, Date)    ; export(cast.Date)
+S3method(cast, POSIXct) ; export(cast.POSIXct)
+S3method(cast, record)  ; export(cast.record)
 
-export(cast_as.NULL)
-export(cast_as.logical)
-export(cast_as.raw)
-export(cast_as.integer)
-export(cast_as.double)
-export(cast_as.complex)
-export(cast_as.character)
-export(cast_as.vector)
+export(cast.NULL)
+export(cast.logical)
+export(cast.raw)
+export(cast.integer)
+export(cast.double)
+export(cast.complex)
+export(cast.character)
+export(cast.vector)
 
 
 ### idproxy
