@@ -47,13 +47,17 @@ as.normal.default <- function(x)
     if (mode == "character") {
         x <- as_utf8(x)
     } else if (mode == "double") {
-        x
+        x[x == 0] <- 0      # replace -0 with 0
+        x[is.nan(x)] <- NaN # replace all NaN with canonical
     } else if (mode == "integer") {
         # pass
     } else if (mode == "logical") {
         # pass
     } else if (mode == "complex") {
         x[is.na(x)] <- NA
+        re <- as.normal(Re(x))
+        im <- as.normal(Im(x))
+        x <- complex(real = re, imaginary = im)
     } else if (mode == "raw") {
         # pass
     } else {
