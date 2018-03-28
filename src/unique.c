@@ -2,28 +2,28 @@
 #include <string.h>
 
 // Initial array size. Must be positive.
-#define ARRAY_SIZE_INIT 32
+#define RFRAME_ARRAY_SIZE_INIT 32
 
 // Maximum occupy percentage before we resize. Must be in (0, 1].
-#define TABLE_LOAD_FACTOR 0.75
+#define RFRAME_TABLE_LOAD_FACTOR 0.75
 
 // Initial table size. Must be a positive power of 2.
-#define TABLE_SIZE_INIT 32
+#define RFRAME_TABLE_SIZE_INIT 32
 
 // Code for an empty table item
-#define TABLE_ITEM_EMPTY (R_xlen_t)(-1)
+#define RFRAME_TABLE_ITEM_EMPTY (R_xlen_t)(-1)
 
-typedef struct {
+struct rframe_array {
     R_xlen_t *items;
     R_xlen_t count;
     R_xlen_t size;
-} Array;
+};
 
 
-void array_init(Array *a, R_xlen_t size)
+void rframe_array_init(struct rframe_array *a, R_xlen_t size)
 {
-    if (size <= ARRAY_SIZE_INIT) {
-        size = ARRAY_SIZE_INIT;
+    if (size <= RFRAME_ARRAY_SIZE_INIT) {
+        size = RFRAME_ARRAY_SIZE_INIT;
     }
 
     a->size = size;
@@ -32,7 +32,7 @@ void array_init(Array *a, R_xlen_t size)
 }
 
 
-void array_grow(Array *a)
+void rframe_array_grow(struct rframe_array *a)
 {
     R_xlen_t n0, n1;
     R_xlen_t *items0, *items1;
@@ -49,13 +49,13 @@ void array_grow(Array *a)
 }
 
 
-void array_push(Array *a, R_xlen_t item)
+void rframe_array_push(struct rframe_array *a, R_xlen_t item)
 {
     R_xlen_t nmax = a->size;
     R_xlen_t n = a->count;
 
     if (n == nmax) {
-        array_grow(a);
+        rframe_array_grow(a);
     }
 
     a->items[n] = item;
@@ -63,24 +63,26 @@ void array_push(Array *a, R_xlen_t item)
 }
 
 
-typedef struct {
-    R_xlen_t *items;
+struct rframe_table {
+    double *items;
     R_xlen_t size;
     R_xlen_t capacity;
     uint64_t mask;
-} Table;
+};
 
 
-typedef struct {
+struct rframe_probe {
     uint64_t mask;
     uint64_t hash;
     uint64_t nprobe;
     uint64_t index;
-} Probe;
+};
 
 
 // Start a new table probe at the given hash code.
-void table_probe_make(Table *t, Probe *p, uint64_t hash)
+void rframe_probe_init(struct rframe_probe *p,
+                       const struct rframe_table *t,
+                       uint64_t hash)
 {
     p->mask = t->mask;
     p->hash = hash;
@@ -89,7 +91,7 @@ void table_probe_make(Table *t, Probe *p, uint64_t hash)
 
 // Advance a probe to the next index in the sequence. Calling this function
 // repeatedly will loop over all indices in the hash table.
-int table_probe_advance(Probe *p)
+int rframe_probe_advance(struct rframe_probe *p)
 {
     uint64_t index;
 
@@ -116,32 +118,34 @@ int table_probe_advance(Probe *p)
 }
 
 
-void table_init(Table *t, R_xlen_t size)
+void rframe_table_init(struct rframe_table *t, R_xlen_t size)
 {
     R_xlen_t i;
 
-    if (size <= TABLE_SIZE_INIT) {
-        size = TABLE_SIZE_INIT;
+    if (size <= RFRAME_TABLE_SIZE_INIT) {
+        size = RFRAME_TABLE_SIZE_INIT;
     }
 
     t->size = size;
     t->mask = (uint64_t)(t->size - 1);
-    t->capacity = (R_xlen_t)(TABLE_LOAD_FACTOR * t->size);
+    t->capacity = (R_xlen_t)(RFRAME_TABLE_LOAD_FACTOR * t->size);
     t->items = (void *)R_alloc(t->size, sizeof(*t->items));
 
     for (i = 0; i < t->size; i++) {
-        t->items[i] = TABLE_ITEM_EMPTY;
+        t->items[i] = RFRAME_TABLE_ITEM_EMPTY;
     }
 }
 
 
-void table_grow(Table *t, const Array *types, const uint64_t *hash)
+void rframe_table_grow(struct rframe_table *t,
+                       const struct rframe_array *types,
+                       const uint64_t *hash)
 {
-    Table t2;
-    Probe p;
+    struct rframe_table t2;
+    struct rframe_probe p;
     R_xlen_t i, j, m;
 
-    table_init(&t2, 2 * t->size);
+    rframe_table_init(&t2, 2 * t->size);
 
     m = types->count;
     for (j = 0; j < m; j++) {
@@ -149,9 +153,9 @@ void table_grow(Table *t, const Array *types, const uint64_t *hash)
 
         i = types->items[j];
 
-        table_probe_make(&t2, &p, hash[i]);
-        while (table_probe_advance(&p)) {
-            if (t2.items[p.index] == TABLE_ITEM_EMPTY) {
+        rframe_probe_init(&p, &t2, hash[i]);
+        while (rframe_probe_advance(&p)) {
+            if (t2.items[p.index] == RFRAME_TABLE_ITEM_EMPTY) {
                 t2.items[p.index] = j;
                 break;
             }
@@ -165,9 +169,9 @@ void table_grow(Table *t, const Array *types, const uint64_t *hash)
 SEXP rframe_unique(SEXP x_)
 {
     SEXP id_, table_, typehash_, typerows_, names_, out_;
-    Array types;
-    Table t;
-    Probe p;
+    struct rframe_array types;
+    struct rframe_table t;
+    struct rframe_probe p;
     R_xlen_t i, j, n;
     uint64_t *hash;
     double *id, *table, *typehash, *typerows;
@@ -182,25 +186,25 @@ SEXP rframe_unique(SEXP x_)
     rframe_hash_dataset(hash, n, x_);
     rframe_hash_final(hash, n);
 
-    array_init(&types, 0);
-    table_init(&t, 0);
+    rframe_array_init(&types, 0);
+    rframe_table_init(&t, 0);
 
     for (i = 0; i < n; i++) {
         RFRAME_CHECK_INTERRUPT(i);
 
-        table_probe_make(&t, &p, hash[i]);
+        rframe_probe_init(&p, &t, hash[i]);
 
-        while (table_probe_advance(&p)) {
+        while (rframe_probe_advance(&p)) {
             j = t.items[p.index];
 
-            if (j == TABLE_ITEM_EMPTY) {
+            if (j == RFRAME_TABLE_ITEM_EMPTY) {
 
                 j = types.count;
-                array_push(&types, i);
+                rframe_array_push(&types, i);
                 t.items[p.index] = j;
 
                 if (types.count == t.capacity) {
-                    table_grow(&t, &types, hash);
+                    rframe_table_grow(&t, &types, hash);
                 }
 
                 break;
@@ -218,7 +222,7 @@ SEXP rframe_unique(SEXP x_)
     table = REAL(table_);
     for (i = 0; i < t.size; i++) {
         j = t.items[i];
-        if (j == TABLE_ITEM_EMPTY) {
+        if (j == RFRAME_TABLE_ITEM_EMPTY) {
             table[i] = 0;
         } else {
             table[i] = (double)(j + 1);
