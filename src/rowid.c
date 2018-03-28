@@ -19,8 +19,8 @@ SEXP rframe_rowid_keyset(SEXP keyset_, SEXP x_, SEXP def_)
     keytable_ = Rf_getAttrib(keyset_, Rf_install("keyset.table"));
     t.items = REAL(keytable_);
     t.capacity = XLENGTH(keytable_);
+    t.mask = (uint64_t)t.capacity - 1;
     t.size = XLENGTH(keyhash_);
-    t.mask = (uint64_t)t.size - 1;
 
     n = rframe_nrow_dataset(x_);
     def = REAL(def_)[0];
