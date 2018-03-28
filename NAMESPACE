@@ -134,6 +134,16 @@ S3method(duplicated, keyset)    ; export(duplicated.keyset)
 S3method(anyDuplicated, keyset) ; export(anyDuplicated.keyset)
 
 
+### lookup, rowid
+
+export(lookup)
+export(rowid)
+
+S3method(rowid, default) ; export(rowid.default)
+S3method(rowid, keyset)  ; export(rowid.keyset)
+S3method(rowid, NULL)    ; export(rowid.NULL)
+
+
 ### keys
 
 export(keys)
@@ -199,16 +209,11 @@ export(numeric.map)
 # export(keyrows.default)
 # export(keyrows.keyset)
 # export(keyrows.NULL)
-# export(lookup)
 # export(reorder.dataset)
 # export(rbind.dataset)
 # export(restrict)
 # export(restrict_slice)
 # export(restrict_slice.default)
-# export(rowid)
-# export(rowid.default)
-# export(rowid.keyset)
-# export(rowid.NULL)
 
 ## Deprecated
 # (none)
@@ -225,9 +230,6 @@ export(numeric.map)
 # S3method(grouped, dataset)
 # S3method(grouped, default)
 # S3method(restrict_slice, default)
-# S3method(rowid, default)
-# S3method(rowid, keyset)
-# S3method(rowid, NULL)
 
 
 ## Base S3 methods

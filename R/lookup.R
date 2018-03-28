@@ -17,6 +17,15 @@ rowid.default <- function(table, x, default = NA)
 }
 
 
+rowid.NULL <- function(table, x, default = NA)
+{
+    x <- as.dataset(x)
+    default <- as.integer.scalar(default)
+    default <- as.double(default)
+    rep_len(default, nrow(x))
+}
+
+
 rowid.keyset <- function(table, x, default = NA)
 {
     table   <- as.keyset(table)
