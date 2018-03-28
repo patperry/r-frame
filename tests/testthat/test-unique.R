@@ -41,10 +41,9 @@ test_that("complex", {
     set.seed(0)
     x <- dataset(col = (sample(c(NA, rnorm(5)), 50, replace = TRUE)
                         + 1i * sample(c(NA, rnorm(4)), 50, replace = TRUE)))
-    y <- dataset(re = Re(x$col), im = Im(x$col))
-    expect_equal(anyDuplicated(x), anyDuplicated(y))
-    expect_equal(duplicated(x), duplicated(y))
-    expect_equal(unique(x), x[!duplicated(x), ])
+    expect_equal(anyDuplicated(x), anyDuplicated(x$col))
+    expect_equal(duplicated(x), duplicated(x$col))
+    expect_equal(unique(x), dataset(col = unique(x$col)))
 })
 
 
