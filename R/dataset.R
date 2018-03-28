@@ -94,7 +94,10 @@ as.dataset.default <- function(x)
     r <- length(d)
 
     if (r <= 1) {
-        as.dataset.vector(x)
+        if (is.list(x) && !is.object(x))
+            as.dataset.record(x)
+        else
+            as.dataset.vector(x)
     } else if (r == 2) {
         as.dataset.matrix(x)
     } else {
@@ -186,6 +189,7 @@ as.dataset.record <- function(x)
     if (is.dataset(x))
         return(x)
 
+    x  <- as.record(x)
     nc <- length(x)
     nrow <- dataset_nrow(x)
     if (is.na(nrow))
