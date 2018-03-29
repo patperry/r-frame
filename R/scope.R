@@ -5,6 +5,13 @@ scope <- function(x, expr, env = NULL)
     expr <- substitute(expr)
     env  <- if (is.null(env)) parent.frame() else as.environment(env)
 
+    expr <- eval_I(expr, env)
+    eval(expr, x, env)
+}
+
+
+eval_I <- function(expr, env)
+{
     if (is.call(expr)) {
         if (expr[[1]] == as.name("I")) {
             narg <- length(expr)
@@ -20,11 +27,9 @@ scope <- function(x, expr, env = NULL)
                 e <- expr[[i]]
                 if (!is.call(e))
                     next
-                e <- call("scope", x, e, env)
-                expr[[i]] <- e
+                expr[[i]] <- eval_I(e, env)
             }
         }
     }
-
-    eval(expr, x, env)
+    expr
 }
