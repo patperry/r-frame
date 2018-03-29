@@ -155,6 +155,11 @@ S3method(`keys<-`, dataset)
 S3method(`keys<-`, keyset)
 
 
+### scope
+
+export(scope)
+
+
 ### functor
 
 export(do)
