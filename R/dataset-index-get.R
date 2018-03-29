@@ -64,18 +64,8 @@ row_subset <- function(x, i)
     keys <- attr(x, "dataset.keys", TRUE)
     
     if (!is.null(i)) {
-        i <- arg_subscript(i, nrow, NULL, TRUE)
-
-        if (!is.null(keys)) {
-            keys <- keys[i, , drop = FALSE]
-
-            if (anyDuplicated(i)) {
-                keys <- append_copy_num(keys, nrow, i)
-            }
-
-            keys <- as.keyset(keys)
-        }
-
+        i    <- arg_row_subscript(i, nrow, keys, TRUE)
+        keys <- attr(i, "keys", TRUE)
         nrow <- length(i)
         x <- lapply(x, elt_subset, i)
     } else {
@@ -87,28 +77,6 @@ row_subset <- function(x, i)
     attr(x, "dataset.nrow") <- nrow
     attr(x, "dataset.keys") <- keys
     class(x) <- c("dataset", "record")
-
-    x
-}
-
-
-append_copy_num <- function(x, nkey, id)
-{
-    # TODO: implement in C?
-    copy <- integer(nkey)
-    newkey <- integer(length(id))
-    for (i in seq_along(id)) {
-        k <- id[[i]]
-        copy[[k]] <- copy[[k]] + 1L
-        newkey[[i]] <- copy[[k]]
-    }
-    names <- names(x)
-    if (is.null(names)) {
-        names <- character(length(x))
-    }
-
-    x[[length(x) + 1L]] <- newkey
-    names(x) <- c(names, "#")
 
     x
 }

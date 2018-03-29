@@ -125,7 +125,7 @@ replace_block <- function(x, is, js, value)
     if (is.null(is)) {
         is <- seq_len(d[[1]])
     } else {
-        is <- arg_subscript(is, d[[1]], NULL, TRUE)
+        is <- arg_row_subscript(is, d[[1]], keys(x), TRUE)
     }
 
     if (is.null(js)) {

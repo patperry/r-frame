@@ -101,3 +101,56 @@ arg_subscript <- function(value, n, names, get)
 
     value
 }
+
+
+arg_row_subscript <- function(value, n, keys, get)
+{
+    if (is.record(value) || (is.list(value) && !is.object(value))) {
+        value <- as.dataset(value)
+        keys2 <- keys(value)
+        value <- rowid(keys, value)
+        if (anyNA(value)) {
+            i <- which(is.na(value))[[1]]
+            stop(sprintf("unknown key (row subscript %.0f)", i))
+        }
+    } else {
+        keys2 <- NULL
+        value <- arg_subscript(value, n, NULL, get)
+    }
+
+    if (get) {
+        if (!is.null(keys2)) {
+            keys <- keys2
+        } else if (!is.null(keys)) {
+            keys <- keys[value, , drop = FALSE]
+            if (anyDuplicated(value)) {
+                keys <- append_copy_num(keys, n, value)
+            }
+            keys <- as.keyset(keys)
+        }
+        attr(value, "keys") <- keys
+    }
+    value
+}
+
+
+append_copy_num <- function(x, nkey, id)
+{
+    # TODO: implement in C?
+    copy <- integer(nkey)
+    newkey <- integer(length(id))
+    for (i in seq_along(id)) {
+        k <- id[[i]]
+        copy[[k]] <- copy[[k]] + 1L
+        newkey[[i]] <- copy[[k]]
+    }
+    names <- names(x)
+    if (is.null(names)) {
+        names <- character(length(x))
+    }
+
+    x[[length(x) + 1L]] <- newkey
+    names(x) <- c(names, "#")
+
+    x
+}
