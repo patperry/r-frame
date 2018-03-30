@@ -13,7 +13,8 @@ rowid <- function(table, x, default = NA)
 
 rowid.default <- function(table, x, default = NA)
 {
-    match(x, table, default)
+    table <- as.keyset(table)
+    rowid.keyset(table, x, default)
 }
 
 

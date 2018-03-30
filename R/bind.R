@@ -231,6 +231,7 @@ rbind.dataset <- function(..., deparse.level = 1)
     for (j in seq_len(nc)) {
         elt <- x1[[j]]
         rows <- lapply(x, `[[`, j)
+        names(rows) <- NULL
 
         if (is.null(dim(elt))) {
             col <- do.call(c, rows)
@@ -254,6 +255,7 @@ rbind.dataset <- function(..., deparse.level = 1)
             k1 <- k[[1L]]
             for (j in seq_len(nk)) {
                 rows <- lapply(k, `[[`, j)
+                names(rows) <- NULL
                 col <- do.call(c, rows)
                 keys[[j]] <- col
             }
