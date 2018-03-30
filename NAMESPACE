@@ -67,6 +67,7 @@ S3method(duplicated, dataset)    ; export(duplicated.dataset)
 S3method(anyDuplicated, dataset) ; export(anyDuplicated.dataset)
 
 S3method(reorder, dataset) ; export(reorder.dataset)
+S3method(xtfrm, dataset)   ; export(xtfrm.dataset)
 
 
 ### schema

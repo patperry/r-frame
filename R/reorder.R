@@ -24,6 +24,10 @@ reorder.dataset <- function(x, ..., env = NULL)
         return(x)
     }
 
+    for (j in seq_along(i)) {
+        i[[j]] <- xtfrm.dataset(i[[j]])
+    }
+
     names <- names(i)
     if (!is.null(names)) {
         if (!all(names %in% c("asc", "desc", ""))) {
@@ -40,4 +44,43 @@ reorder.dataset <- function(x, ..., env = NULL)
     o <- do.call(order, i)
 
     x[o,]
+}
+
+
+xtfrm.dataset <- function(x)
+{
+    x <- as.dataset(x)
+    x <- as.simple(x)
+
+    n <- length(x)
+    names(x) <- NULL
+    null <- logical(n)
+
+    for (i in seq_len(n)) {
+        null[[i]] <- is.null(x[[i]])
+        if (null[[i]])
+            next
+        x[[i]] <- xtfrm(x[[i]])
+    }
+
+    nx <- nrow(x)
+    x <- x[!null]
+
+    if (length(x) == 0) {
+        return(seq_len(nx))
+    } else if (length(x) == 1) {
+        return(x[[1]])
+    }
+
+    u <- unique(x)
+    o <- do.call(order, u)
+
+    nu <- nrow(u)
+    ru <- integer(nu)
+    ru[o] <- seq_len(nu)
+
+    if (nu == nx)
+        ru
+    else
+        ru[lookup(x, u)]
 }
