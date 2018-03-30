@@ -68,7 +68,15 @@ S3method(anyDuplicated, dataset) ; export(anyDuplicated.dataset)
 
 S3method(reorder, dataset) ; export(reorder.dataset)
 S3method(sort, dataset)    ; export(sort.dataset)
+S3method(split, dataset)   ; export(split.dataset)
 S3method(xtfrm, dataset)   ; export(xtfrm.dataset)
+
+
+### group
+
+export(group)
+S3method(group, default) ; export(group.default)
+S3method(group, dataset) ; export(group.dataset)
 
 
 ### schema
@@ -212,9 +220,6 @@ export(numeric.map)
 # export(framed)
 # export(framed.dataset)
 # export(framed.default)
-# export(grouped)
-# export(grouped.dataset)
-# export(grouped.default)
 # export(keylevels)
 # export(keylevels.default)
 # export(keylevels.keyset)
@@ -238,8 +243,6 @@ export(numeric.map)
 # S3method(keyrows, NULL)
 # S3method(framed, dataset)
 # S3method(framed, default)
-# S3method(grouped, dataset)
-# S3method(grouped, default)
 # S3method(restrict_slice, default)
 
 
