@@ -2,6 +2,8 @@
 useDynLib(frame, .registration = TRUE)
 
 ## Imports
+importFrom(stats, reorder)
+
 importFrom(utf8, as_utf8)
 importFrom(utf8, output_ansi)
 importFrom(utf8, output_utf8)
@@ -63,6 +65,8 @@ S3method(print, dataset)  ; export(print.dataset)
 S3method(unique, dataset)        ; export(unique.dataset)
 S3method(duplicated, dataset)    ; export(duplicated.dataset)
 S3method(anyDuplicated, dataset) ; export(anyDuplicated.dataset)
+
+S3method(reorder, dataset) ; export(reorder.dataset)
 
 
 ### schema
@@ -216,7 +220,6 @@ export(numeric.map)
 # export(keyrows.default)
 # export(keyrows.keyset)
 # export(keyrows.NULL)
-# export(reorder.dataset)
 # export(restrict)
 # export(restrict_slice)
 # export(restrict_slice.default)
@@ -244,7 +247,6 @@ export(numeric.map)
 # S3method(as.data.frame, dataset)
 # S3method(as.matrix, dataset)
 # S3method(`dimnames<-`, dataset)
-# S3method(reorder, dataset)
 # S3method(row.names, dataset)
 # S3method(`row.names<-`, dataset)
 # S3method(transform, dataset)
