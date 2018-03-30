@@ -177,43 +177,6 @@ S3method(`keys<-`, keyset)
 export(scope)
 
 
-### functor
-
-export(do)
-
-export(map_)
-S3method(map_, default); export(map_.default)
-
-export(map)
-S3method(map, default)           ; export(map.default)
-
-export(NULL.map)
-S3method(NULL.map, default)      ; export(NULL.map.default)
-
-export(logical.map)
-S3method(logical.map, default)   ; export(logical.map.default)
-
-export(raw.map)
-S3method(raw.map, default)       ; export(raw.map.default)
-
-export(integer.map)
-S3method(integer.map, default)   ; export(integer.map.default)
-
-export(double.map)
-S3method(double.map, default)    ; export(double.map.default)
-
-export(complex.map)
-S3method(complex.map, default)   ; export(complex.map.default)
-
-export(character.map)
-S3method(character.map, default) ; export(character.map.default)
-
-export(list.map)
-S3method(list.map, default)      ; export(list.map.default)
-
-export(numeric.map)
-
-
 ## old # exports (need fixing)
 # export(as.data.frame.dataset)
 # export(as.matrix.dataset)
