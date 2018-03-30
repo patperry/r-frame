@@ -89,3 +89,16 @@ test_that("mixed encoding", {
     expect_equal(duplicated(x), duplicated(x$col))
     expect_equal(unique(x), dataset(col = unique(x$col)))
 })
+
+
+test_that("fixes bugs in base R", {
+    x <- as.dataset(data.frame(x = c(.15, .1 + .05), y = "a"))
+    expect_equal(unique(x), x)
+})
+
+
+test_that("works for empty dataset", {
+    x <- as.dataset(structure(list(), row.names = .set_row_names(3),
+                              class = "data.frame"))
+    expect_equal(unique(x), x[1, ])
+})
