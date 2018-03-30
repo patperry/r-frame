@@ -47,6 +47,16 @@ reorder.dataset <- function(x, ..., env = NULL)
 }
 
 
+sort.dataset <- function(x, decreasing = FALSE, ...)
+{
+    x <- as.dataset(x)
+    decreasing <- as.option(decreasing)
+    y <- xtfrm(x)
+    o <- order(y, decreasing = decreasing)
+    x[o, ]
+}
+
+
 xtfrm.dataset <- function(x)
 {
     x <- as.dataset(x)
