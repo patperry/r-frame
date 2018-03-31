@@ -49,6 +49,9 @@ S3method(as.dataset, matrix)     ; export(as.dataset.matrix)
 S3method(as.dataset, default)    ; export(as.dataset.default)
 S3method(as.dataset, record)     ; export(as.dataset.record)
 
+S3method(as.data.frame, dataset) ; export(as.data.frame.dataset)
+S3method(as.matrix, dataset)     ; export(as.matrix.dataset)
+
 S3method(dim, dataset)
 S3method(dimnames, dataset)
 S3method(`$<-`, dataset)
@@ -178,8 +181,6 @@ export(scope)
 
 
 ## old # exports (need fixing)
-# export(as.data.frame.dataset)
-# export(as.matrix.dataset)
 # export(framed)
 # export(framed.dataset)
 # export(framed.default)
@@ -212,8 +213,6 @@ export(scope)
 ## Base S3 methods
 
 ### dataset
-# S3method(as.data.frame, dataset)
-# S3method(as.matrix, dataset)
 # S3method(`dimnames<-`, dataset)
 # S3method(row.names, dataset)
 # S3method(`row.names<-`, dataset)
