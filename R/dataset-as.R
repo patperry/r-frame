@@ -73,3 +73,11 @@ as.matrix.dataset <- function(x, ...)
     colnames(x) <- names
     x
 }
+
+
+t.dataset <- function(x, ...)
+{
+    x <- as.dataset(x)
+    x <- as.matrix(x)
+    t(x)
+}
