@@ -73,6 +73,7 @@ S3method(anyDuplicated, dataset) ; export(anyDuplicated.dataset)
 S3method(reorder, dataset) ; export(reorder.dataset)
 S3method(sort, dataset)    ; export(sort.dataset)
 S3method(split, dataset)   ; export(split.dataset)
+S3method(subset, dataset)  ; export(subset.dataset)
 S3method(xtfrm, dataset)   ; export(xtfrm.dataset)
 
 
