@@ -3,9 +3,7 @@ subset.dataset <- function(x, ...)
 {
     x <- as.dataset(x)
     exprs <- substitute(list(...))
-    for (i in seq_along(exprs)) {
-        exprs <- eval.parent(call("scope", x, exprs))
-    }
+    exprs <- eval.parent(call("scope", x, exprs))
 
     n <- length(exprs)
     if (n == 0)
