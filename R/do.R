@@ -8,15 +8,15 @@ do <- function(x, f, type = NULL)
 do.default <- function(x, f, type = NULL)
 {
     x <- as.dataset(x)
-    f <- as.function(f)
     do.dataset(x, f, type)
 }
 
 
 do.dataset <- function(x, f, type = NULL)
 {
-    x <- as.dataset(x)
-    f <- as.function(f)
+    x    <- as.dataset(x)
+    f    <- as.function(f)
+    type <- schema(type)
 
     n    <- nrow(x)
     keys <- keys(x)
@@ -33,7 +33,7 @@ do.dataset <- function(x, f, type = NULL)
 
     y  <- vector("list", n)
     xt <- t(x)
-    colnames(xt) <- NULL
+    rownames(xt) <- NULL
 
     for (i in seq_len(n)) {
         yi <- do.call(f, xt[, i, drop = TRUE])

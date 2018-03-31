@@ -29,19 +29,18 @@ split.dataset <- function(x, f, drop = FALSE, ...)
 }
 
 
-group <- function(x, by, do = NULL)
+group <- function(x, by)
 {
     UseMethod("group")
 }
 
 
-group.default <- function(x, by, do = NULL)
+group.default <- function(x, by)
 {
     x   <- as.dataset(x)
     by  <- as.by(x, substitute(by))
-    do  <- if (!is.null(do)) as.function(do)
 
-    group.dataset(x, I(by), do)
+    group.dataset(x, I(by))
 }
 
 
@@ -67,11 +66,10 @@ as.by <- function(x, expr)
 }
 
 
-group.dataset <- function(x, by, do = NULL)
+group.dataset <- function(x, by)
 {
     x   <- as.dataset(x)
     by  <- as.by(x, substitute(by))
-    do  <- if (!is.null(do)) as.function(do)
 
     if (nrow(by) != nrow(x)) {
         stop(sprintf("'by' rows (%.0f) must match data rows (%.0f)",
@@ -88,36 +86,8 @@ group.dataset <- function(x, by, do = NULL)
         return(NULL)
     }
 
-    y <- as.dataset(list(xg))
+    y <- as.dataset(list(group = xg))
     keys(y) <- keys
-
-    if (!is.null(do) && nrow(y) > 0L) {
-        rows <- lapply(y[[1L]], function(g) {
-            row <- do(g)
-            if (!is.null(row)) {
-                row <- as.dataset(row)
-            }
-            row
-        })
-        nr <- vapply(rows, NROW, 0)
-        if (!all(nr == nr[[1L]])) {
-            j <- which(nr != nr[[1L]])[[1L]]
-            stop(sprintf("'do' action returned differing number of rows (%.0f, %.0f) for groups %.0f, %.0f (%s, %s)",
-                             nrow(rows[[1]]), nrow(rows[[j]]),
-                             1, j,
-                             keys(y)[1,], keys(y)[j,]))
-        }
-        nr <- nr[[1L]]
-        if (nr == 0) {
-            y[] <- NULL
-        } else if (nr == 1L) {
-            cols <- do.call(rbind.dataset, rows)
-            keys(cols) <- keys(y)
-            y <- cols
-        } else {
-            stop(sprintf("'do' action returned multiple rows (%.0f)", nr))
-        }
-    }
 
     y
 }
