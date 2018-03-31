@@ -122,3 +122,10 @@ test_that("indexing with keys, duplicate row, no names", {
 
     expect_equal(x[i, ], y)
 })
+
+
+test_that("get 0 rows", {
+    x <- dataset(col = 1:5)
+    y <- x[0, ]
+    expect_equal(nrow(y), 0)
+})

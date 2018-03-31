@@ -33,3 +33,10 @@ as.simple.record <- function(x)
     }
     x
 }
+
+
+as.simple.dataset <- function(x)
+{
+    x <- as.dataset(x)
+    as.simple.record(x)
+}

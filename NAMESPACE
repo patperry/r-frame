@@ -77,6 +77,13 @@ S3method(subset, dataset)  ; export(subset.dataset)
 S3method(xtfrm, dataset)   ; export(xtfrm.dataset)
 
 
+### do
+
+export(do)
+S3method(do, default) ; export(do.default)
+S3method(do, dataset) ; export(do.dataset)
+
+
 ### group
 
 export(group)
