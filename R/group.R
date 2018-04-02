@@ -29,37 +29,37 @@ split.dataset <- function(x, f, drop = FALSE, ...)
 }
 
 
-group <- function(x, ...)
+group <- function(`_data`, ...)
 {
     UseMethod("group")
 }
 
 
-group.default <- function(x, ...)
+group.default <- function(`_data`, ...)
 {
-    x   <- as.dataset(x)
-    by  <- substitute(cbind.dataset(...))
-    by  <- eval.parent(call("scope", x, by))
+    `_data` <- as.dataset(`_data`)
+    by      <- substitute(cbind.dataset(...))
+    by      <- eval.parent(call("scope", `_data`, by))
 
-    group.dataset(x, I(by))
+    group.dataset(`_data`, I(by))
 }
 
 
-group.dataset <- function(x, ...)
+group.dataset <- function(`_data`, ...)
 {
-    x   <- as.dataset(x)
-    by  <- substitute(cbind.dataset(...))
-    by  <- eval.parent(call("scope", x, by))
+    `_data` <- as.dataset(`_data`)
+    by      <- substitute(cbind.dataset(...))
+    by      <- eval.parent(call("scope", `_data`, by))
 
-    if (nrow(by) != nrow(x)) {
+    if (nrow(by) != nrow(`_data`)) {
         stop(sprintf("'by' rows (%.0f) must match data rows (%.0f)",
-                     nrow(by), nrow(x)))
+                     nrow(by), nrow(`_data`)))
     }
 
     # split into parts
     keys <- as.keyset(unique.dataset(by))
     g <- lookup(by, keys)
-    xg <- split.dataset(x, g) # returns a dataset
+    xg <- split.dataset(`_data`, g) # returns a dataset
     names(xg) <- NULL
 
     if (length(xg) == 0L) {
