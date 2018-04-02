@@ -16,7 +16,7 @@ test_that("'group(,integer)' splits", {
 test_that("'group' + 'do' works with scalar function on parts", {
     set.seed(0)
     g <- sample(1:5, nrow(mtcars), replace = TRUE)
-    xg <- group(mtcars, I(g))
+    xg <- group(mtcars, g = I(g))
     x <- as.dataset(sapply(xg[[1]], nrow))
     keys(x) <-  keys(xg)
 

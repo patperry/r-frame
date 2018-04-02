@@ -29,47 +29,27 @@ split.dataset <- function(x, f, drop = FALSE, ...)
 }
 
 
-group <- function(x, by)
+group <- function(x, ...)
 {
     UseMethod("group")
 }
 
 
-group.default <- function(x, by)
+group.default <- function(x, ...)
 {
     x   <- as.dataset(x)
-    by  <- as.by(x, substitute(by))
+    by  <- substitute(cbind.dataset(...))
+    by  <- eval.parent(call("scope", x, by))
 
     group.dataset(x, I(by))
 }
 
 
-as.by <- function(x, expr)
-{
-    if (is.call(expr) && expr[[1]] == as.name("list")) {
-        expr[[1]] <- as.name("dataset")
-        eval.parent(call("scope", x, expr), n = 2)
-    } else {
-        if (is.call(expr) && expr[[1]] == as.name("I") && length(expr) > 1) {
-            name <- deparse(expr[[2]], 500L)
-        } else {
-            name <- deparse(expr, 500L)
-        }
-
-        by   <- eval.parent(call("scope", x, expr), n = 2)
-        if (!is.list(by) && length(dim(by)) <= 1) {
-            by <- list(by)
-            names(by) <- name
-        }
-        as.dataset(by)
-    }
-}
-
-
-group.dataset <- function(x, by)
+group.dataset <- function(x, ...)
 {
     x   <- as.dataset(x)
-    by  <- as.by(x, substitute(by))
+    by  <- substitute(cbind.dataset(...))
+    by  <- eval.parent(call("scope", x, by))
 
     if (nrow(by) != nrow(x)) {
         stop(sprintf("'by' rows (%.0f) must match data rows (%.0f)",
