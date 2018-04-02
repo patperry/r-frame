@@ -89,8 +89,9 @@ test_that("'cbind' can handle named vector arguments", {
 
 
 test_that("'cbind' can handle unnamed vector arguments", {
-    x <- cbind.dataset(rownames(mtcars), mtcars)
-    y <- cbind.dataset(as.dataset(rownames(mtcars)), mtcars)
+    vec <- rownames(mtcars)
+    x <- cbind.dataset(vec, mtcars)
+    y <- cbind.dataset(dataset(vec = rownames(mtcars)), mtcars)
     expect_equal(x, y)
 })
 

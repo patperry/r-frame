@@ -16,59 +16,72 @@ cbind.dataset <- function(..., deparse.level = 1)
 {
     # ignore 'deparse.level' argument
 
-    xorig <- list(...)
-    null <- vapply(xorig, is.null, NA)
-    xorig <- xorig[!null]
-    x <- lapply(xorig, as.dataset)
-    n <- length(x)
+    exprs    <- substitute(list(...))
+    args     <- list(...)
+    narg     <- length(args)
+    argnames <- names(args)
 
-    if (n == 0L) {
+    x     <- vector("list", narg)
+    index <- integer(narg)
+    n     <- 0
+    nctot <- 0
+
+    # convert arguments to dataset and set names
+    for (i in seq_len(narg)) {
+        col <- args[[i]]
+        if (is.null(col))
+            next
+
+        vec <- (length(dim(col)) <= 1
+                && (!is.list(col) || (is.object(col) && !is.record(col))))
+        col <- as.dataset(col)
+
+        if (vec) {
+            if (is.null(argnames) || !nzchar(argnames[[i]])) {
+                names(col) <- deparse(exprs[[i + 1]], 500L)
+            } else {
+                names(col) <- argnames[[i]]
+            }
+            nctot <- nctot + 1
+        } else {
+            nc    <- length(col)
+            nctot <- nctot + nc
+
+            if (!is.null(argnames) && nzchar(argnames[[i]]) && nc > 0) {
+                prefix <- argnames[[i]]
+                suffix <- names(col)
+                if (is.null(suffix)) {
+                    suffix <- as.character(seq_along(col))
+                } else {
+                    miss <- which(is.na(suffix) | !nzchar(suffix))
+                    suffix[miss] <- as.character(miss)
+                }
+                names(col) <- paste(prefix, suffix, sep = ".")
+            }
+        }
+
+        n          <- n + 1
+        index[[n]] <- i
+        x[[n]]     <- col
+    }
+
+    if (n == 0) {
         return(NULL)
     }
 
-    # handle named arguments
-    argnames <- names(x)
-    if (!is.null(argnames)) {
-        for (i in seq_len(n)) {
-            nm <- argnames[[i]]
-            if (!nzchar(nm))
-                next
-
-            xi <- x[[i]]
-            if (length(xi) == 0L)
-                next
-
-            xoi <- xorig[[i]]
-            # matrix inputs (and lists) get 'name.' prefix; others just get name
-            if ((is.list(xoi) && !is.object(xoi)) || (length(dim(xoi)) > 1L)) {
-                ni <- names(xi)
-                if (is.null(ni)) {
-                    ni <- as.character(seq_along(xi))
-                }
-                names(xi) <- paste(nm, ni, sep = ".")
-            } else {
-                names(xi) <- nm
-            }
-
-            x[[i]] <- xi
-        }
-    }
-
     # get rows, columns, keys; validate
-    nctot <- 0L
-    keys <- NULL
-    ikey <- 0L
+    keys  <- NULL
+    ikey  <- 0L
+
     for (i in seq_len(n)) {
         xi <- x[[i]]
         di <- dim(xi)
 
-        nri <- di[[1L]]
-        nctot <- nctot + di[[2L]]
+        nri   <- di[[1L]]
 
         if (i == 1L) {
             nr <- nri
         } else if (nri != nr) {
-            index <- which(!null)
             stop(sprintf("mismatch: argument %.0f has %.0f rows, argument %.0f has %.0f",
                          index[[1L]], nr, index[[i]], nri))
         }
@@ -81,7 +94,6 @@ cbind.dataset <- function(..., deparse.level = 1)
             keys <- ki
             ikey <- i
         } else if (!identical(ki, keys)) {
-            index <- which(!null)
             stop(sprintf("arguments %.0f and %.0f have different keys",
                          index[[ikey]], index[[i]]))
         }
@@ -96,7 +108,7 @@ cbind.dataset <- function(..., deparse.level = 1)
     names <- NULL
 
     off <- 0L
-    for (i in seq_along(x)) {
+    for (i in seq_len(n)) {
         xi <- x[[i]]
         nc <- ncol(xi)
 
