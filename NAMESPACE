@@ -91,6 +91,12 @@ export(group)
 S3method(group, default) ; export(group.default)
 S3method(group, dataset) ; export(group.dataset)
 
+### select
+
+export(select)
+S3method(select, default) ; export(select.default)
+S3method(select, dataset) ; export(select.dataset)
+
 
 ### schema
 
