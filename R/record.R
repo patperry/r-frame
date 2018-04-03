@@ -43,21 +43,9 @@ record <- function(...)
 }
 
 
-is.record <- function(x, n = NULL, names = NULL)
+is.record <- function(x)
 {
-    n     <- if (is.null(n))     NA   else as.size.scalar(n)
-    names <- if (is.null(names)) NULL else as.character.vector(names)
-
-    if (!is.list(x))
-        FALSE
-    else if (!inherits(x, "record"))
-        FALSE
-    else if (!is.na(n) && !isTRUE(length(x) == n))
-        FALSE
-    else if (!is.null(names) && !identical(names(x), names))
-        FALSE
-    else
-        TRUE
+    inherits(x, "record")
 }
 
 
