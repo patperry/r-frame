@@ -194,6 +194,7 @@ S3method(`keys<-`, keyset)
 ### scope
 
 export(scope)
+S3method(scope, default) ; export(scope.default)
 
 
 ## old # exports (need fixing)
@@ -232,4 +233,3 @@ export(scope)
 # S3method(`dimnames<-`, dataset)
 # S3method(row.names, dataset)
 # S3method(`row.names<-`, dataset)
-# S3method(transform, dataset)

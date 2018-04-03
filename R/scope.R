@@ -1,6 +1,12 @@
 
 scope <- function(x, expr, env = NULL)
 {
+    UseMethod("scope")
+}
+
+
+scope.default <- function(x, expr, env = NULL)
+{
     x    <- if (is.record(x) || is.data.frame(x)) x else as.list(x)
     expr <- substitute(expr)
     env  <- if (is.null(env)) parent.frame() else as.environment(env)
