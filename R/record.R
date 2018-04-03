@@ -16,27 +16,30 @@
 
 record <- function(...)
 {
-# A *record* is a vector of 0 or more components, optionally with names.
-# Duplicate and empty names are allowed.
-
-    args <- substitute(list(...))[-1]
-
     x <- list(...)
     n <- length(x)
     names <- names(x)
 
     if (is.null(names)) {
         names <- character(n)
+        empty <- rep_len(TRUE, n)
+    } else {
+        empty <- !nzchar(names)
     }
 
-    for (i in seq_len(n)) {
-        if (!nzchar(names[[i]])) {
-            names[[i]] <- deparse(args[[i]], 500)[[1]]
+    if (any(empty)) {
+        args <- substitute(list(...))
+
+        for (i in seq_len(n)) {
+            if (empty[[i]]) {
+                names[[i]] <- deparse(args[[i + 1L]], 500L)
+            }
         }
+        names(x) <- names
     }
 
-    names(x) <- names
-    as.record(x)
+    oldClass(x) <- "record"
+    x
 }
 
 
@@ -91,16 +94,8 @@ as.record.default <- function(x)
 }
 
 
-# Record names are themselves records, but unlike most R character objects,
-# they are required to be encoded in UTF-8.
-#
-# Note that `names(x)` may contain duplicate values.
-
 `names<-.record` <- function(x, value)
 {
-    if (identical(names(x), value))
-        return(x)
-
     if (!is.null(value)) {
         n <- length(x)
         nv <- length(value)
@@ -108,13 +103,12 @@ as.record.default <- function(x)
             fmt <- "mismatch: `value` length is %.0f, object length is %.0f"
             stop(sprintf(fmt, nv, n))
         }
-
-        value <- arg_names(value, "`value`")
     }
 
     attr(x, "names") <- value
     x
 }
+
 
 `length<-.record` <- function(x, value)
 {

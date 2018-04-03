@@ -43,7 +43,6 @@ arg_index <- function(value, n, names, get)
             stop(sprintf("bounds error: index is %.0f, maximum is %.0f", i, n))
         }
     } else if (is.character(value)) {
-        value <- arg_names(value, "index")
         i <- match(value, names, 0L)
         if (i == 0) {
             if (get) {

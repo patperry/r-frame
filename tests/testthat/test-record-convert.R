@@ -65,13 +65,13 @@ test_that("setting names with wrong length", {
 })
 
 
-test_that("setting names with wrong encoding", {
-    names <- c("hello", "fa\xE7ile", "world")
-    Encoding(names) <- "UTF-8"
-
-    x <- record(a = 1, b = 18, c = "foo")
-    expect_error(names(x) <- names) #, "^encoding error: `value` entry 2")
-})
+#test_that("setting names with wrong encoding", {
+#    names <- c("hello", "fa\xE7ile", "world")
+#    Encoding(names) <- "UTF-8"
+#
+#    x <- record(a = 1, b = 18, c = "foo")
+#    expect_error(names(x) <- names) #, "^encoding error: `value` entry 2")
+#})
 
 
 test_that("as.list downcasts", {

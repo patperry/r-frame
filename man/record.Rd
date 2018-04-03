@@ -36,8 +36,7 @@ function. The default implementation converts the result of
 }
 \section{Record Behavior}{
 Records behave like lists in many respects but they have different
-subscripting and printing behavior. Further, record names, if present,
-are required to be encoded in valid UTF-8.
+subscripting and printing behavior.
 
 Record subscript (\code{[}, \code{[[}, and \code{$}) behavior differs from
 list behavior as follows:

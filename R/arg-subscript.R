@@ -11,9 +11,6 @@ arg_subscript <- function(value, n, names, get)
 
     if (get) {
         vnames <- names(value)
-        if (!is.null(vnames)) {
-            vnames <- arg_names(vnames, "replacement name")
-        }
     }
     
     if (is.object(value)) {
@@ -68,7 +65,6 @@ arg_subscript <- function(value, n, names, get)
             names(value) <- vnames[value]
         }
     } else if (is.character(value)) {
-        value <- arg_names(value, "index")
         index <- match(value, names, 0)
 
         if (!get || is.null(vnames)) {
