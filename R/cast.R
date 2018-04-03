@@ -38,7 +38,7 @@ cast.NULL <- function(type, x)
     x    <- as.vector.value(x)
     n <- length(x)
     if (n != 0)
-        stop(sprintf("cannot cast from length-.%0f object to NULL", n))
+        stop(sprintf("cannot cast from length-%.0f object to NULL", n))
     type
 }
 
