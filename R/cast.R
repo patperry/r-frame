@@ -180,7 +180,7 @@ cast.record <- function(type, x)
     if (!is.null(names)) {
         namesx <- names(x)
         if (!is.null(namesx) && !identical(names, namesx)) {
-            i <- which(!mapply(identical, letters, LETTERS))[[1]]
+            i <- which(!mapply(identical, names, namex))[[1]]
             nfmt <- function(nm) if (is.na(nm)) "<NA>"
                                  else paste0('`', nm, '`')
             fmt <- "mismatch: type name %.0f is %s, value name is %s"
