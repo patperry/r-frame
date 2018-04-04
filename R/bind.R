@@ -275,23 +275,12 @@ rbind.dataset <- function(..., deparse.level = 1)
     y <- as.dataset(y)
 
     if (has_keys) {
-        keys <- vector("list", nk)
-        names(keys) <- knames
-
         if (nk == 0) {
-            keys <- structure(keys, row.names = .set_row_names(nrow(y)),
-                              class = "data.frame")
+            keys <- as.dataset(matrix(0, nrow(y), 0))
         } else {
-            k1 <- k[[1L]]
-            for (j in seq_len(nk)) {
-                rows <- lapply(k, `[[`, j)
-                names(rows) <- NULL
-                col <- do.call(c, rows)
-                keys[[j]] <- col
-            }
-            keys <- as.record(keys)
+            keys <- do.call(rbind.dataset, k)
         }
-
+        names(keys) <- knames
         keys(y) <- make_unique(keys)
     }
 
