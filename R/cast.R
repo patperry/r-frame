@@ -166,7 +166,8 @@ get_tzone <- function(x, default = "UTC")
 
 cast.record <- function(type, x)
 {
-    x  <- as.simple.record(x)
+    x  <- as.record(x)
+    x  <- as.simple(x)
     nx <- length(x)
     n  <- length(type)
 

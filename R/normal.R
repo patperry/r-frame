@@ -1,9 +1,9 @@
 
-normalize <- function(x)
+as.normal <- function(x)
 {
     if (is.record(x)) {
         for (i in seq_along(x)) {
-            x[[i]] <- normalize(x[[i]])
+            x[[i]] <- as.normal(x[[i]])
         }
     } else {
         mode <- storage.mode(x)
@@ -14,8 +14,8 @@ normalize <- function(x)
             x[is.nan(x)] <- NaN # replace all NaN with canonical
         } else if (mode == "complex") {
             x[is.na(x)] <- NA
-            re <- normalize(Re(x))
-            im <- normalize(Im(x))
+            re <- as.normal(Re(x))
+            im <- as.normal(Im(x))
             x <- complex(real = re, imaginary = im)
         } else {
             # pass
