@@ -134,28 +134,6 @@ S3method(idproxy, default) ; export(idproxy.default)
 S3method(idproxy, matrix)  ; export(idproxy.matrix)
 
 
-### normal
-
-export(as.normal)
-export(is.normal)
-export(is.normal.dataset)
-
-S3method(as.normal, default) ; export(as.normal.default)
-S3method(as.normal, dataset) ; export(as.normal.dataset)
-
-S3method(as.normal, Date)
-S3method(as.normal, POSIXct)
-S3method(as.normal, POSIXlt)
-S3method(as.normal, factor)
-S3method(as.normal, normal)
-
-S3method(`[`, normal)
-S3method(`[<-`, normal)
-S3method(`[[`, normal)
-S3method(`[[<-`, normal)
-S3method(`levels<-`, normal)
-
-
 ### keyset
 
 export(keyset)

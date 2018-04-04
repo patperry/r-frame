@@ -1,4 +1,4 @@
-#  Copyright 2017 Patrick O. Perry.
+#  Copyright 2018 Patrick O. Perry.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -45,18 +45,22 @@ as.keyset.default <- function(x)
 
 as.keyset.dataset <- function(x)
 {
-    x <- as.normal.dataset(x)
+    x <- as.dataset(x)
     keys(x) <- NULL
 
-    u <- .Call(rframe_unique, x)
+    y <- as.simple(x)
+    y <- normalize(y)
+    u <- .Call(rframe_unique, y)
 
     if (length(u$types) < length(u$group)) {
         j <- anyDuplicated(u$group)
         stop(sprintf("argument has a duplicate row (%.0f)", j))
     }
 
-    attr(x, "keyset.hash")  <- u$hash
-    attr(x, "keyset.table") <- u$table
+    attr(x, "keyset.type")   <- schema(y)
+    attr(x, "keyset.normal") <- y
+    attr(x, "keyset.hash")   <- u$hash
+    attr(x, "keyset.table")  <- u$table
     class(x) <- c("keyset", class(x))
     x
 }
