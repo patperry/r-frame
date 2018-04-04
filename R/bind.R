@@ -233,9 +233,8 @@ rbind.dataset <- function(..., deparse.level = 1)
     for (j in seq_len(nc)) {
         elt <- x1[[j]]
         rows <- lapply(x, `[[`, j)
-        names(rows) <- NULL
 
-        if (is.null(dim(elt))) {
+        if (length(dim(elt)) <= 1) {
             col <- do.call(c, rows)
         } else {
             col <- do.call(rbind, rows)
