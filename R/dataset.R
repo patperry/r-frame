@@ -109,15 +109,9 @@ as.dataset.default <- function(x)
 as.dataset.data.frame <- function(x)
 {
     nrow <- nrow(x)
-    keys <- if (.row_names_info(x) > 0)
-        dataset(name = row.names(x))
-    else NULL
-
     x <- as.record(x)
     attr(x, "dataset.nrow") <- nrow
     class(x) <- c("dataset", class(x))
-    keys(x) <- keys
-
     x
 }
 

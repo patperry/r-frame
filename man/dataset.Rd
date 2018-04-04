@@ -45,10 +45,6 @@ function. The default implementation works as follows:
         the argument as variables.
 }
 The default conversion fails for rank-3 and higher arrays.
-
-The \code{as.dataset.data.frame} method converts its argument to a dataset
-with the same variables. If the argument has row names, then these get
-converted to keys.
 }
 \section{Dataset Behavior}{
 Datasets are similar to \code{data.frame} objects but exhibit some

@@ -41,8 +41,9 @@ test_that("'cbind' errors if rows do not match, with NULL in between", {
 
 
 test_that("'cbind' errors if keys do not match", {
-    x1 <- mtcars[,1:3]
-    x2 <- mtcars[rev(seq_len(nrow(x1))),4:5]
+    ds <- as.dataset(mtcars); keys(ds) <- keyset(name = rownames(mtcars))
+    x1 <- ds[,1:3]
+    x2 <- ds[rev(seq_len(nrow(x1))), 4:5]
     expect_error(cbind.dataset(x1, x2),
                  "arguments 1 and 2 have different keys")
 })

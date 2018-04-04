@@ -106,10 +106,9 @@ test_that("'as.dataset' works with no columns", {
 })
 
 
-test_that("'as.dataset' can convert data.frame row names", {
+test_that("'as.dataset' ignores data.frame row names", {
     x1 <- data.frame(x = 1:26, row.names = letters)
     x2 <- dataset(x = 1:26)
-    keys(x2) <- dataset(name = letters)
     expect_equal(as.dataset(x1), x2)
 })
 

@@ -404,6 +404,8 @@ test_that("trunc rows", {
     on.exit(Sys.setlocale("LC_CTYPE", ctype), add = TRUE)
 
     x <- as.dataset(mtcars)
+    keys(x) <- keyset(name = rownames(mtcars))
+
     lines <- c(
 'name              |  mpg cyl disp  hp drat    wt  qsec vs am gear carb',
 'Mazda RX4         | 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4',
@@ -424,6 +426,8 @@ test_that("trunc rows and columns", {
     on.exit(Sys.setlocale("LC_CTYPE", ctype), add = TRUE)
 
     x <- as.dataset(mtcars)
+    keys(x) <- keyset(name = rownames(mtcars))
+
     lines <- c(
 'name              |  mpg cyl disp ...',
 'Mazda RX4         | 21.0   6  160 ...',
