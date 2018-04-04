@@ -55,7 +55,8 @@ list behavior as follows:
 
     \item a \code{NULL} subscript is treated as a missing value;
 
-    \item setting a field to \code{NULL} does not delete the field.
+    \item setting a field to \code{NULL} with double subscript (\code{[[})
+    does not delete the field (delete with (\code{[}) instead).
 }
 
 Printing and formatting a record objects via \code{format} and \code{print}
@@ -86,6 +87,11 @@ x[[1]] <- NULL
 
 # different printing
 print(x)
+
+# use single subscript (`[`) to delete
+y <- x
+y[1] <- NULL
+print(y)
 
 # index with logical treats NA like FALSE
 x[c(FALSE, NA, TRUE)]
