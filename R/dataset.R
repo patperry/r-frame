@@ -94,10 +94,7 @@ as.dataset.default <- function(x)
     r <- length(d)
 
     if (r <= 1) {
-        if (is.list(x) && !is.object(x))
-            as.dataset.record(x)
-        else
-            as.dataset.vector(x)
+        as.dataset.vector(x)
     } else if (r == 2) {
         as.dataset.matrix(x)
     } else {

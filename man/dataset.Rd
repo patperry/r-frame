@@ -93,7 +93,7 @@ x[c(foo = "x")]
 keys(x) <- dataset(k1 = LETTERS, k2 = 1:26)
 
 # index with keys
-x[list("E", 5), ]
+x[record(k1 = "E", k2 = 5), ]
 k <- keys(x)[c(5, 17, 2, 1), ]
 x[k, ]
 

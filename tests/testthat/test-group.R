@@ -7,7 +7,7 @@ test_that("'group(,integer)' splits", {
     x <- group(mtcars, group)
     l <- lapply(split(mtcars, group), as.dataset)
     l0 <- l; names(l0) <- NULL
-    y <- as.dataset(list(group = l0))
+    y <- as.dataset(record(group = l0))
     keys(y) <-  keyset(group = as.integer(names(l)))
     expect_equal(reorder(x, keys(x)), y)
 })
@@ -34,7 +34,7 @@ test_that("'group' + 'do' works with NA", {
     y <- do(y, nrow)
 
     keys <- unique(x[,"tailnum"])
-    z <- as.dataset(list(rep(1L, nrow(keys))))
+    z <- as.dataset.record(list(rep(1L, nrow(keys))))
     keys(z) <- keys
     expect_equal(y, z)
 })

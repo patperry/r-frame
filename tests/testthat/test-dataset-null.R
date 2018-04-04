@@ -57,7 +57,7 @@ test_that("setting scalar entry with [<-", {
 
 test_that("setting vector entry with [<-", {
     x <- dataset(x = 1:5, y = NULL, z = letters[1:5])
-    x[4, 2] <- list(list(c(20, 8)))
+    x[4, 2] <- record(list(c(20, 8)))
     y <- dataset(x = 1:5,
                  y = list(NULL, NULL, NULL, c(20,  8), NULL),
                  z = letters[1:5])
@@ -67,7 +67,7 @@ test_that("setting vector entry with [<-", {
 
 test_that("setting NULL value with [<-", {
     x <- dataset(x = 1:5, y = NULL, z = letters[1:5])
-    x[4, 2] <- list(list(NULL))
+    x[4, 2] <- record(list(NULL))
     y <- dataset(x = 1:5,
                  y = list(NULL, NULL, NULL, NULL, NULL),
                  z = letters[1:5])

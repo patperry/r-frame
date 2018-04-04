@@ -93,7 +93,7 @@ test_that("'rbind' errors for mismatched number of keys", {
 
 test_that("'rbind' can handle named vector arguments", {
     ds <- as.dataset(mtcars); keys(ds) <- keyset(name = rownames(mtcars))
-    x <- rbind.dataset(first = mtcars[1, , drop = TRUE], ds)
+    x <- rbind.dataset(first = as.record(mtcars[1, , drop = TRUE]), ds)
     ydf <- rbind(first = mtcars[1, , drop = TRUE], mtcars)
     y <- as.dataset(ydf); keys(y) <- keyset(name = rownames(ydf))
     expect_equal(x, y)

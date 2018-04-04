@@ -32,8 +32,7 @@ cbind.dataset <- function(..., deparse.level = 1)
         if (is.null(col))
             next
 
-        vec <- (length(dim(col)) <= 1
-                && (!is.list(col) || (is.object(col) && !is.record(col))))
+        vec <- (length(dim(col)) <= 1 && !is.record(col))
         col <- as.dataset(col)
 
         if (vec) {
@@ -127,6 +126,7 @@ cbind.dataset <- function(..., deparse.level = 1)
     }
 
     names(y) <- names
+    y <- as.record(y)
     y <- as.dataset(y)
     keys(y) <- keys
 
@@ -138,22 +138,44 @@ rbind.dataset <- function(..., deparse.level = 1)
 {
     # ignore 'deparse.level'
 
-    xorig <- list(...)
-    null <- vapply(xorig, is.null, NA)
-    xorig <- xorig[!null]
-    x <- lapply(xorig, as.dataset)
-    k <- lapply(x, keys)
-    n <- length(x)
+    args     <- list(...)
+    narg     <- length(args)
+    argnames <- names(args)
+
+    x        <- vector("list", narg)
+    k        <- vector("list", narg)
+    index    <- integer(narg)
+    n        <- 0L
+    has_keys <- FALSE
+
+    for (i in seq_len(narg)) {
+        row <- args[[i]]
+        if (is.null(row))
+            next
+
+        if (length(dim(row)) <= 1) {
+            row <- as.record(row)
+        }
+        row <- as.dataset(row)
+
+        n          <- n + 1L
+        x[[n]]     <- row
+        index[[n]] <- i
+        keys <- keys(row)
+        if (!is.null(keys)) {
+            has_keys <- TRUE
+            k[[n]] <- keys
+        }
+    }
 
     if (n == 0L) {
         return(NULL)
     }
 
     # handle named arguments
-    argnames <- names(x)
     if (!is.null(argnames)) {
         for (i in seq_len(n)) {
-            nm <- argnames[[i]]
+            nm <- argnames[[ index[[i]] ]]
             if (!nzchar(nm))
                 next
 
@@ -167,7 +189,7 @@ rbind.dataset <- function(..., deparse.level = 1)
             if (length(ki) == 0L && ni > 1L) {
                 ki <- as.dataset(paste(nm, seq_len(ni), sep = "."))
             } else {
-                ki <- as.dataset(c(list(rep(nm, ni)), ki))
+                ki <- as.dataset(c.record(list(rep(nm, ni)), ki))
             }
             k[[i]] <- ki
         }
@@ -180,7 +202,6 @@ rbind.dataset <- function(..., deparse.level = 1)
     for (i in seq_len(n)) {
         xi <- x[[i]]
         if (length(xi) != nc) {
-            index <- which(!null)
             stop(sprintf("arguments %.0f and %.0f have different numbers of columns",
                          index[[1]], index[[i]]))
         }
@@ -200,7 +221,6 @@ rbind.dataset <- function(..., deparse.level = 1)
             xi <- x[[i]]
             ni <- names(xi)
             if (!is.null(ni) && !identical(ni, names)) {
-                index <- which(!null)
                 stop(sprintf("arguments %.0f and %.0f have different names",
                              index[[iname]], index[[i]]))
             }
@@ -208,7 +228,6 @@ rbind.dataset <- function(..., deparse.level = 1)
     }
 
     # get number of keys, key names
-    has_keys <- !all(vapply(k, is.null, NA))
     if (has_keys) {
         nk <- length(k[[1]])
         for (ikname in seq_len(n)) {
@@ -223,13 +242,11 @@ rbind.dataset <- function(..., deparse.level = 1)
         for (i in seq_len(n)) {
             ki <- k[[i]]
             if (length(ki) != nk) {
-                index <- which(!null)
                 stop(sprintf("arguments %.0f and %.0f have different numbers of keys",
                              index[[1]], index[[i]]))
             }
             nki <- names(ki)
             if (!is.null(nki) && !identical(nki, knames)) {
-                index <- which(!null)
                 stop(sprintf("arguments %.0f and %.0f have different key names",
                              index[[ikname]], index[[i]]))
             }
@@ -254,6 +271,7 @@ rbind.dataset <- function(..., deparse.level = 1)
         y[[j]] <- col
     }
 
+    y <- as.record(y)
     y <- as.dataset(y)
 
     if (has_keys) {
@@ -271,6 +289,7 @@ rbind.dataset <- function(..., deparse.level = 1)
                 col <- do.call(c, rows)
                 keys[[j]] <- col
             }
+            keys <- as.record(keys)
         }
 
         keys(y) <- make_unique(keys)

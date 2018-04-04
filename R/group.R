@@ -66,7 +66,7 @@ group.dataset <- function(`_data`, ...)
         return(NULL)
     }
 
-    y <- as.dataset(list(group = xg))
+    y <- as.dataset(record(group = xg))
     keys(y) <- keys
 
     y
