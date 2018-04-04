@@ -51,33 +51,34 @@ is.record <- function(x)
 
 as.list.record <- function(x, ...)
 {
-    names <- names(x)
-    attributes(x) <- NULL
-    names(x) <- names
+    attributes(x) <- list(names = names(x))
     x
 }
 
-
-# We coerce other objects to records by first converting to list. We
-# preserve object names for vector inputs.
 
 as.record <- function(x)
     UseMethod("as.record")
 
 
-as.record.record <- function(x)
+as.record.default <- function(x)
 {
+    x <- as.list(x)
+    as.record.list(x)
+}
+
+
+as.record.list <- function(x)
+{
+    if (is.object(x)) {
+        x <- as.list(x)
+    }
+    attributes(x) <- list(names = names(x), class = "record")
     x
 }
 
 
-as.record.default <- function(x)
+as.record.record <- function(x)
 {
-    names <- names(x)
-    x <- as.list(x)
-    attributes(x) <- NULL
-    class(x) <- "record"
-    names(x) <- names
     x
 }
 

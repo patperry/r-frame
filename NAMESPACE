@@ -21,6 +21,7 @@ export(is.record)
 export(as.record)
 
 S3method(as.record, default); export(as.record.default)
+S3method(as.record, list)
 S3method(as.record, record)
 S3method(c, record); export(c.record)
 
