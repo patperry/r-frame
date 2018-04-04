@@ -300,7 +300,13 @@ format_head <- function(x, meta, style, char)
     }
 
     # determine header for nested groups
-    depth <- max(1, vapply(meta$index, length, 0))
+    depth <- max(0, vapply(meta$index, length, 0))
+    if (depth == 0) {
+        lines <- ""
+        attr(lines, "width") <- 0
+        return(lines)
+    }
+
     group <- matrix(unlist(lapply(meta$index, `length<-`, depth)), nrow = depth)
     gname <- matrix(unlist(lapply(path, `length<-`, depth)), nrow = depth)
 
@@ -442,7 +448,11 @@ format_body <- function(x, meta, style)
         }
     }
 
-    attr(lines, "width") <- (meta$indent[[n]] + meta$width[[n]])
+    if (n > 0) {
+        attr(lines, "width") <- (meta$indent[[n]] + meta$width[[n]])
+    } else {
+        attr(lines, "width") <- 0
+    }
     lines
 }
 
@@ -494,17 +504,12 @@ print.dataset <- function(x, limit = NULL, line = NULL, control = NULL, ...)
     n <- nr <- dim(x)[[1L]]
     style <- new_format_style(control)
 
-    if (length(x) == 0) {
-        cat(sprintf("(%.0f rows, 0 columns)\n", n))
-        return(invisible(x))
-    }
-
     if (isTRUE(limit >= 0)) {
         n <- min(n, limit)
     }
 
     row <- format_rows(n, keys(x), control, style$faint)
-    if (row$width > 0) {
+    if (row$width > 0 && length(x) > 0) {
         row$head  <- paste0(row$head, style$normal(" "))
         row$body  <- paste0(row$body, style$normal(" "))
         row$width <- row$width + 1
@@ -516,7 +521,7 @@ print.dataset <- function(x, limit = NULL, line = NULL, control = NULL, ...)
 
     fmt   <- format.dataset(x, limit, line, control, TRUE)
     meta  <- attr(fmt, "format.meta", TRUE)
-    npage <- max(0, meta$page)
+    npage <- max(1, meta$page)
 
     for (page in seq_len(npage)) {
         if (page > 1) {
@@ -547,7 +552,7 @@ print.dataset <- function(x, limit = NULL, line = NULL, control = NULL, ...)
         cat("(0 rows)\n")
     } else if (!is.null(caption)) {
         vellipsis <- if (rows.trunc) control$vellipsis else ""
-        width     <- row$width + max(meta$indent + meta$width)
+        width     <- row$width + max(0, meta$indent + meta$width)
         foot_width <- max(0, width - utf8_width(vellipsis))
         foot <- utf8_format(paste0(" ", caption), width = foot_width,
                             justify = "right")
