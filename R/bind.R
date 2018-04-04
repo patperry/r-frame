@@ -142,6 +142,10 @@ rbind.dataset <- function(..., deparse.level = 1)
     narg     <- length(args)
     argnames <- names(args)
 
+    if (!is.null(argnames)) {
+        stop("named arguments are not allowed")
+    }
+
     x        <- vector("list", narg)
     k        <- vector("list", narg)
     index    <- integer(narg)
@@ -172,31 +176,14 @@ rbind.dataset <- function(..., deparse.level = 1)
         return(NULL)
     }
 
-    # handle named arguments
-    if (!is.null(argnames)) {
-        for (i in seq_len(n)) {
-            nm <- argnames[[ index[[i]] ]]
-            if (!nzchar(nm))
-                next
-
-            xi <- x[[i]]
-            ni <- dim(xi)[[1L]]
-            if (ni == 0L)
-                next
-
-            # prepend name as first column of keys
-            ki <- as.list(k[[i]])
-            if (length(ki) == 0L && ni > 1L) {
-                ki <- as.dataset(paste(nm, seq_len(ni), sep = "."))
-            } else {
-                ki <- as.dataset(c.record(list(rep(nm, ni)), ki))
-            }
-            k[[i]] <- ki
+    # get number of columns, names
+    nc <- length(x[[1]])
+    for (iname in seq_len(n)) {
+        names <- names(x[[iname]])
+        if (!is.null(names)) {
+            break
         }
     }
-
-    # get columns
-    nc <- length(x[[1L]])
 
     # validate columns
     for (i in seq_len(n)) {
@@ -205,25 +192,11 @@ rbind.dataset <- function(..., deparse.level = 1)
             stop(sprintf("arguments %.0f and %.0f have different numbers of columns",
                          index[[1]], index[[i]]))
         }
-    }
 
-    # get names
-    for (iname in seq_len(n)) {
-        names <- names(x[[iname]])
-        if (!is.null(names)) {
-            break
-        }
-    }
-
-    # validate names
-    if (iname < n) {
-        for (i in (iname + 1L):n) {
-            xi <- x[[i]]
-            ni <- names(xi)
-            if (!is.null(ni) && !identical(ni, names)) {
-                stop(sprintf("arguments %.0f and %.0f have different names",
-                             index[[iname]], index[[i]]))
-            }
+        ni <- names(xi)
+        if (!is.null(ni) && !identical(ni, names)) {
+            stop(sprintf("arguments %.0f and %.0f have different names",
+                         index[[iname]], index[[i]]))
         }
     }
 

@@ -91,22 +91,29 @@ test_that("'rbind' errors for mismatched number of keys", {
 })
 
 
-test_that("'rbind' can handle named vector arguments", {
-    ds <- as.dataset(mtcars); keys(ds) <- keyset(name = rownames(mtcars))
-    x <- rbind.dataset(first = as.record(mtcars[1, , drop = TRUE]), ds)
-    ydf <- rbind(first = mtcars[1, , drop = TRUE], mtcars)
-    y <- as.dataset(ydf); keys(y) <- keyset(name = rownames(ydf))
-    expect_equal(x, y)
+test_that("'rbind' errors for named argument", {
+    x1 <- as.dataset(mtcars[1:3, ])
+    x2 <- as.dataset(mtcars[4:5, ])
+    expect_error(rbind.dataset(x1, two = x2),
+                 "named arguments are not allowed")
 })
 
+#test_that("'rbind' can handle named vector arguments", {
+#    ds <- as.dataset(mtcars); keys(ds) <- keyset(name = rownames(mtcars))
+#    x <- rbind.dataset(first = as.record(mtcars[1, , drop = TRUE]), ds)
+#    ydf <- rbind(first = mtcars[1, , drop = TRUE], mtcars)
+#    y <- as.dataset(ydf); keys(y) <- keyset(name = rownames(ydf))
+#    expect_equal(x, y)
+#})
 
-test_that("'rbind' can handle named vector arguments with unnamed matrix", {
-    ds <- as.dataset(mtcars); keys(ds) <- keyset(name = rownames(mtcars))
-    x <- rbind.dataset(first = ds[1, , drop = TRUE], unname(ds))
-    ydf <- rbind(first = mtcars[1, , drop = TRUE], mtcars)
-    y <- as.dataset(ydf); keys(y) <- keyset(name = rownames(ydf))
-    expect_equal(x, y)
-})
+
+#test_that("'rbind' can handle named vector arguments with unnamed matrix", {
+#    ds <- as.dataset(mtcars); keys(ds) <- keyset(name = rownames(mtcars))
+#    x <- rbind.dataset(first = ds[1, , drop = TRUE], unname(ds))
+#    ydf <- rbind(first = mtcars[1, , drop = TRUE], mtcars)
+#    y <- as.dataset(ydf); keys(y) <- keyset(name = rownames(ydf))
+#    expect_equal(x, y)
+#})
 
 
 test_that("'rbind' can handle unnamed vector arguments", {
@@ -127,15 +134,15 @@ test_that("'rbind' can handle unnamed vector arguments with unnamed matrix", {
 })
 
 
-test_that("'rbind' can handle named matrix arguments", {
-    z <- mtcars
-    rownames(z) <- NULL
-    ds <- as.dataset(mtcars); keys(ds) <- keyset(name = rownames(mtcars))
-    x <- rbind.dataset(ds[1, , drop = FALSE], nest = z)
-    ydf <- rbind(mtcars[1, , drop = FALSE], nest = z)
-    y <- as.dataset(ydf); keys(y) <- keyset(name = rownames(ydf))
-    expect_equal(x, y)
-})
+#test_that("'rbind' can handle named matrix arguments", {
+#    z <- mtcars
+#    rownames(z) <- NULL
+#    ds <- as.dataset(mtcars); keys(ds) <- keyset(name = rownames(mtcars))
+#    x <- rbind.dataset(ds[1, , drop = FALSE], nest = z)
+#    ydf <- rbind(mtcars[1, , drop = FALSE], nest = z)
+#    y <- as.dataset(ydf); keys(y) <- keyset(name = rownames(ydf))
+#    expect_equal(x, y)
+#})
 
 
 test_that("'rbind' can handle duplicate keys", {
