@@ -101,22 +101,31 @@ as.vector.type <- function(x)
     x
 }
 
-
 as.vector.value <- function(x)
 {
-    r <- length(dim(x))
-    if (r == 2) {
-        x <- as.simple.dataset(x)
-    } else if (r > 2) {
-        stop(sprintf("cannot cast from rank-%.0f object to vector", r))
-    }
-
     if (is.record(x)) {
         nx <- length(x)
         if (nx != 1) {
             stop(sprintf("mismatch: type has 1 components, value has %.0f", nx))
         }
-        return(as.vector.value(x[[1]]))
+        x <- x[[1]]
+        return(as.vector.value(x))
+    }
+
+    d <- dim(x)
+    r <- length(d)
+
+    if (r <= 1) {
+        # pass
+    } else if (r == 2) {
+        nx <- d[[2]]
+        if (nx != 1) {
+            stop(sprintf("mismatch: type has 1 components, value has %.0f", nx))
+        }
+        x <- x[ , 1, drop = TRUE]
+        x <- as.vector.value(x)
+    } else if (r > 2) {
+        stop(sprintf("cannot cast from rank-%.0f object to vector", r))
     }
 
     x
