@@ -13,13 +13,12 @@
 #  limitations under the License.
 
 
-reorder.dataset <- function(x, ..., env = NULL)
+reorder.dataset <- function(x, ...)
 {
     x     <- as.dataset(x)
     exprs <- substitute(list(...))
-    env   <- if (is.null(env)) parent.frame() else as.environment(env)
 
-    i <- eval.parent(call("scope", x, exprs, env))
+    i <- eval.parent(call("scope", x, exprs))
     if (length(i) == 0) {
         return(x)
     }
