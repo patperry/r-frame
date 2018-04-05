@@ -58,4 +58,9 @@ cast(r, unname(x))   # succeed, source names are NULL
 cast(unname(r), x)   # succeeds, destination names are NULL
 names(x) <- names(r)
 cast(r, x)           # succeeds, names match
+
+#  conversion from POSIXct 'America/New_Nork' to 'America/Los_Angeles'
+t <- as.POSIXct("0000-01-01 00:00:00", tz = "America/Los_Angeles")[0]
+x <- as.POSIXct("2000-10-26 10:00:00", tz = "America/New_York")
+cast(t, x)
 }

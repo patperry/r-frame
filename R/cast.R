@@ -24,7 +24,7 @@ cast.vector <- function(type, x)
 
     if (is.null(type)) {
         if (n != 0) {
-            stop(sprintf("cannot cast from length-%.0f object to NULL", n))
+            stop(sprintf("cannot cast from length-%.0f vector to NULL", n))
         }
         return(type)
     } else if (is.atomic(type) && !is.object(type)) {

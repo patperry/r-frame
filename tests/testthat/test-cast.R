@@ -5,6 +5,8 @@ test_that("to NULL", {
     expect_equal(cast(NULL, NULL), NULL)
     expect_equal(cast(NULL, integer()), NULL)
     expect_equal(cast(NULL, list()), NULL)
+    expect_error(cast(NULL, 1),
+                 "cannot cast from length-1 vector to NULL")
 })
 
 
@@ -165,4 +167,12 @@ test_that("to record with wrong components", {
 
 test_that("to list", {
     expect_equal(cast(list(), letters), as.list(letters))
+})
+
+
+test_that("to matrix", {
+    t <- matrix(0L, 0, 3)
+    x <- c(1.1, 2.4, 4.4)
+    y <- as.record(list(1L, 2L, 4L))
+    expect_equal(cast(t, x), y)
 })
