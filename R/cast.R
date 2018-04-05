@@ -27,6 +27,8 @@ cast.default <- function(type, x)
         cast.complex(type, x)
     else if (mode == "character")
         cast.character(type, x)
+    else if (mode == "list")
+        cast.list(type, x)
     else
         stop(sprintf("cannot cast from object of mode \"%s\"", mode))
 }
@@ -110,6 +112,17 @@ cast.character <- function(type, x)
 }
 
 
+cast.list <- function(type, x)
+{
+    type <- as.vector.type(type)
+    x    <- as.vector.value(x)
+
+    x <- as.list(x)
+    type[seq_along(x)] <- x
+    type
+}
+
+
 cast.factor <- function(type, x)
 {
     cast.vector(type, x)
@@ -166,24 +179,29 @@ get_tzone <- function(x, default = "UTC")
 
 cast.record <- function(type, x)
 {
+    type <- as.record.type(type)
     x  <- as.record(x)
     x  <- as.simple(x)
     nx <- length(x)
     n  <- length(type)
 
     if (n != nx) {
-        stop(sprintf("mismatch: type has %.0f components, value has %.0f",
+        stop(sprintf("mismatch: destination has %.0f components, source has %.0f",
                      n, nx))
     }
 
     names <- names(type)
-    if (!is.null(names)) {
+    if (is.null(names)) {
+        names(x) <- NULL
+    } else {
         namesx <- names(x)
-        if (!is.null(namesx) && !identical(names, namesx)) {
-            i <- which(!mapply(identical, names, namex))[[1]]
+        if (is.null(namesx)) {
+            names(x) <- names
+        } else if (!identical(names, namesx)) {
+            i <- which(!mapply(identical, names, namesx))[[1]]
             nfmt <- function(nm) if (is.na(nm)) "<NA>"
                                  else paste0('`', nm, '`')
-            fmt <- "mismatch: type name %.0f is %s, value name is %s"
+            fmt <- "mismatch: destination component %.0f has name %s, source has name %s"
             stop(sprintf(fmt, i, nfmt(names[[i]]), nfmt(namesx[[i]])))
         }
     }

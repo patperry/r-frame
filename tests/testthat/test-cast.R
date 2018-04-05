@@ -51,6 +51,18 @@ test_that("to factor", {
 })
 
 
+test_that("to factor with different levels", {
+    f <- factor(c(), levels = letters)
+    x1 <- cast(f, c("a", "e", "i", "o", "u"))
+    expect_equal(x1, factor(c("a", "e", "i", "o", "u"), levels = letters))
+
+    x2 <- cast(f, factor(c("a", "e", "i", "o", "u")))
+    expect_equal(x1, factor(c("a", "e", "i", "o", "u"), levels = letters))
+
+    expect_warning(cast(f, "A"), "invalid factor level, NA generated")
+})
+
+
 test_that("to Date from character", {
     type <- as.Date("2000-01-01")[0]
     expect_equal(cast(type, "1900-10-26"), as.Date("1900-10-26"))
@@ -126,4 +138,31 @@ test_that("to POSIXct (America/Los_Angeles) from POSIXct or POSIXlt", {
     xx <- lapply(x, function(xi) cast(type, xi))
     yy <- lapply(y, function(yi) cast(type, yi))
     expect_equal(xx, yy)
+})
+
+
+test_that("to record", {
+    r <- record(int = integer(), lgl = logical(), chr = character())
+    x <- record(a = 1.3, b = "TRUE", c = 3.14)
+    y <- record(int = 1L, lgl = TRUE, chr = "3.14")
+    expect_error(cast(r, x),
+                 "mismatch: destination component 1 has name `int`, source has name `a`")
+
+    expect_equal(cast(r, unname(x)), y)
+    expect_equal(cast(unname(r), x), unname(y))
+
+    names(x) <- names(r)
+    expect_equal(cast(r, x), y)
+})
+
+
+test_that("to record with wrong components", {
+    r <- record(int = integer(), lgl = logical(), chr = character())
+    x <- record(int = 1L, lgl = TRUE, chr = "3.14", z = NULL)
+    expect_error(cast(r, x), "mismatch: destination has 3 components, source has 4")
+})
+
+
+test_that("to list", {
+    expect_equal(cast(list(), letters), as.list(letters))
 })

@@ -96,8 +96,19 @@ as.size.scalar <- function(x)
 
 as.vector.type <- function(x)
 {
-    if (!(length(x) == 0 && length(dim(x)) <= 1))
+    x <- schema(x)
+    if (!(length(x) == 0 && length(dim(x)) <= 1)) {
         stop("argument is not a vector type")
+    }
+    x
+}
+
+as.record.type <- function(x)
+{
+    x <- schema(x)
+    if (!is.record(x)) {
+        stop("argument is not a record type")
+    }
     x
 }
 
