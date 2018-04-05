@@ -1,4 +1,5 @@
 \name{sort.dataset}
+\alias{sort.dataset}
 \alias{xtfrm.dataset}
 \title{Sorting Datasets}
 \description{
