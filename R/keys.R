@@ -45,8 +45,8 @@ keys.dataset <- function(x)
         n <- dim(x)[[1L]]
         nk <- dim(value)[[1L]]
         if (n != nk) {
-            stop(sprintf("mismatch: keys have %.0f rows, data have %.0f",
-                         nk, n))
+            stop(sprintf("mismatch: data have %.0f rows, keys have %.0f",
+                         n, nk))
         }
 
         attr(x, "dataset.keys") <- value
@@ -58,7 +58,16 @@ keys.dataset <- function(x)
 
 `keys<-.keyset` <- function(x, value)
 {
-    if (!is.null(value))
-        stop("setting 'keys' on a keyset object is not allowed")
+    if (!is.null(value)) {
+        at <- attributes(x)
+
+        names <- names(at)
+        global   <- grepl("^[^.]+$", names)
+        subclass <- grepl("^(record|dataset)[.]", names)
+        at <- at[global | subclass]
+
+        at$class <- c("dataset", "record")
+        attributes(x) <- at
+    }
     x
 }
