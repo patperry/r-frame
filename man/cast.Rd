@@ -1,6 +1,10 @@
 \name{cast}
 \alias{cast}
+\alias{cast.Date}
 \alias{cast.default}
+\alias{cast.POSIXct}
+\alias{cast.record}
+\alias{cast.vector}
 \title{Casting Types}
 \description{
 Convert a data object from one type to another.
