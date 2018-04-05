@@ -27,3 +27,8 @@ test_that("0 components", {
     expect_equal(lookup(record(), keys), 1)
     expect_equal(lookup(as.dataset(matrix(0, 10, 0)), keys), rep(1, 10))
 })
+
+
+test_that("NULL", {
+    expect_equal(lookup(1:10, NULL), rep(NA_real_, 10))
+})
