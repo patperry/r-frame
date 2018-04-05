@@ -1,11 +1,14 @@
 \name{dataset}
 \alias{dataset}
+\alias{as.data.frame.dataset}
 \alias{as.dataset}
 \alias{as.dataset.default}
 \alias{as.dataset.data.frame}
 \alias{as.dataset.matrix}
 \alias{as.dataset.record}
+\alias{as.matrix.dataset}
 \alias{is.dataset}
+\alias{t.dataset}
 \title{Dataset Objects}
 \description{
 Create or test for dataset objects.

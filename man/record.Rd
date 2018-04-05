@@ -1,5 +1,6 @@
 \name{record}
 \alias{record}
+\alias{as.list.record}
 \alias{as.record}
 \alias{as.record.default}
 \alias{is.record}
