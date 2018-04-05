@@ -43,10 +43,6 @@ idproxy.vector <- function(x)
 
 idproxy.matrix <- function(x)
 {
-    d <- dim(x)
-    if (length(d) != 2)
-        stop("argument is not a matrix")
-
     x <- as.dataset.matrix(x)
     idproxy.dataset(x)
 }
