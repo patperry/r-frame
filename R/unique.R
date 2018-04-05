@@ -2,6 +2,7 @@
 
 unique.dataset <- function(x, incomparables = FALSE, ...)
 {
+    x <- as.dataset(x)
     p <- idproxy(x)
     p <- as.normal(p)
     u <- .Call(rframe_unique, p)
@@ -11,6 +12,7 @@ unique.dataset <- function(x, incomparables = FALSE, ...)
 
 duplicated.dataset <- function(x, incomparables = FALSE, ...)
 {
+    x <- as.dataset(x)
     x <- idproxy(x)
     x <- as.normal(x)
     u <- .Call(rframe_unique, x)
@@ -20,6 +22,7 @@ duplicated.dataset <- function(x, incomparables = FALSE, ...)
 
 anyDuplicated.dataset <- function(x, incomparables = FALSE, ...)
 {
+    x <- as.dataset(x)
     x <- idproxy(x)
     x <- as.normal(x)
     u <- .Call(rframe_unique, x)

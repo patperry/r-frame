@@ -102,3 +102,16 @@ test_that("works for empty dataset", {
                               class = "data.frame"))
     expect_equal(unique(x), x[1, ])
 })
+
+
+test_that("converts to dataset", {
+    expect_true(is.dataset(unique.dataset(mtcars)))
+})
+
+
+test_that("works for keyset", {
+    k <- keyset(x = 1:10)
+    expect_equal(anyDuplicated(k), 0L)
+    expect_equal(duplicated(k), logical(10))
+    expect_equal(unique(k), k)
+})
