@@ -33,14 +33,13 @@ reorder.dataset <- function(x, ...)
             stop("named arguments must be 'asc' or 'desc'")
         }
         desc <- (names == "desc")
-        names(i) <- NULL
-    } else {
-        desc <- FALSE
+        for (j in seq_along(i)) {
+            if (desc[[j]]) {
+                i[[j]] <- -i[[j]]
+            }
+        }
     }
 
-    i[["decreasing"]] <- desc
-    i[["method"]] <- "radix"
     o <- do.call(order, i)
-
-    x[o,]
+    x[o, ]
 }

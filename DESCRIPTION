@@ -5,7 +5,7 @@ Authors@R: c(
   person(c("Patrick", "O."), "Perry",
          role = c("aut", "cph", "cre"),
          email = "pperry@stern.nyu.edu"))
-Depends: R (>= 3.3)
+Depends: R (>= 3.0)
 Imports:
   utf8 (>= 1.1.2)
 Suggests:
