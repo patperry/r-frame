@@ -7,125 +7,12 @@ cast <- function(type, x)
 
 cast.default <- function(type, x)
 {
-    cl <- oldClass(type)
-    if (!is.null(cl)) {
-        stop(sprintf("cannot cast to type \"%s\"", paste(cl, collapse = ".")))
+    type <- schema(type)
+    if (is.record(type)) {
+        cast.record(type, x)
+    } else {
+        cast.vector(type, x)
     }
-
-    mode <- storage.mode(type)
-    if (mode == "NULL")
-        cast.NULL(type, x)
-    else if (mode == "logical")
-        cast.logical(type, x)
-    else if (mode == "raw")
-        cast.raw(type, x)
-    else if (mode == "integer")
-        cast.integer(type, x)
-    else if (mode == "double")
-        cast.double(type, x)
-    else if (mode == "complex")
-        cast.complex(type, x)
-    else if (mode == "character")
-        cast.character(type, x)
-    else if (mode == "list")
-        cast.list(type, x)
-    else
-        stop(sprintf("cannot cast from object of mode \"%s\"", mode))
-}
-
-
-cast.NULL <- function(type, x)
-{
-    type <- as.vector.type(type)
-    x    <- as.vector.value(x)
-    n <- length(x)
-    if (n != 0)
-        stop(sprintf("cannot cast from length-%.0f object to NULL", n))
-    type
-}
-
-
-cast.logical <- function(type, x)
-{
-    type <- as.vector.type(type)
-    x    <- as.vector.value(x)
-
-    x <- as.logical(x)
-    type[seq_along(x)] <- x
-    type
-}
-
-
-cast.raw <- function(type, x)
-{
-    type <- as.vector.type(type)
-    x    <- as.vector.value(x)
-
-    x <- as.raw(x)
-    type[seq_along(x)] <- x
-    type
-}
-
-
-cast.integer <- function(type, x)
-{
-    type <- as.vector.type(type)
-    x    <- as.vector.value(x)
-
-    x <- as.integer(x)
-    type[seq_along(x)] <- x
-    type
-}
-
-
-cast.double <-
-cast.numeric <- function(type, x)
-{
-    type <- as.vector.type(type)
-    x    <- as.vector.value(x)
-
-    x <- as.double(x)
-    type[seq_along(x)] <- x
-    type
-}
-
-
-cast.complex <- function(type, x)
-{
-    type <- as.vector.type(type)
-    x    <- as.vector.value(x)
-
-    x <- as.complex(x)
-    type[seq_along(x)] <- x
-    type
-}
-
-
-cast.character <- function(type, x)
-{
-    type <- as.vector.type(type)
-    x    <- as.vector.value(x)
-
-    x <- as.character(x)
-    type[seq_along(x)] <- x
-    type
-}
-
-
-cast.list <- function(type, x)
-{
-    type <- as.vector.type(type)
-    x    <- as.vector.value(x)
-
-    x <- as.list(x)
-    type[seq_along(x)] <- x
-    type
-}
-
-
-cast.factor <- function(type, x)
-{
-    cast.vector(type, x)
 }
 
 
@@ -133,8 +20,19 @@ cast.vector <- function(type, x)
 {
     type <- as.vector.type(type)
     x    <- as.vector.value(x)
+    n    <- length(x)
 
-    type[seq_along(x)] <- x
+    if (is.null(type)) {
+        if (n != 0) {
+            stop(sprintf("cannot cast from length-%.0f object to NULL", n))
+        }
+        return(type)
+    } else if (is.atomic(type) && !is.object(type)) {
+        mode <- storage.mode(type)
+        x    <- as.vector(x, mode)
+    }
+
+    type[seq_len(n)] <- x
     type
 }
 
@@ -180,7 +78,8 @@ get_tzone <- function(x, default = "UTC")
 cast.record <- function(type, x)
 {
     type <- as.record.type(type)
-    x  <- as.record(x)
+    x    <- as.record(x)
+
     x  <- as.simple(x)
     nx <- length(x)
     n  <- length(type)

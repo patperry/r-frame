@@ -111,21 +111,10 @@ S3method(schema, record)  ; export(schema.record)
 export(cast)
 
 S3method(cast, default) ; export(cast.default)
-S3method(cast, factor)  ; export(cast.factor)
 S3method(cast, Date)    ; export(cast.Date)
 S3method(cast, POSIXct) ; export(cast.POSIXct)
 S3method(cast, record)  ; export(cast.record)
-
-S3method(cast, NULL)      ; export(cast.NULL)
-S3method(cast, logical)   ; export(cast.logical)
-S3method(cast, raw)       ; export(cast.raw)
-S3method(cast, integer)   ; export(cast.integer)
-S3method(cast, double)    ; export(cast.double)
-S3method(cast, numeric)   ; export(cast.numeric)
-S3method(cast, complex)   ; export(cast.complex)
-S3method(cast, character) ; export(cast.character)
-S3method(cast, list)      ; export(cast.list)
-S3method(cast, vector)    ; export(cast.vector)
+S3method(cast, vector)  ; export(cast.vector)
 
 
 ### idproxy
