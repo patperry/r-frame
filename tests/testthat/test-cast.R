@@ -176,3 +176,10 @@ test_that("to matrix", {
     y <- as.record(list(1L, 2L, 4L))
     expect_equal(cast(t, x), y)
 })
+
+test_that("from matrix", {
+    x <- matrix(1:6, 3, 2)
+    t <- record(a = integer(), b = character())
+    y <- cast(t, x)
+    expect_equal(y, dataset(a = 1:3, b = as.character(4:6)))
+})
