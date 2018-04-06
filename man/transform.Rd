@@ -8,7 +8,7 @@ Modify or add columns to a dataset.
 \method{transform}{dataset}(`_data`, ...)
 }
 \arguments{
-\item{`_data`}{a dataset object.}
+\item{_data}{a dataset object.}
 \item{...}{expressions used to modify or update the dataset.}
 }
 \details{
