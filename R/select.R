@@ -12,9 +12,13 @@ select.dataset <- function(`_data`, ...)
     vars    <- substitute(dataset(...))
     vars    <- eval.parent(call("scope", `_data`, vars))
 
+    if (length(vars) == 0) {
+        return(`_data`[0])
+    }
+
     nx <- nrow(`_data`)
     nv <- nrow(vars)
-    if (nx != nx) {
+    if (nx != nv) {
         stop(sprintf("mismatch: data have %.0f rows, selected values have %.0f",
                      nx, nv))
     }
