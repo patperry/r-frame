@@ -7,9 +7,9 @@
 Perform an action on each row in a dataset and combine the results.
 }
 \usage{
-do(x, f, type = NULL)
-\method{do}{default}(x, f, type = NULL)
-\method{do}{dataset}(x, f, type = NULL)
+do(x, f)
+\method{do}{default}(x, f)
+\method{do}{dataset}(x, f)
 }
 \arguments{
 \item{x}{a data object.}
