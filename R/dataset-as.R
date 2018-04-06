@@ -29,9 +29,9 @@ as.data.frame.dataset <- function(x, row.names = NULL, optional = FALSE, ...)
         names <- character(n)
     }
     if (optional) {
-        names <- make.names(names, unique = TRUE)
-    } else {
         names <- make.unique(names)
+    } else {
+        names <- make.names(names, unique = TRUE)
     }
 
     names(x) <- names
