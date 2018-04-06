@@ -5,14 +5,23 @@ select <- function(`_data`, ...)
 }
 
 
-select.default <- 
+select.default <- function(`_data`, ...)
+{
+    `_data` <- as.dataset(`_data`)
+    vars    <- substitute(cbind.dataset(...))
+    vars    <- eval.parent(call("scope", `_data`, vars))
+
+    select.dataset(`_data`, I(vars))
+}
+
+
 select.dataset <- function(`_data`, ...)
 {
     `_data` <- as.dataset(`_data`)
-    vars    <- substitute(dataset(...))
+    vars    <- substitute(cbind.dataset(...))
     vars    <- eval.parent(call("scope", `_data`, vars))
 
-    if (length(vars) == 0) {
+    if (is.null(vars)) {
         return(`_data`[0])
     }
 
