@@ -8,6 +8,7 @@
 \alias{as.dataset.record}
 \alias{as.matrix.dataset}
 \alias{is.dataset}
+\alias{split.dataset}
 \alias{t.dataset}
 \title{Dataset Objects}
 \description{
