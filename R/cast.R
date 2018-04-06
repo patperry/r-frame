@@ -84,7 +84,6 @@ cast.record <- function(type, x)
         x <- as.dataset(x)
     }
 
-    x  <- as.simple(x)
     nx <- length(x)
     n  <- length(type)
 
