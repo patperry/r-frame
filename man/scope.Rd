@@ -29,7 +29,7 @@ function, but is otherwise not used in base R.
 The result of the evaluated expression \code{expr}.
 }
 \seealso{
-\code{\link{select}}.
+\code{\link{select}}, \code{\link{transform.dataset}}.
 }
 \examples{
 x <- list(a = 1:10, b = 10 * (1:10))
