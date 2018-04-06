@@ -1,4 +1,5 @@
 \name{select}
+\alias{select}
 \alias{select.dataset}
 \alias{select.default}
 \title{Selecting Variables}
