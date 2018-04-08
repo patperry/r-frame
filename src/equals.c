@@ -120,6 +120,7 @@ int rframe_equals_character(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2)
 {
     R_xlen_t n1, n2;
     SEXP x1, x2;
+    cetype_t ce1, ce2;
     const char *s1, *s2;
     int eq, cmp, nprot = 0;
 
@@ -139,7 +140,13 @@ int rframe_equals_character(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2)
             s1 = CHAR(x1);
             s2 = CHAR(x2);
             cmp = memcmp(s1, s2, n1);
-            eq = (cmp == 0);
+            if (cmp == 0) {
+                ce1 = Rf_getCharCE(x1);
+                ce2 = Rf_getCharCE(x2);
+                eq = (ce1 == ce2);
+            } else {
+                eq = 0;
+            }
         }
     }
 

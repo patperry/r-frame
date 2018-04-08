@@ -72,6 +72,14 @@ test_that("character with empty, NA", {
 })
 
 
+test_that("character with bytes", {
+    x <- c("fa\u00E7ile", "fa\xE7ile", "fa\xC3\xA7ile")
+    Encoding(x) <- c("UTF-8", "latin1", "bytes")
+    d <- duplicated.dataset(x)
+    expect_equal(d, c(FALSE, TRUE, FALSE))
+})
+
+
 test_that("large set", {
     set.seed(0)
     x <- dataset(col = sample.int(200, 1000, replace = TRUE))
