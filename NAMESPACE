@@ -79,12 +79,20 @@ S3method(transform, dataset) ; export(transform.dataset)
 S3method(xtfrm, dataset)     ; export(xtfrm.dataset)
 
 
-### as.simple
+### as.normal
 
-export(as.simple)
-S3method(as.simple, default) ; export(as.simple.default)
-S3method(as.simple, dataset) ; export(as.simple.dataset)
-S3method(as.simple, matrix)  ; export(as.simple.matrix)
+export(as.normal)
+S3method(as.normal, default)   ; export(as.normal.default)
+S3method(as.normal, matrix)    ; export(as.normal.matrix)
+S3method(as.normal, dataset)   ; export(as.normal.dataset)
+S3method(as.normal, NULL)      ; export(as.normal.NULL)
+S3method(as.normal, logical)   ; export(as.normal.logical)
+S3method(as.normal, raw)       ; export(as.normal.raw)
+S3method(as.normal, integer)   ; export(as.normal.integer)
+S3method(as.normal, double)    ; export(as.normal.double)
+S3method(as.normal, numeric)   ; export(as.normal.numeric)
+S3method(as.normal, complex)   ; export(as.normal.complex)
+S3method(as.normal, character) ; export(as.normal.character)
 
 
 ### do

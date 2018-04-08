@@ -35,7 +35,7 @@ rowid.keyset <- function(table, x, default = NA)
 
     type    <- attr(table, "keyset.type", TRUE)
     x       <- cast(type, x)
-    x       <- as.simple(x)
+    x       <- as.normal(x)
     default <- as.double(default)
     .Call(rframe_rowid_keyset, table, x, default)
 }
