@@ -67,9 +67,6 @@ including sparse matrices and nested datasets.
 
 # dataset with a dataset column
 (y <- dataset(value = rnorm(4), nested = x))
-
-# convert a data.frame
-as.dataset(mtcars[1:5, ])
 ```
 
 ### Keys
