@@ -3,7 +3,7 @@
 
 SEXP rframe_rowid_keyset(SEXP keyset_, SEXP x_, SEXP def_)
 {
-    SEXP keynormal_, keyhash_, keytable_, id_;
+    SEXP keyhash_, keytable_, id_;
     struct rframe_table t;
     struct rframe_probe p;
     const double *keyhash;
@@ -12,8 +12,6 @@ SEXP rframe_rowid_keyset(SEXP keyset_, SEXP x_, SEXP def_)
     uint64_t *hash;
     double def;
     int nprot = 0;
-
-    keynormal_ = Rf_getAttrib(keyset_, Rf_install("keyset.normal"));
 
     keyhash_ = Rf_getAttrib(keyset_, Rf_install("keyset.hash"));
     keyhash = REAL(keyhash_);
@@ -50,7 +48,7 @@ SEXP rframe_rowid_keyset(SEXP keyset_, SEXP x_, SEXP def_)
                 j = (R_xlen_t)item - 1;
                 if (hash[i] != (uint64_t)keyhash[j]) {
                     continue;
-                } else if (rframe_equals_dataset(x_, i, keynormal_, j)) {
+                } else if (rframe_equals_dataset(x_, i, keyset_, j)) {
                     break;
                 }
             }

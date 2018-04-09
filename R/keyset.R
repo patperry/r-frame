@@ -45,19 +45,17 @@ as.keyset.default <- function(x)
 
 as.keyset.dataset <- function(x)
 {
-    x <- as.dataset(x)
+    x <- as.simple.dataset(x)
     keys(x) <- NULL
 
-    y <- as.simple(x)
-    u <- .Call(rframe_unique, y)
+    u <- .Call(rframe_unique, x)
 
     if (length(u$types) < length(u$group)) {
         j <- anyDuplicated(u$group)
         stop(sprintf("argument has a duplicate row (%.0f)", j))
     }
 
-    attr(x, "keyset.type")   <- schema(y)
-    attr(x, "keyset.normal") <- y
+    attr(x, "keyset.type")   <- schema(x)
     attr(x, "keyset.hash")   <- u$hash
     attr(x, "keyset.table")  <- u$table
     class(x) <- c("keyset", class(x))
