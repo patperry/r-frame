@@ -130,6 +130,15 @@ as.simple.factor <- function(x)
 }
 
 
+as.simple.Date <- function(x)
+{
+    if (!inherits(x, "Date")) {
+        x <- as.Date(x)
+    }
+    as.simple.double(x)
+}
+
+
 as.simple.POSIXt <- function(x)
 {
     if (!inherits(x, "POSIXct")) {

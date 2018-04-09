@@ -85,6 +85,8 @@ export(as.simple)
 S3method(as.simple, default)   ; export(as.simple.default)
 S3method(as.simple, matrix)    ; export(as.simple.matrix)
 S3method(as.simple, dataset)   ; export(as.simple.dataset)
+
+S3method(as.simple, Date)      ; export(as.simple.Date)
 S3method(as.simple, factor)    ; export(as.simple.factor)
 S3method(as.simple, POSIXt)    ; export(as.simple.POSIXt)
 
