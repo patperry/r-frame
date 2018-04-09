@@ -11,3 +11,22 @@ makes it easier to identify the sources giving rise to downstream results.  R
 `data.frame` objects have partial support for keys through their `rownames`;
 the `dataset` object extends this support by allowing non-character and
 multi-component keys.
+
+
+### Grouping
+
+Split the rows according to groups defined by one or more columns, optionally
+performing a computation on each group.
+
+```{r}
+# split the rows into groups defined by unique ('cyl', 'gear') combinations;
+# the grouping factors are the keys for the result
+xg <- group(mtcars, cyl, gear)
+
+# perform a computation on all groups
+do(xg, function(x)
+   record(n   = nrow(x),
+          mpg = mean(x$mpg),
+          hp  = mean(x$hp)))
+```
+
