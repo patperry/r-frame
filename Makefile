@@ -1,5 +1,5 @@
 RSCRIPT= Rscript --vanilla
-BUILT_VIGNETTES=vignettes/concepts.Rmd
+BUILT_VIGNETTES=vignettes/concepts.Rmd vignettes/frame.Rmd
 
 all: README.md $(BUILT_VIGNETTES)
 

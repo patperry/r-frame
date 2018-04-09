@@ -1,0 +1,13 @@
+Data with Context: the `frame` package
+======================================
+
+
+The package is built around the idea that a data point consists of a
+(variable, key, value) triple identifying an attribute, target, and value.
+This notion of data differs from Wickham's notion of "tidy" data, which allows
+only (variable, value) pairs.  Having explicit support for keys makes it
+easier to link different measurements made on the same set of individuals and
+makes it easier to identify the sources giving rise to downstream results.  R
+`data.frame` objects have partial support for keys through their `rownames`;
+the `dataset` object extends this support by allowing non-character and
+multi-component keys.

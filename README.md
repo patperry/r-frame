@@ -13,20 +13,10 @@ frame
 [![CRAN RStudio Mirror Downloads][cranlogs-badge]][cran]
 
 
-*frame* is an R package providing a `dataset` type analogous to `data.frame`
-that allows you to keep track of the context associated with the values by
-specifying a single- or multi-component key for each row.
-
-
-The package is built around the idea that a data point consists of a
-(variable, key, value) triple identifying an attribute, target, and value.
-This notion of data differs from Wickham's notion of "tidy" data, which allows
-only (variable, value) pairs.  Having explicit support for keys makes it
-easier to link different measurements made on the same set of individuals and
-makes it easier to identify the sources giving rise to downstream results.  R
-`data.frame` objects have partial support for keys through their `rownames`;
-the `dataset` object extends this support by allowing non-character and
-multi-component keys.
+*frame* is an R package providing a `dataset` type analogous to a
+`data.frame` supporting two major extensions: (1) associate keys with one
+or more components to each row; (2) use matrix-like objects as columns,
+including nested datasets.
 
 
 Installation
@@ -97,12 +87,11 @@ as.dataset(mtcars[1:5, ])
 ### Keys
 
 Datasets can have multi-component keys that uniquely identify each row.
+You can index a dataset just like a `data.frame`, or you can use key values
+to extract particular rows.
 
 
 ```r
-# set single-component keys
-keys(y) <- c("w", "x", "y", "z")
-
 # set multi-component keys
 keys(x) <- keyset(major = c("x", "x", "y", "y"),
                   minor = c(1, 2, 1, 3))
@@ -117,11 +106,6 @@ print(x)
 #> y         3 │  42 green 3.8  0.0 0.0
 ```
 
-### Indexing and slicing
-
-Index a dataset just like a `data.frame`, or use key values to index or slice.
-
-
 ```r
 # index with keys
 x[dataset(major = c("y", "x"),
@@ -130,33 +114,6 @@ x[dataset(major = c("y", "x"),
 #> major minor │ age color   a    b   c
 #> y         3 │  42 green 3.8  0.0 0.0
 #> x         1 │  35 red   0.0 -1.3 2.8
-```
-
-### Grouping
-
-Split the rows according to groups defined by one or more columns, optionally
-performing a computation on each group.
-
-
-```r
-# split the rows into groups defined by unique ('cyl', 'gear') combinations;
-# the grouping factors are the keys for the result
-xg <- group(mtcars, cyl, gear)
-
-# perform a computation on all groups
-do(xg, function(x)
-   record(n   = nrow(x),
-          mpg = mean(x$mpg),
-          hp  = mean(x$hp)))
-#> cyl gear │  n    mpg       hp
-#>   6    4 │  4 19.750 116.5000
-#>   4    4 │  8 26.925  76.0000
-#>   6    3 │  2 19.750 107.5000
-#>   8    3 │ 12 15.050 194.1667
-#>   4    3 │  1 21.500  97.0000
-#>   4    5 │  2 28.200 102.0000
-#>   8    5 │  2 15.400 299.5000
-#>   6    5 │  1 19.700 175.0000
 ```
 
 
