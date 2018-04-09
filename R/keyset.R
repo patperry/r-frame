@@ -48,7 +48,7 @@ as.keyset.dataset <- function(x)
     x <- as.dataset(x)
     keys(x) <- NULL
 
-    y <- as.normal(x)
+    y <- as.simple(x)
     u <- .Call(rframe_unique, y)
 
     if (length(u$types) < length(u$group)) {
