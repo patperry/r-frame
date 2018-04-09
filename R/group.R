@@ -51,9 +51,16 @@ group.dataset <- function(`_data`, ...)
     by      <- substitute(cbind.dataset(...))
     by      <- eval.parent(call("scope", `_data`, by))
 
-    if (nrow(by) != nrow(`_data`)) {
-        stop(sprintf("'by' rows (%.0f) must match data rows (%.0f)",
-                     nrow(by), nrow(`_data`)))
+    n   <- nrow(`_data`)
+    nby <- nrow(by)
+
+    if (n != nby) {
+        stop(sprintf("mismatch: data have %.0f rows, 'by' factor has %.0f",
+                     n, nby))
+    }
+
+    if (n == 0) {
+        return(NULL)
     }
 
     # split into parts
@@ -61,10 +68,7 @@ group.dataset <- function(`_data`, ...)
     keys(by) <- NULL
 
     u  <- .Call(rframe_unique, by)
-
     ngroup <- length(u$types)
-    if (ngroup == 0)
-        return(NULL)
 
     keys <- by[u$types, ]
     attr(keys, "keyset.type")  <- schema(keys)
