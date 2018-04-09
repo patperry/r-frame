@@ -16,6 +16,8 @@ as.keyset(x)
 is.keyset(x)
 }
 \arguments{
+\item{\dots}{keyset variables.}
+
 \item{x}{object to be converted or tested.}
 }
 \details{
