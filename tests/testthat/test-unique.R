@@ -38,6 +38,9 @@ test_that("double", {
 
 
 test_that("complex", {
+    # 'duplicated' behaves differently for R < 3.4.0
+    skip_if_not(R.version$major >= 3 && R.version$minor >= "4.0")
+
     set.seed(0)
     x <- dataset(col = (sample(c(NA, rnorm(5)), 50, replace = TRUE)
                         + 1i * sample(c(NA, rnorm(4)), 50, replace = TRUE)))
