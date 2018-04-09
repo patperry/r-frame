@@ -58,7 +58,7 @@ as.keyset.dataset <- function(x)
     attr(x, "keyset.type")   <- schema(x)
     attr(x, "keyset.hash")   <- u$hash
     attr(x, "keyset.table")  <- u$table
-    class(x) <- c("keyset", class(x))
+    class(x) <- c("keyset", "dataset", "record")
     x
 }
 

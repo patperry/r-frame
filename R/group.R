@@ -57,13 +57,25 @@ group.dataset <- function(`_data`, ...)
     }
 
     # split into parts
-    keys <- as.keyset(unique.dataset(by))
-    g <- lookup(by, keys)
-    xg <- split.dataset(`_data`, g) # returns a dataset
-    names(xg) <- NULL
+    by <- as.simple.dataset(by)
+    keys(by) <- NULL
 
-    if (length(xg) == 0L) {
+    u  <- .Call(rframe_unique, by)
+
+    ngroup <- length(u$types)
+    if (ngroup == 0)
         return(NULL)
+
+    keys <- by[u$types, ]
+    attr(keys, "keyset.type")  <- schema(keys)
+    attr(keys, "keyset.hash")  <- u$hash
+    attr(keys, "keyset.table") <- u$table
+    class(keys) <- c("keyset", "dataset", "record")
+
+    index <- .Call(rframe_split_group, u$group, as.double(ngroup))
+    xg    <- vector("list", length(u$types))
+    for (g in seq_len(ngroup)) {
+        xg[[g]] <- `_data`[index[[g]], ]
     }
 
     y <- as.dataset(record(group = xg))

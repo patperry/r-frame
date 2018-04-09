@@ -8,6 +8,7 @@
 static const R_CallMethodDef CallEntries[] = {
     CALLDEF(rframe_as_simple_double, 1),
     CALLDEF(rframe_rowid_keyset, 3),
+    CALLDEF(rframe_split_group, 2),
     CALLDEF(rframe_unique, 1),
     {NULL, NULL, 0}
 };
