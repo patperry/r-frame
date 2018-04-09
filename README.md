@@ -95,9 +95,7 @@ print(x)
 #> x         2 │  70 blue  7.1  0.0 0.0
 #> y         1 │  12 black 0.0 -5.1 0.1
 #> y         3 │  42 green 3.8  0.0 0.0
-```
 
-```r
 # index with keys
 x[dataset(major = c("y", "x"),
           minor = c(  3,   1)), ]

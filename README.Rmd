@@ -83,8 +83,6 @@ keys(x) <- keyset(major = c("x", "x", "y", "y"),
 # show the data keys and values
 print(x)
 
-
-```{r}
 # index with keys
 x[dataset(major = c("y", "x"),
           minor = c(  3,   1)), ]
