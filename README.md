@@ -1,210 +1,207 @@
-Contents
-========
-
-# Objects
-
-## Vector-like
-
-A *vector-like* object is an object `x` with non-negative integer `length(x)`
-and `dim(x)` either `NULL` or equal to `length(x)`. This object associates
-values to the integers `1, ..., n`. Index operation `x[[i]]` returns the value
-for index `i`; subset operation `x[i]` returns the subset of values
-corresponding the indices specified by `i`.
-
-Examples include `list(1, 2, 3)`, `letters`, and `rnorm(10)`.
+<!-- README.md is generated from README.Rmd. Please edit that file -->
 
 
-## Matrix-like
 
-A *matrix-like* object is an object `x` with `length(dim(x)) == 2`. This
-object has `n = nrow(x)` *rows* and `p = ncol(x)` *columns*. The object
-associates vector-like values to the integers `1, ..., n`. Index operation
-`x[i, , drop = TRUE]` returns the value for index `i`; subset operation
-`x[i, , drop = FALSE]` returns the subset of values corresponding to the
-indices specified by `i`.
+frame
+=====
 
-
-A matrix-like object can optionally have *column names* `colnames(x)`, not
-necessarily unique. The index operation `x[, j, drop = FALSE]` projects
-the object onto the components specified by subset `j`. For scalar `j`,
-`x[, j, drop = TRUE]` returns a vector-like object containing the values
-in the `j`th component.
-
-Examples include `matrix(1:20, 4, 5)`, `mtcars`,
-`Matrix::sparseMatrix(i = c(1, 1, 2, 3, 3, 4),
-                      j = c(3, 2, 1, 3, 2, 1),
-                      x = c(2.8, -1.3, 7.1, 0.1, -5.1, 3.8),
-                      dimnames = list(NULL, c("a", "b", "c")))`.
+[![Build Status (Linux)][travis-badge]][travis]
+[![Build Status (Windows)][appveyor-badge]][appveyor]
+[![Coverage Status][codecov-badge]][codecov]
+[![CRAN Status][cran-badge]][cran]
+[![License][apache-badge]][apache]
+[![CRAN RStudio Mirror Downloads][cranlogs-badge]][cran]
 
 
-## Variable
-
-A *variable with n observations* is a set of values identified with the
-integers `1, ..., n`. An *atomic variable* is one that is represented as
-a vector-like object. A *composite variable* is one that is represented as
-a matrix-like object.
+*frame* is an R package providing a `dataset` type analogous to `data.frame`
+that allows you to keep track of the context associated with the values by
+specifying a single- or multi-component key for each row.
 
 
-## Record
+The package is built around the idea that a data point consists of a
+(variable, key, value) triple identifying an attribute, target, and value.
+This notion of data differs from Wickham's notion of "tidy" data, which allows
+only (variable, value) pairs.  Having explicit support for keys makes it
+easier to link different measurements made on the same set of individuals and
+makes it easier to identify the sources giving rise to downstream results.  R
+`data.frame` objects have partial support for keys through their `rownames`;
+the `dataset` object extends this support by allowing non-character and
+multi-component keys.
 
-A *record* is a tuple of values. The components of a tuple can optionally have
-names, and these names are not necessarily unique. We construct a record using
-the `record()` function:
+
+Installation
+------------
+
+### Stable version
+
+*frame* is [available on CRAN][cran]. To install the latest released version,
+run the following command in R:
 
 ```r
-x <- record(a = 1, b = "foo", c = FALSE)
+### install.packages("frame") # not yet, actually
 ```
 
-When you don't specify the names in the record constructor, they get taken
-from the arguments themselves:
+### Development version
+
+To install the latest development version, run the following:
 
 ```r
-a <- 1
-b <- "foo
-c <- FALSE
-y <- record(a, b, c)
-names(y)
+devtools::install_github("patperry/r-frame")
 ```
 
-You can convert vector-like objects to records using the `as.record` function:
 
-```
-as.record(letters)
-```
+Usage
+-----
 
-## Record indexing
+### Datasets
 
-In some ways, records behave like `list()` objects, but in other ways the two
-have markedly different behavior.
+The `dataset` type is like a `data.frame` but it allows matrix-like columns,
+including sparse matrices and nested datasets.
 
-### Errors for unknown names
-
-Records error on unknown names:
 
 ```r
-x["zzz"]
+# dataset with a sparse matrix column
+(x <- dataset(age = c(35, 70, 12, 42),
+              color = c("red", "blue", "black", "green"),
+              set = Matrix::sparseMatrix(i = c(1, 1, 2, 3, 3, 4),
+                                         j = c(3, 2, 1, 3, 2, 1),
+                                         x = c(2.8, -1.3, 7.1, 0.1, -5.1, 3.8),
+                                         dimnames = list(NULL, c("a", "b", "c")))))
+#>             ════set═════
+#>   age color   a    b   c
+#> 1  35 red   0.0 -1.3 2.8
+#> 2  70 blue  7.1  0.0 0.0
+#> 3  12 black 0.0 -5.1 0.1
+#> 4  42 green 3.8  0.0 0.0
+
+# dataset with a dataset column
+(y <- dataset(value = rnorm(4), nested = x))
+#>              ════════nested════════
+#>                        ════set═════
+#>        value age color   a    b   c
+#> 1  1.2629543  35 red   0.0 -1.3 2.8
+#> 2 -0.3262334  70 blue  7.1  0.0 0.0
+#> 3  1.3297993  12 black 0.0 -5.1 0.1
+#> 4  1.2724293  42 green 3.8  0.0 0.0
+
+# convert a data.frame
+as.dataset(mtcars[1:5, ])
+#>    mpg cyl disp  hp drat    wt  qsec vs am gear carb
+#> 1 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+#> 2 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+#> 3 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+#> 4 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+#> 5 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2
 ```
 
-### Renaming components
+### Keys
 
-Records allow you to rename the components in the result of an indexing
-operations:
+Datasets can have multi-component keys that uniquely identify each row.
+
 
 ```r
-x[c(first = "b", second = "a")]
-```
+# set single-component keys
+keys(y) <- c("w", "x", "y", "z")
 
-This also works with integer and logical indexing:
+# set multi-component keys
+keys(x) <- keyset(major = c("x", "x", "y", "y"),
+                  minor = c(1, 2, 1, 3))
 
-```r
-x[c(foo = 3, bar = 2, baz = 2)]
-x[c(one = TRUE, two = FALSE, three = TRUE)]
-```
-
-
-### Assigning `NULL`
-
-Assigning `NULL` to a record value does not delete the field:
-
-```r
-x <- record(a = 1, b = 2, c = "foo")
-x[[2]] <- NULL
-x
-```
-
-Compare this to list behavior:
-```r
-l <- list(a = 1, b = 2, c = "foo")
-l[[2]] <- NULL
-l
-```
-
-If you want to delete a field, just index with a negative value indicating
-which fields to exclude:
-
-```r
-x[-2]
-```
-
-
-### Printing
-
-Records print more concisely than lists:
-
-```r
-x <- record(a = 1, b = letters, c = record(x = "nested", y = TRUE))
+# show the data keys and values
 print(x)
+#>                         ════set═════
+#> major minor │ age color   a    b   c
+#> x         1 │  35 red   0.0 -1.3 2.8
+#> x         2 │  70 blue  7.1  0.0 0.0
+#> y         1 │  12 black 0.0 -5.1 0.1
+#> y         3 │  42 green 3.8  0.0 0.0
 ```
 
-By default, printing truncates after 20 rows. You can override this behavior
-with the second argument to `print`, specifying a higher limit (or no limit
-with `NA`):
-```
-x <- as.record(letters)
-print(x) # truncates
-print(x, NA) # no limit
-```
+### Indexing and slicing
 
+Index a dataset just like a `data.frame`, or use key values to index or slice.
 
-## Dataset
-
-A *dataset* is a record of zero or more variables measured on the same set of
-individuals.
-
-We construct a dataset using the `dataset()` function, analogous to the
-`record()` function:
 
 ```r
-data <- dataset(x = 1:10, y = letters[1:10])
+# index with keys
+x[dataset(major = c("y", "x"),
+          minor = c(  3,   1)), ]
+#>                         ════set═════
+#> major minor │ age color   a    b   c
+#> y         3 │  42 green 3.8  0.0 0.0
+#> x         1 │  35 red   0.0 -1.3 2.8
 ```
 
-Alternatively, we can convert another object to a `dataset` using the
-`as.dataset()` function:
+### Grouping
+
+Split the rows according to groups defined by one or more columns, optionally
+performing a computation on each group.
+
 
 ```r
-as.dataset(mtcars)
+# split the rows into groups defined by unique ('cyl', 'gear') combinations;
+# the grouping factors are the keys for the result
+xg <- group(mtcars, cyl, gear)
+
+# perform a computation on all groups
+do(xg, function(x)
+   record(n   = nrow(x),
+          mpg = mean(x$mpg),
+          hp  = mean(x$hp)))
+#> cyl gear │  n    mpg       hp
+#>   6    4 │  4 19.750 116.5000
+#>   4    4 │  8 26.925  76.0000
+#>   6    3 │  2 19.750 107.5000
+#>   8    3 │ 12 15.050 194.1667
+#>   4    3 │  1 21.500  97.0000
+#>   4    5 │  2 28.200 102.0000
+#>   8    5 │  2 15.400 299.5000
+#>   6    5 │  1 19.700 175.0000
 ```
 
 
-## Keys
+Citation
+--------
 
-The individuals in a dataset can optionally be identified by a set of unique
-values, known as *keys*. For any dataset `x`, `keys(x)` gets the associated
-keys, or `NULL` if none exists. The result is a dataset with unique rows, the
-same number as are in `x`.
+Cite *frame* with the following BibTeX entry:
 
-
-## Simple
-
-R `data.frames` allow only character keys. Frame `dataset` keys can have a
-variety of types. We call these types *simple*. The *simple atomic* types are
-`NULL`, `logical`, `integer`, `numeric`, `character`, `Date`,
-`POSIXct`. A *simple* type is either a simple atomic type or a dataset of zero or
-more simple types.
-
-The `as.simple` function converts a variable to a simple variable. We can
-convert many of the built-in R types, including `factor` and `complex` to
-simple types using this function:
-
-```
-as.simple(factor(c("a", "a", "b", "a", "c", "a")))
-as.simple(c(1+2i, 3 + 4i, -1, 6i))
-```
-
-The `as.simple` function is generic; if you add a new type to R, you can
-define `as.simple` for this type.
+    @Manual{,
+        title = {frame: Data with Context},
+        author = {Patrick O. Perry},
+        year = {2018},
+        note = {R package version 0.0.0},
+    }
 
 
-## Setting Keys
+Contributing
+------------
 
-You can set the keys of a dataset using the `keys(x)<-` function:
+The project maintainer welcomes contributions in the form of feature requests,
+bug reports, comments, unit tests, vignettes, or other code.  If you'd like to
+contribute, either
 
-```
-x <- as.dataset(mtcars)
-keys(x) <- dataset(k1 = rnorm(32),
-                   k2 = rep(c(TRUE, FALSE), 16))
-```
+ + fork the repository and submit a pull request (note the nonstandard
+   instructions for [building from source][building]);
 
-This command converts they keys to simple, ensures that the rows are unique,
-and sets the keys for `x`.
+ + [file an issue][issues];
 
+ + or contact the maintainer via e-mail.
+
+This project is released with a [Contributor Code of Conduct][conduct],
+and if you choose to contribute, you must adhere to its terms.
+
+
+[apache]: https://www.apache.org/licenses/LICENSE-2.0.html "Apache License, Version 2.0"
+[apache-badge]: https://img.shields.io/badge/License-Apache%202.0-blue.svg "Apache License, Version 2.0"
+[appveyor]: https://ci.appveyor.com/project/patperry/r-frame/branch/master "Continuous Integration (Windows)"
+[appveyor-badge]: https://ci.appveyor.com/api/projects/status/github/patperry/r-frame?branch=master&svg=true "Continuous Inegration (Windows)"
+[building]: #development-version "Building from Source"
+[codecov]: https://codecov.io/github/patperry/r-frame?branch=master "Code Coverage"
+[codecov-badge]: https://codecov.io/github/patperry/r-frame/coverage.svg?branch=master "Code Coverage"
+[conduct]: https://github.com/patperry/r-frame/blob/master/CONDUCT.md "Contributor Code of Conduct"
+[cran]: https://cran.r-project.org/package=frame "CRAN Page"
+[cran-badge]: http://www.r-pkg.org/badges/version/frame "CRAN Page"
+[cranlogs-badge]: http://cranlogs.r-pkg.org/badges/frame "CRAN Downloads"
+[issues]: https://github.com/patperry/r-frame/issues "Issues"
+[travis]: https://travis-ci.org/patperry/r-frame "Continuous Integration (Linux)"
+[travis-badge]: https://api.travis-ci.org/patperry/r-frame.svg?branch=master "Continuous Integration (Linux)"

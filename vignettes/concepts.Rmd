@@ -1,0 +1,436 @@
+Fundamemtal Concepts
+====================
+
+## Type
+
+A *type* is a set of values. Examples in R include the following
+
+ + *logical*, to represent boolean truth (`FALSE`, and `TRUE`),
+   along with a missing value, denoted `NA`.
+
+ + *integer*, for integers in the range `[-2^31, +2^31]` and the
+   integer missing value denoted `NA_integer_`.
+ 
+ + *double*, for real numbers that can be represented as
+   double-precision floating-point numbers, along with the special
+   values `-Inf` and `+Inf` for negative and positive infinity;
+   `NA_real_` for the missing value, and a set of "not-a-number"
+   values including `NaN`, used to represent the result of
+   operations like `sqrt(-1)`;
+
+ + *character*, for strings of zero or more characters, and a
+   missing value, `NA_character_`;
+
+ + *NULL*, a type with a single value, denoted `NULL`.
+
+The above types are defined in every R session. Certain
+functions in R allow you to create new types. The most common
+such function is `factor`, which defines a type of a finite
+collection of character values, each of which can be identified
+with a positive integer:
+
+
+```r
+# defines a type with values { "a", "b", "c", NA }
+x <- factor(c("a", "b", "c", "b", "b", "a", "c"))
+
+# defines a type with values { "a", "b", ..., "z", NA }
+y <- factor(c("a" ,"b", "c"), letters)
+```
+
+## Scalar
+
+A *scalar* of type `t` is a single value from `t`.
+
+
+```r
+# scalar values
+99  # double
+```
+
+```
+## [1] 99
+```
+
+```r
+99L # integer
+```
+
+```
+## [1] 99
+```
+
+```r
+1.3
+```
+
+```
+## [1] 1.3
+```
+
+```r
+"hello"
+```
+
+```
+## [1] "hello"
+```
+
+```r
+TRUE
+```
+
+```
+## [1] TRUE
+```
+
+```r
+factor("x", letters)
+```
+
+```
+## [1] x
+## Levels: a b c d e f g h i j k l m n o p q r s t u v w x y z
+```
+
+Strings of digits without a decimal point have type `double`
+unless they are suffixed with `L`, in which case they have
+type `integer. (The `L` suffix stands for *long*, which is
+used to denote an integer with 32 or more bits in the C
+programming language.)
+
+
+## Vector
+
+For non-negative integer `n`, a *vector* of type `t` and length `n`
+is a collection of scalar values of type `t`, identified with the
+index values `1, 2, ..., n`. These values are called the *entries*
+of the vector.
+
+We can construct a vector of a given type by concatenating its
+entries together with the `c` function:
+
+
+```r
+c(1.2, 3.14, 2.718, -Inf, NA) # double
+```
+
+```
+## [1] 1.200 3.140 2.718  -Inf    NA
+```
+
+```r
+c("hello", "world", "how are you?")
+```
+
+```
+## [1] "hello"        "world"        "how are you?"
+```
+
+The `c` function will convert its arguments to the most
+general type required to represent all the values. This process is
+called *type promotion*. Above, the logical `NA` value gets
+promoted to `NA_real_`.
+
+
+## Vector-like
+
+A *vector-like* object is an object `x` with non-negative integer
+`length(x)` and `dim(x)` either `NULL` or equal to `length(x)`. This
+object associates values to the integers `1, ..., n`. Index operation
+`x[[i]]` returns the value for index `i`; subset operation `x[i]`
+returns the subset of values corresponding the indices specified
+by `i`.
+
+
+```r
+list(1, 2, 3)
+```
+
+```
+## [[1]]
+## [1] 1
+## 
+## [[2]]
+## [1] 2
+## 
+## [[3]]
+## [1] 3
+```
+
+```r
+letters
+```
+
+```
+##  [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q"
+## [18] "r" "s" "t" "u" "v" "w" "x" "y" "z"
+```
+
+```r
+rnorm(10)
+```
+
+```
+##  [1] -0.8007126 -1.3900620 -2.0336488  0.5975202  1.0386494 -0.6480299
+##  [7] -1.0922480  0.6425235  1.2044557  0.5092077
+```
+
+
+## Matrix-like
+
+A *matrix-like* object is an object `x` with `length(dim(x)) == 2`.
+This object has `n = nrow(x)` *rows* and `p = ncol(x)` *columns*.
+The object associates vector-like values to the integers `1, ..., n`.
+Index operation `x[i, , drop = TRUE]` returns the value for index `i`;
+subset operation `x[i, , drop = FALSE]` returns the subset of values
+corresponding to the indices specified by `i`.
+
+
+A matrix-like object can optionally have *column names* `colnames(x)`,
+not necessarily unique. The index operation `x[, j, drop = FALSE]`
+projects the object onto the components specified by subset `j`. For
+scalar `j`, `x[, j, drop = TRUE]` returns a vector-like object
+containing the values in the `j`th component.
+
+
+```r
+matrix(1:20, 4, 5)
+```
+
+```
+##      [,1] [,2] [,3] [,4] [,5]
+## [1,]    1    5    9   13   17
+## [2,]    2    6   10   14   18
+## [3,]    3    7   11   15   19
+## [4,]    4    8   12   16   20
+```
+
+```r
+mtcars
+```
+
+```
+##                      mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+## Mazda RX4           21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
+## Mazda RX4 Wag       21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
+## Datsun 710          22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
+## Hornet 4 Drive      21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1
+## Hornet Sportabout   18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2
+## Valiant             18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1
+## Duster 360          14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4
+## Merc 240D           24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2
+## Merc 230            22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2
+## Merc 280            19.2   6 167.6 123 3.92 3.440 18.30  1  0    4    4
+## Merc 280C           17.8   6 167.6 123 3.92 3.440 18.90  1  0    4    4
+## Merc 450SE          16.4   8 275.8 180 3.07 4.070 17.40  0  0    3    3
+## Merc 450SL          17.3   8 275.8 180 3.07 3.730 17.60  0  0    3    3
+## Merc 450SLC         15.2   8 275.8 180 3.07 3.780 18.00  0  0    3    3
+## Cadillac Fleetwood  10.4   8 472.0 205 2.93 5.250 17.98  0  0    3    4
+## Lincoln Continental 10.4   8 460.0 215 3.00 5.424 17.82  0  0    3    4
+## Chrysler Imperial   14.7   8 440.0 230 3.23 5.345 17.42  0  0    3    4
+## Fiat 128            32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1
+## Honda Civic         30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2
+## Toyota Corolla      33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1
+## Toyota Corona       21.5   4 120.1  97 3.70 2.465 20.01  1  0    3    1
+## Dodge Challenger    15.5   8 318.0 150 2.76 3.520 16.87  0  0    3    2
+## AMC Javelin         15.2   8 304.0 150 3.15 3.435 17.30  0  0    3    2
+## Camaro Z28          13.3   8 350.0 245 3.73 3.840 15.41  0  0    3    4
+## Pontiac Firebird    19.2   8 400.0 175 3.08 3.845 17.05  0  0    3    2
+## Fiat X1-9           27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1
+## Porsche 914-2       26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2
+## Lotus Europa        30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2
+## Ford Pantera L      15.8   8 351.0 264 4.22 3.170 14.50  0  1    5    4
+## Ferrari Dino        19.7   6 145.0 175 3.62 2.770 15.50  0  1    5    6
+## Maserati Bora       15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8
+## Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2
+```
+
+```r
+Matrix::sparseMatrix(i = c(1, 1, 2, 3, 3, 4),
+                     j = c(3, 2, 1, 3, 2, 1),
+                     x = c(2.8, -1.3, 7.1, 0.1, -5.1, 3.8),
+                     dimnames = list(NULL, c("a", "b", "c")))
+```
+
+```
+## 4 x 3 sparse Matrix of class "dgCMatrix"
+##        a    b   c
+## [1,] .   -1.3 2.8
+## [2,] 7.1  .   .  
+## [3,] .   -5.1 0.1
+## [4,] 3.8  .   .
+```
+
+
+## Variable
+
+A *variable with n observations* is a set of values identified with the
+integers `1, ..., n`. An *atomic variable* is one that is represented as
+a vector-like object. A *composite variable* is one that is represented as
+a matrix-like object.
+
+
+## Record
+
+A *record* is a tuple of values. The components of a tuple can optionally have
+names, and these names are not necessarily unique. We construct a record using
+the `record()` function:
+
+```r
+x <- record(a = 1, b = "foo", c = FALSE)
+```
+
+When you don't specify the names in the record constructor, they get taken
+from the arguments themselves:
+
+```r
+a <- 1
+b <- "foo
+c <- FALSE
+y <- record(a, b, c)
+names(y)
+```
+
+You can convert vector-like objects to records using the `as.record` function:
+
+```
+as.record(letters)
+```
+
+## Record indexing
+
+In some ways, records behave like `list()` objects, but in other ways the two
+have markedly different behavior.
+
+### Errors for unknown names
+
+Records error on unknown names:
+
+```r
+x["zzz"]
+```
+
+### Renaming components
+
+Records allow you to rename the components in the result of an indexing
+operations:
+
+```r
+x[c(first = "b", second = "a")]
+```
+
+This also works with integer and logical indexing:
+
+```r
+x[c(foo = 3, bar = 2, baz = 2)]
+x[c(one = TRUE, two = FALSE, three = TRUE)]
+```
+
+
+### Assigning `NULL`
+
+Assigning `NULL` to a record value does not delete the field:
+
+```r
+x <- record(a = 1, b = 2, c = "foo")
+x[[2]] <- NULL
+x
+```
+
+Compare this to list behavior:
+```r
+l <- list(a = 1, b = 2, c = "foo")
+l[[2]] <- NULL
+l
+```
+
+If you want to delete a field, just index with a negative value indicating
+which fields to exclude:
+
+```r
+x[-2]
+```
+
+
+### Printing
+
+Records print more concisely than lists:
+
+```r
+x <- record(a = 1, b = letters, c = record(x = "nested", y = TRUE))
+print(x)
+```
+
+By default, printing truncates after 20 rows. You can override this behavior
+with the second argument to `print`, specifying a higher limit (or no limit
+with `NA`):
+```
+x <- as.record(letters)
+print(x) # truncates
+print(x, NA) # no limit
+```
+
+
+## Dataset
+
+A *dataset* is a record of zero or more variables measured on the same set of
+individuals.
+
+We construct a dataset using the `dataset()` function, analogous to the
+`record()` function:
+
+```r
+data <- dataset(x = 1:10, y = letters[1:10])
+```
+
+Alternatively, we can convert another object to a `dataset` using the
+`as.dataset()` function:
+
+```r
+as.dataset(mtcars)
+```
+
+
+## Keys
+
+The individuals in a dataset can optionally be identified by a set of unique
+values, known as *keys*. For any dataset `x`, `keys(x)` gets the associated
+keys, or `NULL` if none exists. The result is a dataset with unique rows, the
+same number as are in `x`.
+
+
+## Simple
+
+R `data.frames` allow only character keys. Frame `dataset` keys can have a
+variety of types. We call these types *simple*. The *simple atomic* types are
+`NULL`, `logical`, `integer`, `numeric`, `character`, `Date`,
+`POSIXct`. A *simple* type is either a simple atomic type or a dataset of zero or
+more simple types.
+
+The `as.simple` function converts a variable to a simple variable. We can
+convert many of the built-in R types, including `factor` and `complex` to
+simple types using this function:
+
+```
+as.simple(factor(c("a", "a", "b", "a", "c", "a")))
+as.simple(c(1+2i, 3 + 4i, -1, 6i))
+```
+
+The `as.simple` function is generic; if you add a new type to R, you can
+define `as.simple` for this type.
+
+
+## Setting Keys
+
+You can set the keys of a dataset using the `keys(x)<-` function:
+
+```
+x <- as.dataset(mtcars)
+keys(x) <- dataset(k1 = rnorm(32),
+                   k2 = rep(c(TRUE, FALSE), 16))
+```
+
+This command converts they keys to simple, ensures that the rows are unique,
+and sets the keys for `x`.
+
