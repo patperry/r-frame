@@ -1,5 +1,18 @@
-Fundamemtal Concepts
-====================
+---
+title: "Fundamental Concepts"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Fundamental Concepts}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(collapse = TRUE,
+                      comment  = "#>",
+                      fig.path = "concepts-")
+options(width = 80)
+```
 
 ## Type
 

@@ -1,5 +1,13 @@
-Data with Context: the `frame` package
-======================================
+---
+title: "Introduction to frame"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to frame}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
 
 
 The package is built around the idea that a data point consists of a
@@ -29,17 +37,14 @@ do(xg, function(x)
    record(n   = nrow(x),
           mpg = mean(x$mpg),
           hp  = mean(x$hp)))
-```
-
-```
-## cyl gear │  n    mpg       hp
-##   6    4 │  4 19.750 116.5000
-##   4    4 │  8 26.925  76.0000
-##   6    3 │  2 19.750 107.5000
-##   8    3 │ 12 15.050 194.1667
-##   4    3 │  1 21.500  97.0000
-##   4    5 │  2 28.200 102.0000
-##   8    5 │  2 15.400 299.5000
-##   6    5 │  1 19.700 175.0000
+#> cyl gear │  n    mpg       hp
+#>   6    4 │  4 19.750 116.5000
+#>   4    4 │  8 26.925  76.0000
+#>   6    3 │  2 19.750 107.5000
+#>   8    3 │ 12 15.050 194.1667
+#>   4    3 │  1 21.500  97.0000
+#>   4    5 │  2 28.200 102.0000
+#>   8    5 │  2 15.400 299.5000
+#>   6    5 │  1 19.700 175.0000
 ```
 

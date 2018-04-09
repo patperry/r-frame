@@ -1,5 +1,18 @@
-Data with Context: the `frame` package
-======================================
+---
+title: "Introduction to frame"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to frame}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(collapse = TRUE,
+                      comment  = "#>",
+                      fig.path = "frame-")
+options(width = 80)
+```
 
 
 The package is built around the idea that a data point consists of a
