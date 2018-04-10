@@ -118,19 +118,22 @@ int rframe_equals_complex(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2)
 
 int rframe_equals_character(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2)
 {
-    R_xlen_t n1, n2;
     SEXP x1, x2;
-    cetype_t ce1, ce2;
+    R_xlen_t n1, n2;
     const char *s1, *s2;
+    cetype_t ce1, ce2;
     int eq, cmp, nprot = 0;
 
     PROTECT(x1 = STRING_ELT(x1_, i1)); nprot++;
     PROTECT(x2 = STRING_ELT(x2_, i2)); nprot++;
 
-    if (x1 == NA_STRING) {
-        eq = (x2 == NA_STRING);
-    } else if (x2 == NA_STRING) {
-        eq = 0;
+    // inputs are normalized, so encoding is either ASCII, UTF-8, or bytes.
+    //
+    // could optimize the comparison to `eq = (x1 == x2)`, but that relies on R
+    // internals
+
+    if (x1 == x2) {
+        eq = 1;
     } else {
         n1 = XLENGTH(x1);
         n2 = XLENGTH(x2);
