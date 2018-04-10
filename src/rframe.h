@@ -16,6 +16,7 @@
 
 SEXP rframe_as_simple_double(SEXP x_);
 SEXP rframe_split_group(SEXP group_, SEXP ngroup_);
+SEXP rframe_subset(SEXP x_, SEXP i_);
 
 SEXP rframe_rowid_keyset(SEXP keyset_, SEXP x_, SEXP def_);
 SEXP rframe_unique(SEXP x_);

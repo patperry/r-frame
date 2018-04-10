@@ -63,43 +63,60 @@ row_subset <- function(x, i)
     nrow <- attr(x, "dataset.nrow", TRUE)
     keys <- attr(x, "dataset.keys", TRUE)
     
-    if (!is.null(i)) {
-        i <- arg_row_subscript(i, nrow, keys, TRUE)
-        keys <- attr(i, "keys", TRUE)
-        nrow <- length(i)
-        n    <- length(x)
-
-        y <- vector("list", n)
-
-        for (j in seq_len(n)) {
-            xj <- x[[j]]
-            if (is.null(xj))
-                next
-            if (length(dim(xj)) <= 1) {
-                if (is.object(xj)) {
-                    y[[j]] <- xj[i]
-                } else {
-                    y[[j]] <- .subset(xj, i)
-                }
-            } else {
-                y[[j]] <- xj[i, , drop = FALSE]
-            }
-        }
-
-        names(y) <- names(x)
-        x <- y
-
-    } else {
-        names <- names(x)
-        attributes(x) <- NULL
-        names(x) <- names
+    if (is.null(i)) {
+        attributes(x) <- list(names = names(x),
+                              dataset.nrow = nrow,
+                              dataset.keys = keys,
+                              class = c("dataset", "record"))
+        return(x)
     }
+
+    i    <- arg_row_subscript(i, nrow, keys, TRUE)
+    keys <- attr(i, "keys", TRUE)
+    nrow <- length(i)
+    n    <- length(x)
+    inum <- as.numeric(i)
+
+    y <- vector("list", n)
+
+    for (j in seq_len(n)) {
+        xj <- x[[j]]
+        if (is.null(xj))
+            next
+
+        if (length(dim(xj)) <= 1) {
+            if (is.object(xj)) {
+                y[[j]] <- xj[i]
+            } else {
+                y[[j]] <- .Call(rframe_subset, xj, inum)
+            }
+        } else {
+            y[[j]] <- xj[i, , drop = FALSE]
+        }
+    }
+
+    names(y) <- names(x)
+    x <- y
 
     attr(x, "dataset.nrow") <- nrow
     attr(x, "dataset.keys") <- keys
     class(x) <- c("dataset", "record")
 
     x
+}
+
+
+elt_subset <- function(elt, i)
+{
+    if (length(dim(elt)) <= 1) {
+        if (is.object(elt)) {
+            elt[i]
+        } else {
+            i <- as.numeric(i)
+        }
+    } else {
+        elt[i, , drop = FALSE]
+    }
 }
 
 
