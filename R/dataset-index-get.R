@@ -67,7 +67,28 @@ row_subset <- function(x, i)
         i <- arg_row_subscript(i, nrow, keys, TRUE)
         keys <- attr(i, "keys", TRUE)
         nrow <- length(i)
-        x <- lapply(x, elt_subset, i)
+        n    <- length(x)
+
+        y <- vector("list", n)
+
+        for (j in seq_len(n)) {
+            xj <- x[[j]]
+            if (is.null(xj))
+                next
+            if (length(dim(xj)) <= 1) {
+                if (is.object(xj)) {
+                    y[[j]] <- xj[i]
+                } else {
+                    y[[j]] <- .subset(xj, i)
+                }
+            } else {
+                y[[j]] <- xj[i, , drop = FALSE]
+            }
+        }
+
+        names(y) <- names(x)
+        x <- y
+
     } else {
         names <- names(x)
         attributes(x) <- NULL
@@ -79,16 +100,6 @@ row_subset <- function(x, i)
     class(x) <- c("dataset", "record")
 
     x
-}
-
-
-elt_subset <- function(x, i)
-{
-    if (length(dim(x)) <= 1L) {
-        x[i]
-    } else {
-        x[i, , drop = FALSE]
-    }
 }
 
 
