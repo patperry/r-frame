@@ -37,7 +37,7 @@ arg_index <- function(value, n, names, get)
 
     if (is.numeric(value)) {
         i <- trunc(value)
-        if (!isTRUE(1 <= i && i < Inf)) {
+        if (!isTRUE(all(1 <= i & i < Inf))) {
             stop(sprintf("invalid index (%s)", value))
         } else if (get && i > n) {
             stop(sprintf("bounds error: index is %.0f, maximum is %.0f", i, n))
