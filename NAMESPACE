@@ -183,7 +183,9 @@ S3method(`keys<-`, keyset)
 ### scope
 
 export(scope)
-S3method(scope, default) ; export(scope.default)
+export(scopeQuoted)
+S3method(scopeQuoted, default) ; export(scopeQuoted.default)
+S3method(scopeQuoted, dataset) ; export(scopeQuoted.dataset)
 
 
 ## old # exports (need fixing)

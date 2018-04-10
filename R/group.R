@@ -38,9 +38,8 @@ group <- function(`_data`, ...)
 group.default <- function(`_data`, ...)
 {
     `_data` <- as.dataset(`_data`)
-    by      <- substitute(cbind.dataset(...))
-    by      <- eval.parent(call("scope", `_data`, by))
-
+    by      <- scopeQuoted.dataset(`_data`, substitute(cbind.dataset(...)),
+                                   parent.frame())
     group.dataset(`_data`, I(by))
 }
 
@@ -48,8 +47,8 @@ group.default <- function(`_data`, ...)
 group.dataset <- function(`_data`, ...)
 {
     `_data` <- as.dataset(`_data`)
-    by      <- substitute(cbind.dataset(...))
-    by      <- eval.parent(call("scope", `_data`, by))
+    by      <- scopeQuoted.dataset(`_data`, substitute(cbind.dataset(...)),
+                                   parent.frame())
 
     n   <- nrow(`_data`)
     nby <- nrow(by)

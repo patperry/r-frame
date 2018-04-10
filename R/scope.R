@@ -1,18 +1,31 @@
 
 scope <- function(x, expr, envir = NULL)
 {
-    UseMethod("scope")
+    expr  <- substitute(expr)
+    envir <- if (is.null(envir)) parent.frame() else as.environment(envir)
+    scopeQuoted(x, expr, envir)
 }
 
 
-scope.default <- function(x, expr, envir = NULL)
+scopeQuoted <- function(x, expr, envir = NULL)
 {
-    x     <- if (is.record(x) || is.data.frame(x)) x else as.list(x)
-    expr  <- substitute(expr)
-    envir <- if (is.null(envir)) parent.frame() else as.environment(envir)
+    UseMethod("scopeQuoted")
+}
 
-    expr <- eval_I(expr, envir)
+
+scopeQuoted.default <- function(x, expr, envir = NULL)
+{
+    envir <- if (is.null(envir)) parent.frame() else as.environment(envir)
+    expr  <- eval_I(expr, envir)
     eval(expr, x, envir)
+}
+
+
+scopeQuoted.dataset <- function(x, expr, envir = NULL)
+{
+    x     <- as.dataset(x)
+    envir <- if (is.null(envir)) parent.frame() else as.environment(envir)
+    scopeQuoted.default(x, expr, envir)
 }
 
 

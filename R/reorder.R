@@ -15,10 +15,9 @@
 
 reorder.dataset <- function(x, ...)
 {
-    x     <- as.dataset(x)
-    exprs <- substitute(list(...))
+    x <- as.dataset(x)
+    i <- scopeQuoted.dataset(x, substitute(list(...)), parent.frame())
 
-    i <- eval.parent(call("scope", x, exprs))
     if (length(i) == 0) {
         return(x)
     }

@@ -11,6 +11,7 @@
 ^README[.]Rmd$
 ^TODO[.]md$
 ^appveyor[.]yml$
+^bench$
 ^dist$
 ^docs$
 ^vignettes/.*[.]in$
