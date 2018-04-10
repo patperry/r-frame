@@ -44,6 +44,7 @@ arg_subscript <- function(value, n, names, get)
             }
 
             if (get) {
+                value <- value[value > 0]
                 bounds <- value > n
                 if (any(bounds)) {
                     i <- which(bounds)[[1]]

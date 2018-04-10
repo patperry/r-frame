@@ -66,7 +66,6 @@ row_subset <- function(x, i)
     if (!is.null(i)) {
         i <- arg_row_subscript(i, nrow, keys, TRUE)
         keys <- attr(i, "keys", TRUE)
-        i    <- i[i > 0]
         nrow <- length(i)
         x <- lapply(x, elt_subset, i)
     } else {
