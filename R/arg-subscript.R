@@ -96,6 +96,7 @@ arg_subscript <- function(value, n, names, get)
         value <- index
     }
 
+    storage.mode(value) <- "numeric"
     value
 }
 

@@ -75,20 +75,18 @@ row_subset <- function(x, i)
     keys <- attr(i, "keys", TRUE)
     nrow <- length(i)
     n    <- length(x)
-    inum <- as.numeric(i)
 
     y <- vector("list", n)
 
     for (j in seq_len(n)) {
         xj <- x[[j]]
-        if (is.null(xj))
-            next
-
-        if (length(dim(xj)) <= 1) {
+        if (is.null(xj)) {
+            # pass
+        } else if (length(dim(xj)) <= 1) {
             if (is.object(xj)) {
                 y[[j]] <- xj[i]
             } else {
-                y[[j]] <- .Call(rframe_subset, xj, inum)
+                y[[j]] <- .Call(rframe_subset, xj, i)
             }
         } else {
             y[[j]] <- xj[i, , drop = FALSE]
