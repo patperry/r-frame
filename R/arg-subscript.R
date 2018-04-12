@@ -9,11 +9,8 @@ arg_subscript <- function(value, n, names, get)
         stop(sprintf("subscript is a rank-%.0f array", r))
     }
 
-    if (get) {
-        vnames <- names(value)
-    }
-    
     if (is.object(value)) {
+        vnames <- names(value)
         if (is.numeric(value)) {
             value <- as.numeric(value)
         } else if (is.logical(value)) {
@@ -21,52 +18,18 @@ arg_subscript <- function(value, n, names, get)
         } else {
             value <- as.character(value)
         }
-        if (get) {
-            names(value) <- vnames
-        }
+        names(value) <- vnames
     }
 
-    if (is.numeric(value)) {
-        if (anyNA(value)) {
-            stop("numeric subscript cannot contain NA values")
-        }
-
-        if (length(value) == 0) {
-            # pass
-        } else if (isTRUE(value[[1]] < 0)) {
-            if (!all(value < 0)) {
-                stop("numeric subscript cannot contain both negative and non-negative values")
-            }
-            value <- seq_len(n)[value]
-        } else {
-            if (!all(value >= 0)) {
-                stop("numeric subscript cannot contain both negative and non-negative values")
-            }
-
-            if (get) {
-                value <- value[value > 0]
-                bounds <- value > n
-                if (any(bounds)) {
-                    i <- which(bounds)[[1]]
-                    vi <- value[[i]]
-                    fmt <- "bounds error: index is %.0f, maximum is %.0f"
-                    stop(simpleError(sprintf(fmt, vi, n), call))
-                }
-            }
-        }
-    } else if (is.logical(value)) {
-        nvalue <- length(value)
-        if (nvalue != n) {
-            fmt <- "mismatch: logical subscript length is %.0f, should be %.0f"
-            stop(simpleError(sprintf(fmt, nvalue, n), call))
-        }
-
-        value <- which(value)
-        if (get) {
-            names(value) <- vnames[value]
-        }
+    if (!is.character(value)) {
+        return(.Call(rframe_subscript, value, n, names, get))
     } else if (is.character(value)) {
         index <- match(value, names, 0)
+        index <- as.numeric(index)
+
+        if (get) {
+            vnames <- names(value)
+        }
 
         if (!get || is.null(vnames)) {
             vnames <- value
@@ -96,7 +59,6 @@ arg_subscript <- function(value, n, names, get)
         value <- index
     }
 
-    storage.mode(value) <- "numeric"
     value
 }
 

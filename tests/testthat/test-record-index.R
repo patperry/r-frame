@@ -29,16 +29,16 @@ test_that("numeric object", {
 
 test_that("numeric NA", {
     x <- record(1)
-    expect_error(x[NA_real_], "numeric subscript cannot contain NA values")
+    expect_error(x[NA_real_], "numeric subscript contains an NA value")
 })
 
 
 test_that("mixed sign", {
     x <- record(1)
-    expect_error(x[c(0, -1)],
-                 "numeric subscript cannot contain both negative and non-negative values")
-    expect_error(x[c(-1, 0)],
-                 "numeric subscript cannot contain both negative and non-negative values")
+    expect_error(x[c(0, -1, 1)],
+                 "numeric subscript contains both positive and negative values")
+    expect_error(x[c(1, -1, 0)],
+                 "numeric subscript contains both positive and negative values")
 })
 
 
@@ -173,7 +173,7 @@ test_that("replace wrong number", {
 
 test_that("replace with 0", {
     x <- record(a = 1, b = 2, c = 3, d = 4)
-    x[c(0, 0, 1)] <- c(100, 200, 300)
+    x[c(0, 0, 1)] <- 300
     expect_equal(x, record(a = 300, b = 2, c = 3, d = 4))
 })
 

@@ -9,7 +9,6 @@ static int rframe_equals_raw(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2);
 static int rframe_equals_integer(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2);
 static int rframe_equals_double(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2);
 static int rframe_equals_complex(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2);
-static int rframe_equals_character(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2);
 
 
 int rframe_equals_dataset(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2)

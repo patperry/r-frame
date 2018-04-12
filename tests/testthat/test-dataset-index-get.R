@@ -24,7 +24,7 @@ test_that("indexing with negative column number works", {
 test_that("indexing with mixed sign fails", {
     x <- as.dataset(mtcars)
     j <- c(-5, -3, 7)
-    expect_error(x[j], "numeric subscript cannot contain both negative and non-negative values")
+    expect_error(x[j], "numeric subscript contains both positive and negative values")
 })
 
 
@@ -38,7 +38,7 @@ test_that("indexing with out of bounds positive fails", {
 test_that("indexing with NA fails", {
     x <- as.dataset(mtcars)
     j <- c(seq_along(mtcars)[-1], NA)
-    expect_error(x[j], "numeric subscript cannot contain NA values")
+    expect_error(x[j], "numeric subscript contains an NA value")
 })
 
 
