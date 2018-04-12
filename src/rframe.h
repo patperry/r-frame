@@ -24,7 +24,6 @@ SEXP rframe_rowid_keyset(SEXP keyset_, SEXP x_, SEXP def_);
 SEXP rframe_unique(SEXP x_);
 
 int rframe_equals_dataset(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2);
-int rframe_equals_character(SEXP x1_, R_xlen_t i1, SEXP x2_, R_xlen_t i2);
 
 void rframe_hash_init(uint64_t *hash, R_xlen_t n);
 void rframe_hash_dataset(uint64_t *hash, R_xlen_t n, SEXP x_);
