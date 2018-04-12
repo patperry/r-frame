@@ -187,17 +187,6 @@ static SEXP rframe_subscript_logical(SEXP value_, R_xlen_t n, int get)
 }
 
 
-static SEXP rframe_subscript_character(SEXP value_, R_xlen_t n,
-                                       SEXP names_, int get)
-{
-    (void)value_;
-    (void)n;
-    (void)names_;
-    (void)get;
-    return R_NilValue;
-}
-
-
 SEXP rframe_subscript(SEXP value_, SEXP n_, SEXP names_, SEXP get_)
 {
     SEXP ans_;
@@ -223,10 +212,6 @@ SEXP rframe_subscript(SEXP value_, SEXP n_, SEXP names_, SEXP get_)
 
     case LGLSXP:
         ans_ = rframe_subscript_logical(value_, n, get);
-        break;
-
-    case STRSXP:
-        ans_ = rframe_subscript_character(value_, n, names_, get);
         break;
 
     default:
