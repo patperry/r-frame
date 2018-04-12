@@ -199,6 +199,8 @@ SEXP rframe_subscript(SEXP value_, SEXP n_, SEXP names_, SEXP get_)
         n = (R_xlen_t)INTEGER(n_)[0];
     }
 
+    (void)names_;
+
     get = LOGICAL(get_)[0] == TRUE;
 
     switch (TYPEOF(value_)) {
