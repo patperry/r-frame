@@ -22,24 +22,25 @@ arg_subscript <- function(value, n, names, get)
     }
 
     if (!is.character(value)) {
-        return(.Call(rframe_subscript, value, n, names, get))
-    } else if (is.character(value)) {
-        index <- match(value, names, 0)
-        index <- as.numeric(index)
+        value <- .Call(rframe_subscript, value, n, names, get)
+    } else {
+        index <- match(value, names, 0L)
 
         if (get) {
             vnames <- names(value)
+            if (is.null(vnames)) {
+                vnames <- value
+            } else {
+                empty <- is.na(vnames) | !nzchar(vnames)
+                vnames[empty] <- value[empty]
+            }
+        } else {
+            vnames <- value
         }
 
-        if (!get || is.null(vnames)) {
-            vnames <- value
-        } else {
-            empty <- is.na(vnames) | !nzchar(vnames)
-            vnames[empty] <- value[empty]
-        }
         names(index) <- vnames
 
-        new <- which(index == 0)
+        new <- which(index == 0L)
         nnew <- length(new)
         if (nnew > 0) {
             if (get) {
@@ -65,7 +66,7 @@ arg_subscript <- function(value, n, names, get)
 
 arg_row_subscript <- function(value, n, keys, get)
 {
-    if (is.record(value) || (is.list(value) && !is.object(value))) {
+    if (is.record(value)) {
         value <- as.dataset(value)
         keys2 <- keys(value)
         value <- rowid(keys, value)
